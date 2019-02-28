@@ -89,9 +89,9 @@
     tabs: true,
     motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
+      applicationID: '2A50TFF1V2',
+      apiKey: '0ec01827ea5e941c4a16bcaa9191bfd0',
+      indexName: 'hexo_next',
       hits: {"per_page":10},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     }
@@ -104,18 +104,18 @@
 
 
 
-  <meta name="description" content="一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。">
+  <meta name="description" content="以前的笔记一直写在印象笔记上，因为只是写给自己看的，基本上都写得很乱。有些笔记现在回头去看，自己都看不懂了。听说大佬都是写博客的，能把学到的知识清楚地讲出来让别人能听懂，自己才是真的懂了。为了向大佬看齐，一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。">
 <meta name="keywords" content="hexo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo搭建博客">
 <meta property="og:url" content="http://zenlian.github.io/2019/02/27/Hexo搭建博客/index.html">
-<meta property="og:site_name" content="ZenLian&#39;s Blog">
-<meta property="og:description" content="一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。">
+<meta property="og:site_name" content="盗梦空间">
+<meta property="og:description" content="以前的笔记一直写在印象笔记上，因为只是写给自己看的，基本上都写得很乱。有些笔记现在回头去看，自己都看不懂了。听说大佬都是写博客的，能把学到的知识清楚地讲出来让别人能听懂，自己才是真的懂了。为了向大佬看齐，一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-02-27T16:54:27.960Z">
+<meta property="og:updated_time" content="2019-02-28T11:20:41.948Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo搭建博客">
-<meta name="twitter:description" content="一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。">
+<meta name="twitter:description" content="以前的笔记一直写在印象笔记上，因为只是写给自己看的，基本上都写得很乱。有些笔记现在回头去看，自己都看不懂了。听说大佬都是写博客的，能把学到的知识清楚地讲出来让别人能听懂，自己才是真的懂了。为了向大佬看齐，一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。">
 
 
 
@@ -132,7 +132,7 @@
   };
 </script>
 
-  <title>Hexo搭建博客 | ZenLian's Blog</title>
+  <title>Hexo搭建博客 | 盗梦空间</title>
   
 
 
@@ -191,10 +191,14 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">ZenLian's Blog</span>
+        <span class="site-title">盗梦空间</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
+    
+      
+        <p class="site-subtitle">Zenlian's Blog</p>
+      
     
     
   </div>
@@ -293,11 +297,46 @@
 
       
       
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
     </ul>
   
 
   
 
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
   
 </nav>
 
@@ -318,7 +357,7 @@
 
   
 
-  <a href="https://github.com/zenlian" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL3plbmxpYW4=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></span>
 
 
 
@@ -351,13 +390,13 @@
     <link itemprop="mainEntityOfPage" href="http://zenlian.github.io/2019/02/27/Hexo搭建博客/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zen Lian">
+      <meta itemprop="name" content="Zenlian">
       <meta itemprop="description" content="努力！奋斗！">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZenLian's Blog">
+      <meta itemprop="name" content="盗梦空间">
     </span>
 
     
@@ -394,22 +433,6 @@
               <time title="创建时间：2019-02-27 23:30:03" itemprop="dateCreated datePublished" datetime="2019-02-27T23:30:03+08:00">2019-02-27</time>
             
 
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-02-28 00:54:27" itemprop="dateModified" datetime="2019-02-28T00:54:27+08:00">2019-02-28</time>
-              
             
           </span>
 
@@ -454,7 +477,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">37</span>
+                <span title="本文字数">2.2k</span>
               
 
               
@@ -468,7 +491,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">2 分钟</span>
               
             </div>
           
@@ -488,8 +511,52 @@
       
 
       
-        <p>一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。</p>
+        <p>以前的笔记一直写在印象笔记上，因为只是写给自己看的，基本上都写得很乱。有些笔记现在回头去看，自己都看不懂了。听说大佬都是写博客的，能把学到的知识清楚地讲出来让别人能听懂，自己才是真的懂了。为了向大佬看齐，一时兴起，想把笔记从印象笔记迁移到博客上，于是有了这篇文章和这个网站。</p>
 <a id="more"></a>
+<p>当然，我还是喜欢印象笔记的，毕竟用了这么多年了，零零碎碎的东西以后还记在那里，系统性的就决定由这个博客接管了。这里的文章主要放学习笔记，以后也可能会写些其他东西。</p>
+<p>下面记录搭建和配置博客的过程吧。</p>
+<h1 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h1><p>Hexo和Next的安装过程网上有很多，这里就不赘述了。可以参考【<span class="exturl" data-url="aHR0cHM6Ly8xMS50dC9wb3N0cy8yMDE4L3NldC11cC1oZXhvLXdpdGgtY29kaW5nLWFuZC1naXRodWIv" title="https://11.tt/posts/2018/set-up-hexo-with-coding-and-github/">基于Hexo+Coding+Github搭建个人博客的全过程 | 十一種情緒的堆棧<i class="fa fa-external-link"></i></span>】这篇文章。</p>
+<p>其实默认的主题Landcsape还挺好看的，所以我选择Next。</p>
+<h1 id="Next配置"><a href="#Next配置" class="headerlink" title="Next配置"></a>Next配置</h1><h2 id="菜单栏配置"><a href="#菜单栏配置" class="headerlink" title="菜单栏配置"></a>菜单栏配置</h2><p>默认菜单栏只有<code>首页</code>和<code>归档</code>，要为菜单栏添加<code>标签</code>和<code>分类</code>，更改<code>next/_config.yml</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">menu:</span></span><br><span class="line"><span class="attr">  home:</span> <span class="string">/</span> <span class="string">||</span> <span class="string">home</span></span><br><span class="line">  <span class="comment">#about: /about/ || user</span></span><br><span class="line"><span class="attr">  tags:</span> <span class="string">/tags/</span> <span class="string">||</span> <span class="string">tags</span></span><br><span class="line"><span class="attr">  categories:</span> <span class="string">/categories/</span> <span class="string">||</span> <span class="string">th</span></span><br><span class="line"><span class="attr">  archives:</span> <span class="string">/archives/</span> <span class="string">||</span> <span class="string">archive</span></span><br><span class="line">  <span class="comment">#schedule: /schedule/ || calendar</span></span><br><span class="line">  <span class="comment">#sitemap: /sitemap.xml || sitemap</span></span><br><span class="line">  <span class="comment">#commonweal: /404/ || heartbeat</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Enable/Disable menu icons / item badges.</span></span><br><span class="line"><span class="attr">menu_settings:</span></span><br><span class="line"><span class="attr">  icons:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  badges:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>也就是将<code>menu.tags</code>字段和<code>menu.catecories</code>字段解注释，顺便将<code>menu_settings.badges</code>字段解注释以显示标签、分类和文章的数量。</p>
+<p>此时博客菜单栏已经有<code>标签</code>和<code>分类</code>了，但是点进去发现无法进入网页，还需要生成<code>标签</code>和<code>分类</code>的页面。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> your-hexo-site</span><br><span class="line">$ hexo new page tags</span><br></pre></td></tr></table></figure>
+<p>在<code>source</code>目录下会生成一个<code>tags</code>目录，编辑其中的<code>index.md</code>文件，将<code>type</code>字段改为<code>&quot;tags&quot;</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: tags</span><br><span class="line">date: 2019-01-11 19:51:28</span><br><span class="line">type: &quot;tags&quot;</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<p>这样<code>tags</code>页面就建好了，对于<code>categories</code>页面也这样操作一遍就行了。</p>
+<h2 id="侧边栏配置"><a href="#侧边栏配置" class="headerlink" title="侧边栏配置"></a>侧边栏配置</h2><p>添加社交链接，前面是链接，后面是图标（一直没找到合适的豆瓣图标）</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">social:</span></span><br><span class="line"><span class="attr">  GitHub:</span> <span class="attr">https://github.com/zenlian</span> <span class="string">||</span> <span class="string">github</span></span><br><span class="line"><span class="attr">  E-Mail:</span> <span class="attr">mailto:zeninglian@gmail.com</span> <span class="string">||</span> <span class="string">envelope</span></span><br><span class="line"><span class="attr">  Steam:</span> <span class="attr">https://steamcommunity.com/profiles/76561198316675758</span> <span class="string">||</span> <span class="string">steam</span></span><br><span class="line"><span class="attr">  Douban:</span> <span class="attr">https://www.douban.com/people/73582537/</span> <span class="string">||</span> <span class="string">film</span></span><br></pre></td></tr></table></figure>
+<p>添加置顶按钮并显示百分比：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sidebar:</span></span><br><span class="line">  <span class="comment"># Back to top in sidebar.</span></span><br><span class="line"><span class="attr">  b2t:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># Scroll percent label in b2t button.</span></span><br><span class="line"><span class="attr">  scrollpercent:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<h2 id="脚注配置"><a href="#脚注配置" class="headerlink" title="脚注配置"></a>脚注配置</h2><p>添加建站时间：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">footer:</span></span><br><span class="line"><span class="attr">  since:</span> <span class="number">2019</span></span><br></pre></td></tr></table></figure>
+<p>更改页面脚注为跳动的红心：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">footer:</span></span><br><span class="line"><span class="attr">  icon:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">heart</span></span><br><span class="line"><span class="attr">    animated:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    color:</span> <span class="string">"#f00000"</span></span><br></pre></td></tr></table></figure>
+<p><code>footer.icon.name</code>字段表示图标名，可以在<span class="exturl" data-url="aHR0cHM6Ly9mb250YXdlc29tZS5jb20vaWNvbnM=" title="https://fontawesome.com/icons">Font Awesome<i class="fa fa-external-link"></i></span>网站上找到合适的图标。</p>
+<p>实现效果像这样<i class="with-love fa fa-heart" id="animate"></i></p>
+<h2 id="文章发布配置"><a href="#文章发布配置" class="headerlink" title="文章发布配置"></a>文章发布配置</h2><p>点开阅读全文从头开始：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">scroll_to_more:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<p>保存阅读位置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">save_scroll:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>不显示更改时间：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">post_meta:</span></span><br><span class="line"><span class="attr">  updated_at:</span></span><br><span class="line"><span class="attr">    enabled:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<p>代码块显示<code>复制</code>按钮及<code>已复制</code>信息：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">codeblock:</span></span><br><span class="line"><span class="attr">  copy_button:</span></span><br><span class="line"><span class="attr">    enable:</span> <span class="literal">true</span></span><br><span class="line">    <span class="comment"># Show text copy result</span></span><br><span class="line"><span class="attr">    show_result:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>更改代码高亮风格：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">highlight_theme:</span> <span class="string">night</span></span><br></pre></td></tr></table></figure>
+<h2 id="动画效果配置"><a href="#动画效果配置" class="headerlink" title="动画效果配置"></a>动画效果配置</h2><p>禁用加载动画：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">motion:</span></span><br><span class="line"><span class="attr">  enable:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<h2 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h2><p>指向<span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlvLw==" title="https://hexo.io/">外部网站<i class="fa fa-external-link"></i></span>的链接后面会显示一个箭头：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">exturl:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>右上角显示<code>Github</code>角标：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">github_banner:</span> <span class="attr">https://github.com/zenlian</span> <span class="string">||</span> <span class="string">Follow</span> <span class="string">me</span> <span class="string">on</span> <span class="string">GitHub</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ol>
+<li><span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlvL3poLWNuL2RvY3Mv" title="https://hexo.io/zh-cn/docs/">文档 | Hexo<i class="fa fa-external-link"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZy9kb2NzL2dldHRpbmctc3RhcnRlZC8=" title="https://theme-next.org/docs/getting-started/">Getting Started | NexT<i class="fa fa-external-link"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly8xMS50dC9wb3N0cy8yMDE4L3NldC11cC1oZXhvLXdpdGgtY29kaW5nLWFuZC1naXRodWIv" title="https://11.tt/posts/2018/set-up-hexo-with-coding-and-github/">基于Hexo+Coding+Github搭建个人博客的全过程 | 十一種情緒的堆棧<i class="fa fa-external-link"></i></span></li>
+</ol>
 
       
     </div>
@@ -578,12 +645,21 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">Zen Lian</p>
+              <p class="site-author-name" itemprop="name">Zenlian</p>
               <p class="site-description motion-element" itemprop="description">努力！奋斗！</p>
           </div>
 
@@ -653,7 +729,7 @@
                   
                     
                   
-                  <a href="https://github.com/zenlian" title="GitHub &rarr; https://github.com/zenlian" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3plbmxpYW4=" title="GitHub &rarr; https://github.com/zenlian"><i class="fa fa-fw fa-github"></i>GitHub</span>
                 </span>
               
                 <span class="links-of-author-item">
@@ -664,7 +740,7 @@
                   
                     
                   
-                  <a href="mailto:zeninglian@gmail.com" title="E-Mail &rarr; mailto:zeninglian@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  <span class="exturl" data-url="bWFpbHRvOnplbmluZ2xpYW5AZ21haWwuY29t" title="E-Mail &rarr; mailto:zeninglian@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
                 </span>
               
                 <span class="links-of-author-item">
@@ -675,7 +751,7 @@
                   
                     
                   
-                  <a href="https://steamcommunity.com/profiles/76561198316675758" title="Steam &rarr; https://steamcommunity.com/profiles/76561198316675758" rel="noopener" target="_blank"><i class="fa fa-fw fa-steam"></i>Steam</a>
+                  <span class="exturl" data-url="aHR0cHM6Ly9zdGVhbWNvbW11bml0eS5jb20vcHJvZmlsZXMvNzY1NjExOTgzMTY2NzU3NTg=" title="Steam &rarr; https://steamcommunity.com/profiles/76561198316675758"><i class="fa fa-fw fa-steam"></i>Steam</span>
                 </span>
               
                 <span class="links-of-author-item">
@@ -686,7 +762,7 @@
                   
                     
                   
-                  <a href="https://www.douban.com/people/73582537/" title="Douban &rarr; https://www.douban.com/people/73582537/" rel="noopener" target="_blank"><i class="fa fa-fw fa-film"></i>Douban</a>
+                  <span class="exturl" data-url="aHR0cHM6Ly93d3cuZG91YmFuLmNvbS9wZW9wbGUvNzM1ODI1Mzcv" title="Douban &rarr; https://www.douban.com/people/73582537/"><i class="fa fa-fw fa-film"></i>Douban</span>
                 </span>
               
             </div>
@@ -695,20 +771,6 @@
           
 
           
-          
-            <div class="links-of-blogroll motion-element links-of-blogroll-block">
-              <div class="links-of-blogroll-title">
-                <i class="fa  fa-fw fa-link"></i>
-                Links
-              </div>
-              <ul class="links-of-blogroll-list">
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://zenlian.github.io" title="https://zenlian.github.io">ZenLian</a>
-                  </li>
-                
-              </ul>
-            </div>
           
 
           
@@ -719,6 +781,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装过程"><span class="nav-number">1.</span> <span class="nav-text">安装过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Next配置"><span class="nav-number">2.</span> <span class="nav-text">Next配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#菜单栏配置"><span class="nav-number">2.1.</span> <span class="nav-text">菜单栏配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#侧边栏配置"><span class="nav-number">2.2.</span> <span class="nav-text">侧边栏配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#脚注配置"><span class="nav-number">2.3.</span> <span class="nav-text">脚注配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文章发布配置"><span class="nav-number">2.4.</span> <span class="nav-text">文章发布配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动画效果配置"><span class="nav-number">2.5.</span> <span class="nav-text">动画效果配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他配置"><span class="nav-number">2.6.</span> <span class="nav-text">其他配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">3.</span> <span class="nav-text">References</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -745,7 +824,7 @@
   <span class="with-love" id="animate">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Zen Lian</span>
+  <span class="author" itemprop="copyrightHolder">Zenlian</span>
 
   
     <span class="post-meta-divider">|</span>
@@ -753,14 +832,14 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">3k</span>
+    <span title="站点总字数">5k</span>
   
 
   
 </div>
 
 
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> 强力驱动 v3.8.0</div>
 
 
 
@@ -768,7 +847,7 @@
 
 
 
-  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.0.0</div>
+  <div class="theme-info">主题 – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> v7.0.0</div>
 
 
 
@@ -887,6 +966,19 @@
 
 
 
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=7.0.0"></script>
+
+
 
   
 
@@ -912,6 +1004,8 @@
 
 
   
+  <script src="/js/src/exturl.js?v=7.0.0"></script>
+
 
   
 
