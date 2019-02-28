@@ -89,9 +89,9 @@
     tabs: true,
     motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     algolia: {
-      applicationID: '2A50TFF1V2',
-      apiKey: '0ec01827ea5e941c4a16bcaa9191bfd0',
-      indexName: 'hexo_next',
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
       hits: {"per_page":10},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     }
@@ -107,14 +107,14 @@
   <meta name="description" content="测试一下Hexo的Markdown支持效果，采用的是马克飞象的示例文档。">
 <meta name="keywords" content="hexo,markdown">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Markdown 效果测试">
-<meta property="og:url" content="http://zenlian.github.io/2019/02/23/Markdown-Test/index.html">
+<meta property="og:title" content="Markdown效果测试">
+<meta property="og:url" content="http://zenlian.github.io/2019/02/23/markdown-test/index.html">
 <meta property="og:site_name" content="盗梦空间">
 <meta property="og:description" content="测试一下Hexo的Markdown支持效果，采用的是马克飞象的示例文档。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-02-27T16:59:32.986Z">
+<meta property="og:updated_time" content="2019-02-28T18:11:41.355Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Markdown 效果测试">
+<meta name="twitter:title" content="Markdown效果测试">
 <meta name="twitter:description" content="测试一下Hexo的Markdown支持效果，采用的是马克飞象的示例文档。">
 
 
@@ -122,7 +122,7 @@
 
 
 
-  <link rel="canonical" href="http://zenlian.github.io/2019/02/23/Markdown-Test/">
+  <link rel="canonical" href="http://zenlian.github.io/2019/02/23/markdown-test/">
 
 
 
@@ -132,7 +132,7 @@
   };
 </script>
 
-  <title>Markdown 效果测试 | 盗梦空间</title>
+  <title>Markdown效果测试 | 盗梦空间</title>
   
 
 
@@ -171,6 +171,9 @@
   </style>
 </noscript>
 
+<link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+<script src="\assets\js\Meting.min.js" class="meting-script-marker"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
@@ -272,7 +275,7 @@
       
     
 
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">4</span></a>
 
   </li>
         
@@ -291,7 +294,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">3</span></a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">5</span></a>
 
   </li>
 
@@ -313,26 +316,20 @@
   
     <div class="site-search">
       
-  
-  <div class="algolia-popup popup search-popup">
-    <div class="algolia-search">
-      <div class="algolia-search-input-icon">
-        <i class="fa fa-search"></i>
-      </div>
-      <div class="algolia-search-input" id="algolia-search-input"></div>
-    </div>
-
-    <div class="algolia-results">
-      <div id="algolia-stats"></div>
-      <div id="algolia-hits"></div>
-      <div id="algolia-pagination" class="algolia-pagination"></div>
-    </div>
-
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
     <span class="popup-btn-close">
       <i class="fa fa-times-circle"></i>
     </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
   </div>
-
+  <div id="local-search-result"></div>
+</div>
 
 
 
@@ -381,13 +378,15 @@
   
 
   
+    <div class="reading-progress-bar"></div>
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
   
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://zenlian.github.io/2019/02/23/Markdown-Test/">
+    <link itemprop="mainEntityOfPage" href="http://zenlian.github.io/2019/02/23/markdown-test/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zenlian">
@@ -404,7 +403,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Markdown 效果测试
+          <h1 class="post-title" itemprop="name headline">Markdown效果测试
 
               
             
@@ -448,7 +447,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Hexo/" itemprop="url" rel="index"><span itemprop="name">Hexo</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a></span>
 
                 
                 
@@ -526,7 +525,7 @@
 <p>Markdown 是一种轻量级标记语言，它允许人们使用易读易写的纯文本格式编写文档，然后转换成格式丰富的HTML页面。    —— <span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvTWFya2Rvd24=" title="https://zh.wikipedia.org/wiki/Markdown">维基百科<i class="fa fa-external-link"></i></span></p>
 </blockquote>
 <p>正如您在阅读的这份文档，它使用简单的符号标识不同的标题，将某些文字标记为<strong>粗体</strong>或者<em>斜体</em>，创建一个<span class="exturl" data-url="aHR0cDovL3d3dy5leGFtcGxlLmNvbQ==" title="http://www.example.com">链接<i class="fa fa-external-link"></i></span>或一个脚注[^demo]。下面列举了几个高级功能，更多语法请按<code>Ctrl + /</code>查看帮助。</p>
-<h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@requires_authorization</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">somefunc</span><span class="params">(param1=<span class="string">''</span>, param2=<span class="number">0</span>)</span>:</span></span><br><span class="line">    <span class="string">'''A docstring'''</span></span><br><span class="line">    <span class="keyword">if</span> param1 &gt; param2: <span class="comment"># interesting</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">'Greater'</span></span><br><span class="line">    <span class="keyword">return</span> (param2 - param1 + <span class="number">1</span>) <span class="keyword">or</span> <span class="keyword">None</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeClass</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>message = <span class="string">'''interpreter</span></span><br><span class="line"><span class="string"><span class="meta">... </span>prompt'''</span></span><br></pre></td></tr></table></figure>
+<h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">@requires_authorization</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">somefunc</span><span class="params">(param1=<span class="string">''</span>, param2=<span class="number">0</span>)</span>:</span></span><br><span class="line">    <span class="string">'''A docstring'''</span></span><br><span class="line">    <span class="keyword">if</span> param1 &gt; param2: <span class="comment"># interesting</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">'Greater'</span></span><br><span class="line">    <span class="keyword">return</span> (param2 - param1 + <span class="number">1</span>) <span class="keyword">or</span> <span class="keyword">None</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeClass</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>message = <span class="string">'''interpreter</span></span><br><span class="line"><span class="string"><span class="meta">... </span>prompt'''</span></span><br></pre></td></tr></table></figure>
 <h3 id="LaTeX-公式"><a href="#LaTeX-公式" class="headerlink" title="LaTeX 公式"></a>LaTeX 公式</h3><p>可以创建行内公式，例如 $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$。或者块级公式：</p>
 <p>$$ x = \dfrac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$</p>
 <h3 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h3><table>
@@ -555,9 +554,9 @@
 </tr>
 </tbody>
 </table>
-<h3 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">st=&gt;start: Start</span><br><span class="line">e=&gt;end</span><br><span class="line">op=&gt;operation: My Operation</span><br><span class="line">cond=&gt;condition: Yes or No?</span><br><span class="line"></span><br><span class="line">st-&gt;op-&gt;cond</span><br><span class="line">cond(yes)-&gt;e</span><br><span class="line">cond(no)-&gt;op</span><br></pre></td></tr></table></figure>
+<h3 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">st=&gt;start: Start</span><br><span class="line">e=&gt;end</span><br><span class="line">op=&gt;operation: My Operation</span><br><span class="line">cond=&gt;condition: Yes or No?</span><br><span class="line"></span><br><span class="line">st-&gt;op-&gt;cond</span><br><span class="line">cond(yes)-&gt;e</span><br><span class="line">cond(no)-&gt;op</span><br></pre></td></tr></table></figure>
 <p>以及时序图:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Alice-&gt;Bob: Hello Bob, how are you?</span><br><span class="line">Note right of Bob: Bob thinks</span><br><span class="line">Bob--&gt;Alice: I am good thanks!</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Alice-&gt;Bob: Hello Bob, how are you?</span><br><span class="line">Note right of Bob: Bob thinks</span><br><span class="line">Bob--&gt;Alice: I am good thanks!</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p><strong>提示：</strong>想了解更多，请查看<strong>流程图</strong><span class="exturl" data-url="aHR0cDovL2FkcmFpLmdpdGh1Yi5pby9mbG93Y2hhcnQuanMv" title="http://adrai.github.io/flowchart.js/">语法<i class="fa fa-external-link"></i></span>以及<strong>时序图</strong><span class="exturl" data-url="aHR0cDovL2JyYW1wLmdpdGh1Yi5pby9qcy1zZXF1ZW5jZS1kaWFncmFtcy8=" title="http://bramp.github.io/js-sequence-diagrams/">语法<i class="fa fa-external-link"></i></span>。</p>
 </blockquote>
@@ -590,12 +589,18 @@
 <h2 id="关于收费"><a href="#关于收费" class="headerlink" title="关于收费"></a>关于收费</h2><p><strong>马克飞象</strong>为新用户提供 10 天的试用期，试用期过后需要<a href="maxiang.info/vip.html">续费</a>才能继续使用。未购买或者未及时续费，将不能同步新的笔记。之前保存过的笔记依然可以编辑。</p>
 <h2 id="反馈与建议"><a href="#反馈与建议" class="headerlink" title="反馈与建议"></a>反馈与建议</h2><ul>
 <li>微博：<span class="exturl" data-url="aHR0cDovL3dlaWJvLmNvbS91LzI3ODgzNTQxMTc=" title="http://weibo.com/u/2788354117">@马克飞象<i class="fa fa-external-link"></i></span>，<span class="exturl" data-url="aHR0cDovL3dlaWJvLmNvbS9nZ29jaw==" title="开发者个人账号">@GGock<i class="fa fa-external-link"></i></span></li>
-<li>邮箱：<span class="exturl" data-url="bWFpbHRvOiYjMTA0OyYjeDc1OyYjeDczOyYjMTE2OyYjeDY3OyYjMTExOyYjOTk7JiN4NmI7JiN4NDA7JiN4Njc7JiMxMDk7JiN4NjE7JiMxMDU7JiN4NmM7JiM0NjsmIzk5OyYjeDZmOyYjeDZkOw==" title="mailto:&#104;&#x75;&#x73;&#116;&#x67;&#111;&#99;&#x6b;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;">&#104;&#x75;&#x73;&#116;&#x67;&#111;&#99;&#x6b;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;<i class="fa fa-external-link"></i></span></li>
+<li>邮箱：<span class="exturl" data-url="bWFpbHRvOiYjMTA0OyYjMTE3OyYjMTE1OyYjeDc0OyYjMTAzOyYjMTExOyYjOTk7JiN4NmI7JiM2NDsmI3g2NzsmI3g2ZDsmIzk3OyYjMTA1OyYjMTA4OyYjNDY7JiM5OTsmI3g2ZjsmI3g2ZDs=" title="mailto:&#104;&#117;&#115;&#x74;&#103;&#111;&#99;&#x6b;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#99;&#x6f;&#x6d;">&#104;&#117;&#115;&#x74;&#103;&#111;&#99;&#x6b;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#99;&#x6f;&#x6d;<i class="fa fa-external-link"></i></span></li>
 </ul>
 <hr>
 <p>感谢阅读这份帮助文档。请点击右上角，绑定印象笔记账号，开启全新的记录与分享体验吧。</p>
 <p>[^demo]: 这是一个示例脚注。请查阅 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2ZsZXRjaGVyL011bHRpTWFya2Rvd24vd2lraS9NdWx0aU1hcmtkb3duLVN5bnRheC1HdWlkZSNmb290bm90ZXM=" title="https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide#footnotes">MultiMarkdown 文档<i class="fa fa-external-link"></i></span> 关于脚注的说明。 <strong>限制：</strong> 印象笔记的笔记内容使用 <span class="exturl" data-url="aHR0cHM6Ly9kZXYueWlueGlhbmcuY29tL2RvYy9hcnRpY2xlcy9lbm1sLnBocA==" title="https://dev.yinxiang.com/doc/articles/enml.php">ENML<i class="fa fa-external-link"></i></span> 格式，基于 HTML，但是不支持某些标签和属性，例如id，这就导致<code>脚注</code>和<code>TOC</code>无法正常点击。</p>
+<hr>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ol>
+<li><span class="exturl" data-url="aHR0cHM6Ly9tYXhpYW5nLmlvLw==" title="https://maxiang.io/">马克飞象<i class="fa fa-external-link"></i></span></li>
+</ol>
+<!--威廉古堡-周杰伦-->
 
+    <div id="aplayer-KsohFcRI" class="aplayer aplayer-tag-marker meting-tag-marker" data-id="0046grpK0A1l9G" data-server="tencent" data-type="song" data-mode="circulation" data-autoplay="true" data-mutex="true" data-listmaxheight="340px" data-preload="auto" data-theme="#ad7a86" data-fixed="true" data-lrctype="0"></div>
       
     </div>
 
@@ -633,13 +638,17 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2019/02/18/blog-with-hexo/" rel="next" title="Hexo搭建博客">
+                <i class="fa fa-chevron-left"></i> Hexo搭建博客
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/02/24/搭建git服务器/" rel="prev" title="搭建git服务器">
+              <a href="/2019/02/24/build-a-git-server/" rel="prev" title="搭建git服务器">
                 搭建git服务器 <i class="fa fa-chevron-right"></i>
               </a>
             
@@ -710,7 +719,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-count">5</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -722,6 +731,8 @@
                 <div class="site-state-item site-state-categories">
                   <a href="/categories/index.html">
                     
+                    
+                      
                     
                       
                     
@@ -832,7 +843,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#欢迎使用马克飞象"><span class="nav-number">1.</span> <span class="nav-text">欢迎使用马克飞象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Markdown简介"><span class="nav-number">1.1.</span> <span class="nav-text">Markdown简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#代码块"><span class="nav-number">1.1.1.</span> <span class="nav-text">代码块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LaTeX-公式"><span class="nav-number">1.1.2.</span> <span class="nav-text">LaTeX 公式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表格"><span class="nav-number">1.1.3.</span> <span class="nav-text">表格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流程图"><span class="nav-number">1.1.4.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复选框"><span class="nav-number">1.1.5.</span> <span class="nav-text">复选框</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#印象笔记相关"><span class="nav-number">1.2.</span> <span class="nav-text">印象笔记相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#笔记本和标签"><span class="nav-number">1.2.1.</span> <span class="nav-text">笔记本和标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#笔记标题"><span class="nav-number">1.2.2.</span> <span class="nav-text">笔记标题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快捷编辑"><span class="nav-number">1.2.3.</span> <span class="nav-text">快捷编辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据同步"><span class="nav-number">1.2.4.</span> <span class="nav-text">数据同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#离线存储"><span class="nav-number">1.2.5.</span> <span class="nav-text">离线存储</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑器相关"><span class="nav-number">1.3.</span> <span class="nav-text">编辑器相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置"><span class="nav-number">1.3.1.</span> <span class="nav-text">设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快捷键"><span class="nav-number">1.3.2.</span> <span class="nav-text">快捷键</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于收费"><span class="nav-number">1.4.</span> <span class="nav-text">关于收费</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反馈与建议"><span class="nav-number">1.5.</span> <span class="nav-text">反馈与建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#欢迎使用马克飞象"><span class="nav-number">1.</span> <span class="nav-text">欢迎使用马克飞象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Markdown简介"><span class="nav-number">1.1.</span> <span class="nav-text">Markdown简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#代码块"><span class="nav-number">1.1.1.</span> <span class="nav-text">代码块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LaTeX-公式"><span class="nav-number">1.1.2.</span> <span class="nav-text">LaTeX 公式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表格"><span class="nav-number">1.1.3.</span> <span class="nav-text">表格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流程图"><span class="nav-number">1.1.4.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复选框"><span class="nav-number">1.1.5.</span> <span class="nav-text">复选框</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#印象笔记相关"><span class="nav-number">1.2.</span> <span class="nav-text">印象笔记相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#笔记本和标签"><span class="nav-number">1.2.1.</span> <span class="nav-text">笔记本和标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#笔记标题"><span class="nav-number">1.2.2.</span> <span class="nav-text">笔记标题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快捷编辑"><span class="nav-number">1.2.3.</span> <span class="nav-text">快捷编辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据同步"><span class="nav-number">1.2.4.</span> <span class="nav-text">数据同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#离线存储"><span class="nav-number">1.2.5.</span> <span class="nav-text">离线存储</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑器相关"><span class="nav-number">1.3.</span> <span class="nav-text">编辑器相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置"><span class="nav-number">1.3.1.</span> <span class="nav-text">设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快捷键"><span class="nav-number">1.3.2.</span> <span class="nav-text">快捷键</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于收费"><span class="nav-number">1.4.</span> <span class="nav-text">关于收费</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反馈与建议"><span class="nav-number">1.5.</span> <span class="nav-text">反馈与建议</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">2.</span> <span class="nav-text">References</span></a></li></ol></div>
             
 
           </div>
@@ -872,7 +883,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">5k</span>
+    <span title="站点总字数">9k</span>
   
 
   
@@ -951,6 +962,8 @@
 
 
 
+  
+
 
 
   
@@ -961,6 +974,9 @@
 
   
   <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/reading_progress/reading_progress.js"></script>
 
 
   
@@ -1003,20 +1019,327 @@
 
 
   
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
 
 
-
-  
-  
-  
-  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
-
-  
-  
-  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
-  
-
-  <script src="/js/src/algolia-search.js?v=7.0.0"></script>
 
 
 
@@ -1048,6 +1371,15 @@
 
 
   
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
 
   
   <style>
