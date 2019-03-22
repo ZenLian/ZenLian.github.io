@@ -1,6 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(9)-Traceroute程序]]></title>
+    <url>%2F2019%2F03%2F13%2Ftcp-ip-volumn1-9%2F</url>
+    <content type="text"><![CDATA[Traceroute程序用于跟踪路由。 References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(8)-Traceroute程序]]></title>
+    <url>%2F2019%2F03%2F12%2Ftcp-ip-volumn1-8%2F</url>
+    <content type="text"><![CDATA[Traceroute程序用于跟踪路由。 原理TTL字段每经过一个路由器，TTL字段-1。TTL字段为0时，丢弃该数据报，并向源端发送一份超时ICMP报文。 操作过程向目标主机发送TTL为1的IP数据报，第一个路由器收到该数据报将TTL减1，丢弃该数据报，并回发一份超时ICMP报文。Traceroute程序收到该ICMP报文得到第一个路由器的地址。 再向目标主机发送TTL为2的IP数据报，得到第二个路由器的地址，以此类推。 如何判断是否到达目标主机目标主机收到TTL=1的数据报时，该数据报已经到达目的地，所以目标主机不会发送超时ICMP报文。 判断方法是，将数据报的（UDP）目的端口设为一个不可能的值（大于30000），当数据报到达时，目标主机将回发一份“端口不可达”的ICMP报文。 这样就可以通过区分接收到的ICMP报文是“超时”还是“端口不可达”来判断到达路由器还是目标主机，从而判断什么时候结束。 注意： 返回的ICMP报文中的源IP地址是路由器的入口地址。 References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(7)-Ping程序]]></title>
+    <url>%2F2019%2F03%2F10%2Ftcp-ip-volumn1-7%2F</url>
+    <content type="text"><![CDATA[Ping程序。 TODO References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(6)-ICMP协议]]></title>
+    <url>%2F2019%2F03%2F10%2Ftcp-ip-volumn1-6%2F</url>
+    <content type="text"><![CDATA[ICMP协议。 TODO References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(5)-RARP协议]]></title>
+    <url>%2F2019%2F03%2F08%2Ftcp-ip-volumn1-5%2F</url>
+    <content type="text"><![CDATA[RARP（逆地址解析协议）与ARP协议相反，是在已知硬件地址的情况下，请求IP地址。 TODO References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(4)-ARP协议]]></title>
+    <url>%2F2019%2F03%2F08%2Ftcp-ip-volumn1-4%2F</url>
+    <content type="text"><![CDATA[数据链路层有自己的寻址机制，以太网是根据48bit的以太网地址来确定目的接口的，而不关心IP地址。地址解析协议为IP地址和数据链路层的硬件地址提供映射，ARP将IP地址转为硬件地址，RAPR则将硬件地址转为IP地址。 流程假设链路层是以太网。 发送一个数据包时，IP数据报从IP层传给链路层。 链路层需要填充以太网头部。源地址和协议类型都很容易填入，剩下目的地址，与路由表中的下一站地址相对应。 首先查找本地ARP缓存，看是否有与下一站IP地址对应的硬件地址。若找到，则填入，发送数据报。 若本地ARP缓存中找不到，则广播ARP请求报文，请求拥有该IP地址的主机回应其硬件地址。 收到ARP回应报文，将报文中回应的硬件地址填入以太网头部。 发送IP数据报。 ARP分组格式ARP请求和应答封装在以太网帧中，分组格式如下： 以太网目的地址 一般来说ARP请求是广播的，以太网目的地址全为1；而ARP应答是单播的。 帧类型 0x0806表示ARP。 硬件类型 1表示以太网。 协议类型 0x0800表示IP地址。它的值以太网头部表示IP数据报的类型字段相同，这是有意设计的。 硬件地址长度和协议地址长度 以字节为单位，6和4分别对应以太网硬件地址长度和IP地址长度。 操作类型(op) 1 ARP请求 2 ARP应答 3 RARP请求 4 RARP应答 发送端以太网地址、发送端IP地址、目的以太网地址、目的IP地址 这里有些信息与以太网头部是重复的。 对于一个ARP请求，除目的以太网地址外其他字段都有填充值。 系统收到给自己的ARP请求后，填入自己的硬件地址，然后互换两个目的地址和发送端地址，并把op字段置2发出一个ARP回应。 ARP缓存每台主机上都拥有一个ARP高速缓存，存放最近的IP地址到硬件地址的映射。发送一个IP数据报时，首先在本地ARP缓存中查找目的IP地址对应的硬件地址，不必每次都发送ARP请求报文，从而提高了效率。高速缓存的生存时间一般为20分钟。 我们可以用arp(8)命令查看ARP高速缓存。-e显示所有ARP缓存(linux格式)，-n显示IP地址而不是域名。 $ arp -enAddress HWtype HWaddress Flags Mask Iface192.168.233.1 ether 00:50:56:c0:00:08 C ens33192.168.233.2 ether 00:50:56:ea:30:ed C ens33 ARP缓存更新的情况： 收到ARP请求。ARP请求是广播的，同一网络内任何主机都会收到，从而可根据ARP请求中的发送端IP和MAC地址更新ARP缓存。 收到ARP回应。ARP回应是单播的，只能收到给自己的ARP回应。根据ARP回应中的发送端IP和MAC地址更新ARP缓存。 ARP代理一个网络中的路由器可以代替该网络中的主机发送ARP应答，让外部网络的ARP请求发起者认为路由器就是目的主机，而将分组发送给路由器，再由路由器转发给目的主机。 ARP欺骗也是利用同样的原理，中间主机对所有ARP请求报文进行回复，让所有源主机都将分组发送到中间主机上，以窃取数据。 免费ARP免费ARP指的是系统启动期间，发送ARP查找自己IP地址对应的硬件地址。 作用 确认自己的IP地址是否被占用。如果主机收到了免费ARP请求的回应，说明同一网络上有相同IP地址的其他主机，提醒系统IP配置有误。 更新其他主机的ARP缓存。其他主机收到该免费ARP请求后，可以根据请求中的发送端IP和MAC地址更新ARP缓存。 References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(3)-IP协议]]></title>
+    <url>%2F2019%2F03%2F07%2Ftcp-ip-volumn1-3%2F</url>
+    <content type="text"><![CDATA[IP协议是TCP/IP协议族的核心协议。 IP提供的是不可靠、无连接的协议。 不可靠（unreliable）的意思是它不能保证IP数据报能成功地到达目的地。IP仅提供最好的传输服务。如果发生某种错误时，如某个路由器暂时用完了缓冲区， IP有一个简单的错误处理算法：丢弃该数据报，然后发送ICMP消息报给信源端。任何要求的可靠性必须由上层来提供（如TCP）。 无连接（connectionless）这个术语的意思是IP并不维护任何关于后续数据报的状态信息。每个数据报的处理是相互独立的。这也说明， IP数据报可以不按发送顺序接收。如果一信源向相同的信宿发送两个连续的数据报（先是A，然后是B），每个数据报都是独立地进行路由选择，可能选择不同的路线，因此B可能在A到达之前先到达。 IP首部不含选项的普通IP首部长度固定为20字节，首部格式如下： 网络中传输的字节序为大端，即先传输高字节。比如IP地址为192.168.1.3，先传192，再传168、1、3。然而许多主机都是以小端形式存储数据的，同样的IP地址在主机上从低到高的存储次序为3、1、168、192，所以传输首部之前必须先转换为网络字节序。库函数htons(3)、htonl(3)实现了这个功能。 版本字段 目前的版本号是4，代表IPv4。新一代的IP协议是IPv6。 首部长度 指的是首部占4字节（32bit字）的数目。不含选项的普通IP首部该字段值为5（5个4字节，总共20字节）。 TOS 这8bit中，有4bit的TOS子字段，分别代表最小时延、最大吞吐量、最高可靠性和最小费用。4 bit中只能置其中1 bit。如果所有4 bit均为0，那么就意味着是一般服务。 总长度字段 指的是整个IP数据报的字节数。IP数据报可能会小于以太网的最小数据长度46字节，如果没有总长度字段，IP层就不知道这46字节中哪些是IP数据报，哪些是链路层填充的字节。 标识、标志和片偏移字段 用于IP分片和重组。 TTL 生存时间，每经过一个路由器，该字段值减1。当该字段值为0时，数据报被丢弃，并发送ICMP报文通知源主机。 协议字段 协议字段标识了上层协议是TCP、UDP、ICMP还是IGMP 首部检验和 首部检验和只计算IP首部的检验和，数据部分的校验由上层协议实现。 为了计算一份数据报的IP检验和，首先把检验和字段置为0。然后，对首部中每个16 bit进行二进制反码求和（整个首部看成是由一串16 bit的字组成），结果存在检验和字段中。当收到一份IP数据报后，同样对首部中每个16 bit进行二进制反码的求和。由于接收方在计算过程中包含了发送方存在首部中的检验和，因此，如果首部在传输过程中没有发生任何差错，那么接收方计算的结果应该为全1。如果结果不是全1（即检验和错误），那么IP就丢弃收到的数据报。但是不生成差错报文，由上层去发现丢失的数据报并进行重传。 选项字段 选项字段是可选的，很少被使用。 在有选项字段时，选项字段都是以4字节对齐的，必要时填充0字节，保证IP首部始终是4字节的整数倍，与首部长度字段要求相符。 IP路由选择IP路由选择的概念很简单：根据一个IP数据报的目的IP地址，IP层决定将该报文发给谁。 路由表IP层维护着一张路由表，可以通过route命令查看。 $ route -nKernel IP routing tableDestination Gateway Genmask Flags Metric Ref Use Iface0.0.0.0 192.168.1.1 255.255.255.255 UG 256 0 0 eth0192.168.10.0 192.168.1.1 255.255.255.0 U 256 0 0 eth0192.168.19.90 192.168.1.1 255.255.255.0 UHG 256 0 0 eth0127.0.0.0 0.0.0.0 255.0.0.0 U 256 0 0 lo127.0.0.1 0.0.0.0 255.255.255.255 U 256 0 0 lo 每条路由表项包含以下条目： 目的IP地址（Destination） 可以是主机地址或网络地址，由标志字段（Flags）指定。 若是主机地址，Genmask为255.255.255.255，Flags包含H，指定一台特定的主机。 若是网络地址，子网范围由Genmask指定， 网关（Gateway） 指定下一站的IP地址。 如果下一站是路由器，即目的地址不在与本主机直接相连的网络上，需要通过路由器转发，则Flags包含G。 标志（Flags） U 路由表项有效。 H 目的地址是主机，而不是一个网络。 G 下一站是路由器，而不是直接相连的接口。 接口（Iface） 为数据报的传输指定一个网络接口。 举个例子，========== 关键点 得到目的IP地址后，IP层搜寻路由表寻找匹配的条目。没有匹配条目则采用默认路由。 目的IP地址始终不变。 目的MAC地址始终为下一站的地址。 子网划分为什么要划分子网？A类和B类地址为主机号分配了24位和16位的空间，实际上在一个网络中不会安排如此多的主机。于是在得到一个特定的网络号后，通常对主机号进一步进行划分，分配一定的比特作为子网号，剩下的才用作主机号。 子网掩码主机知道自己的IP地址，同时还需要知道自己所在的子网。子网掩码确定了一个IP地址中多少比特用于子网号，多少比特用于主机号。 References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(2)-链路层]]></title>
+    <url>%2F2019%2F03%2F07%2Ftcp-ip-volumn1-2%2F</url>
+    <content type="text"><![CDATA[原书中讨论了以太网、SLIP和PPP协议，这里只介绍应用最为广泛的以太网链路层协议。 物理地址IP层有IP地址，类似的，链路层也有自己的地址，称为物理地址（或硬件地址）。以太网物理地址是一个48位的地址，通常用十六进制表示。 在linux下终端输入ifconfig可以看到网络接口对应的物理地址，有类似如下的输出。 ether 40:16:7e:99:a0:56 (Ethernet) 其中40:16:7e:99:a0:56就是网卡的物理地址。 帧格式封装链路层对IP层的数据包封装存在两种帧格式，RFC 894（以太网）和IEEE 802封装。主机必须能发送和接收的是以太网封装格式的分组。 两种封装格式如下图： 以太网封装这是主机必须支持的基本封装格式，也是最常见的封装格式。 首先是6个字节的目的地址和6个字节的源地址。 接着是2字节的类型字段，标识着上层数据报的类型。 0x0800：IP数据报 0x0806：ARP 0x8035：RARP 然后是数据。数据长度限制在46~1500字节之间，对于不足46字节的数据（如ARP和RARP），需要填充至46字节；对于超过1500字节的数据，上层需要对数据报进行分片，也就是IP分片。 最后是4字节的CRC校验码，用来校验数据传输的正确性。关于CRC的具体原理可以参考《A PAINLESS GUIDE TO CRC ERROR DETECTION ALGORITHMS》，或者《循环冗余校验（CRC）算法入门引导》。 IEEE 802封装IEEE 802封装格式用长度字段取代了以太网封装中的类型字段，这里的长度指的是后续字段的长度，从LLC头开始到上层数据报结束，但不包括最后的CRC。可以看到长度字段最大为1500（0x05dc），与以太网封装格式中的类型字段不会产生重复，这样主机就可以区分出两种封装格式。 IEEE 802还提供了逻辑链路控制（LLC）等功能，具体字段介绍可参见RFC 1340。 环回接口环回接口允许运行在同一台主机上的客户程序和服务器程序通过TCP/IP进行通信。我们平时输入ifconfig命令看到的lo接口就是环回接口。 $ ifconfig...lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt; mtu 1500 inet 127.0.0.1 netmask 255.0.0.0 inet6 ::1 prefixlen 128 scopeid 0x0&lt;global&gt; loop (Local Loopback) RX packets 0 bytes 0 (0.0 B) RX errors 0 dropped 0 overruns 0 frame 0 TX packets 0 bytes 0 (0.0 B) TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0 可以看到这个接口的IP地址为127.0.0.1，实际上只要是127开头的IP地址都可以，惯例上使用127.0.0.1，并命名为localhost。 下图是环回接口处理IP数据报的过程： 对环回接口的处理是从离开IP层开始的，关键点是： 传给127.0.0.1的数据传给环回接口，不发送到网络上。 传给本机IP地址的数据，传给环回接口，不传给相应的以太网接口也不发送到网络上。 传给广播或多播地址的数据会传给环回接口，同时也会发送到网络上。 MTU如前所述，以太网和IEEE 802.3对数据报的最大长度都有限制，分别是1500字节和1492字节，这称为最大传输单元（MTU）。 如果IP数据报超过了MTU，那么IP层就要对数据报进行分片，使每一片都小于MTU。 路径MTU两台主机之间通过多个网络通信时，各个网络的链路层MTU有可能各不相同。这时起决定性作用的是这条通信链路上最小的MTU，称作路径MTU。 路径MTU取决于选路，从A到B的路由和从B到A的路由有可能不同，因此路径MTU在两个方向上有可能不相等。 RFC 1191描述了路径MTU的发现机制，以后的章节会有介绍。 References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[《TCP-IP详解卷1》学习笔记(1)-概述]]></title>
+    <url>%2F2019%2F03%2F07%2Ftcp-ip-volumn1-1%2F</url>
+    <content type="text"><![CDATA[实验室刚好有这本书，平时没事拿来随手翻一翻，有空的时候再写写读书笔记，希望能坚持吧。 引言为了解决不同主机之间的通信问题，硬件上需要有连接不同计算机的技术，这就是物理层；而软件上需要定义一种通用的协议，其中TCP/IP协议就是应用最广泛的网络协议。 分层OSI有一个七层模型标准，但实际应用最多的是五层协议。 TCP/IP协议从上到下可以分为应用层、运输层、网络层和数据链路层，其实最底层还有物理层，但严格来讲这不属于TCP/IP协议的一部分，TCP/IP协议并不关心物理链路是如何建立的。 IP地址一台计算机的每个网络接口都具有一个IP地址，它是一个32位的二进制数。IP地址分为5类： 通过二进制表示法的前几位可以判断一个IP地址的类别，更简单的方法是通过点分十进制表示法的第一个十进制数： IP地址的分配由互联网络信息中心(InterNIC, Internet Network Information Center)负责，它只分配网络号，主机号由系统管理员负责。现在32位的IP地址已经远远不够用，后面我们会看到对于IP地址耗尽的解决方案。 DNSIP地址很难记，github.com这样的域名就好记多了。然而网络中实际通信用的都是IP地址，那么就需要一个域名到IP地址的转换机制。DNS系统就提供了这样一个机制，它实际上是一个分布式的数据库系统。 端口号网络中的通信实际上不同主机之间的应用程序进行通信，光有IP地址标识一台主机还不够，我们还需要一个16位的端口号来唯一标识主机中的一个应用程序。其中1~1023之间的端口号称为知名端口号，预留给FTP、Telnet等知名服务使用。并且对于相同的服务，TCP/UDP一般使用同一个端口号。在系统文件/etc/services中你可以看到这些服务对应的端口号。 RFCRFC定义了所有关于Internet的标准，其中包括我们将要学习的TCP/IP协议族。 应用编程接口进行网络编程时，内核为应用程序提供了编程接口，应用程序只需要处理通信逻辑，而通信细节（也就是TCP/IP协议的处理）由内核完成。最常用的编程接口是Berkley socket，而SystemV TLI已经被淘汰了。 References 《TCP/IP详解卷1：协议》]]></content>
+      <categories>
+        <category>计算机</category>
+        <category>《TCP-IP详解卷1》</category>
+      </categories>
+      <tags>
+        <tag>网络</tag>
+        <tag>读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[启用Hexo的资源文件夹]]></title>
     <url>%2F2019%2F02%2F28%2Fasset-test%2F</url>
     <content type="text"><![CDATA[Hexo上文章的资源文件少的时候，可以全都放在一个目录下，比如source/images/下存放所有文章的图片。但资源文件一旦多起来，这样的管理方式就会显得很乱，这时就要用到Hexo提供的资源文件夹功能，将同一篇文章的资源文件放在同一个文件夹下，便于管理。 启用资源文件夹启用资源文件夹很简单，只需要在站点配置文件_config.yml中将post_asset_folder选项打开。 hexo/_config.ymlpost_asset_folder: true 打开这个功能后，Hexo将会在你每次通过hexo new命令创建新文章时自动创建一个同名文件夹，这篇文章所有的资源都可以放在这个文件夹里，并在你的文章里通过相对路径引用。 通过相对路径引用使用相对路径的常规markdown语法会导致资源文件在首页不能正常显示，正确的引用方式是通过标签插件。 &#123;% asset_path slug %&#125;&#123;% asset_img slug [title] %&#125;&#123;% asset_link slug [title] %&#125; 比如这篇文章开头的图片为wallpaper.jpg，我将它放在同名资源文件夹里，然后在文章开头通过标签插件引用它： &#123;% asset_img wallpaper.jpg &quot;Why So Serious&quot; %&#125; 这样图片就能正确显示了。 这里asset_img的使用格式与img相同，参照Hexo的标签插件。 References 资源文件夹 | Hexo]]></content>
@@ -36,14 +153,14 @@
   </entry>
   <entry>
     <title><![CDATA[Markdown效果测试]]></title>
-    <url>%2F2019%2F02%2F23%2Fmarkdown-test%2F</url>
-    <content type="text"><![CDATA[测试一下Hexo的Markdown支持效果，采用的是马克飞象的示例文档。 欢迎使用马克飞象@(示例笔记本)[马克飞象|帮助|Markdown] 马克飞象是一款专为印象笔记（Evernote）打造的Markdown编辑器，通过精心的设计与技术实现，配合印象笔记强大的存储和同步功能，带来前所未有的书写体验。特点概述： 功能丰富 ：支持高亮代码块、LaTeX 公式、流程图，本地图片以及附件上传，甚至截图粘贴，工作学习好帮手； 得心应手 ：简洁高效的编辑器，提供桌面客户端以及离线Chrome App，支持移动端 Web； 深度整合 ：支持选择笔记本和添加标签，支持从印象笔记跳转编辑，轻松管理。 [TOC] Markdown简介 Markdown 是一种轻量级标记语言，它允许人们使用易读易写的纯文本格式编写文档，然后转换成格式丰富的HTML页面。 —— 维基百科 正如您在阅读的这份文档，它使用简单的符号标识不同的标题，将某些文字标记为粗体或者斜体，创建一个链接或一个脚注[^demo]。下面列举了几个高级功能，更多语法请按Ctrl + /查看帮助。 代码块@requires_authorizationdef somefunc(param1='', param2=0): '''A docstring''' if param1 &gt; param2: # interesting print 'Greater' return (param2 - param1 + 1) or Noneclass SomeClass: pass&gt;&gt;&gt; message = '''interpreter... prompt''' LaTeX 公式可以创建行内公式，例如 $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$。或者块级公式： $$ x = \dfrac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$ 表格 Item Value Qty Computer 1600 USD 5 Phone 12 USD 12 Pipe 1 USD 234 流程图st=&gt;start: Starte=&gt;endop=&gt;operation: My Operationcond=&gt;condition: Yes or No?st-&gt;op-&gt;condcond(yes)-&gt;econd(no)-&gt;op 以及时序图: Alice-&gt;Bob: Hello Bob, how are you?Note right of Bob: Bob thinksBob--&gt;Alice: I am good thanks! 提示：想了解更多，请查看流程图语法以及时序图语法。 复选框使用 - [ ] 和 - [x] 语法可以创建复选框，实现 todo-list 等功能。例如： 已完成事项 待办事项1 待办事项2 注意：目前支持尚不完全，在印象笔记中勾选复选框是无效、不能同步的，所以必须在马克飞象中修改 Markdown 原文才可生效。下个版本将会全面支持。 印象笔记相关笔记本和标签马克飞象增加了@(笔记本)[标签A|标签B]语法, 以选择笔记本和添加标签。 绑定账号后， 输入(自动会出现笔记本列表，请从中选择。 笔记标题马克飞象会自动使用文档内出现的第一个标题作为笔记标题。例如本文，就是第一行的 欢迎使用马克飞象。 快捷编辑保存在印象笔记中的笔记，右上角会有一个红色的编辑按钮，点击后会回到马克飞象中打开并编辑该笔记。 注意：目前用户在印象笔记中单方面做的任何修改，马克飞象是无法自动感知和更新的。所以请务必回到马克飞象编辑。 数据同步马克飞象通过将Markdown原文以隐藏内容保存在笔记中的精妙设计，实现了对Markdown的存储和再次编辑。既解决了其他产品只是单向导出HTML的单薄，又规避了服务端存储Markdown带来的隐私安全问题。这样，服务端仅作为对印象笔记 API调用和数据转换之用。 隐私声明：用户所有的笔记数据，均保存在印象笔记中。马克飞象不存储用户的任何笔记数据。 离线存储马克飞象使用浏览器离线存储将内容实时保存在本地，不必担心网络断掉或浏览器崩溃。为了节省空间和避免冲突，已同步至印象笔记并且不再修改的笔记将删除部分本地缓存，不过依然可以随时通过文档管理打开。 注意：虽然浏览器存储大部分时候都比较可靠，但印象笔记作为专业云存储，更值得信赖。以防万一，请务必经常及时同步到印象笔记。 编辑器相关设置右侧系统菜单（快捷键Ctrl + M）的设置中，提供了界面字体、字号、自定义CSS、vim/emacs 键盘模式等高级选项。 快捷键帮助 Ctrl + /同步文档 Ctrl + S创建文档 Ctrl + Alt + N最大化编辑器 Ctrl + Enter预览文档 Ctrl + Alt + Enter文档管理 Ctrl + O系统菜单 Ctrl + M 加粗 Ctrl + B插入图片 Ctrl + G插入链接 Ctrl + L提升标题 Ctrl + H 关于收费马克飞象为新用户提供 10 天的试用期，试用期过后需要续费才能继续使用。未购买或者未及时续费，将不能同步新的笔记。之前保存过的笔记依然可以编辑。 反馈与建议 微博：@马克飞象，@GGock 邮箱：&#104;&#x75;&#115;&#116;&#103;&#111;&#x63;&#107;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#109; 感谢阅读这份帮助文档。请点击右上角，绑定印象笔记账号，开启全新的记录与分享体验吧。 [^demo]: 这是一个示例脚注。请查阅 MultiMarkdown 文档 关于脚注的说明。 限制： 印象笔记的笔记内容使用 ENML 格式，基于 HTML，但是不支持某些标签和属性，例如id，这就导致脚注和TOC无法正常点击。 References 马克飞象]]></content>
+    <url>%2F2019%2F02%2F18%2Fmarkdown-test%2F</url>
+    <content type="text"><![CDATA[测试一下Hexo的Markdown支持效果，采用的是马克飞象的示例文档。 欢迎使用马克飞象@(示例笔记本)[马克飞象|帮助|Markdown] 马克飞象是一款专为印象笔记（Evernote）打造的Markdown编辑器，通过精心的设计与技术实现，配合印象笔记强大的存储和同步功能，带来前所未有的书写体验。特点概述： 功能丰富 ：支持高亮代码块、LaTeX 公式、流程图，本地图片以及附件上传，甚至截图粘贴，工作学习好帮手； 得心应手 ：简洁高效的编辑器，提供桌面客户端以及离线Chrome App，支持移动端 Web； 深度整合 ：支持选择笔记本和添加标签，支持从印象笔记跳转编辑，轻松管理。 [TOC] Markdown简介 Markdown 是一种轻量级标记语言，它允许人们使用易读易写的纯文本格式编写文档，然后转换成格式丰富的HTML页面。 —— 维基百科 正如您在阅读的这份文档，它使用简单的符号标识不同的标题，将某些文字标记为粗体或者斜体，创建一个链接或一个脚注[^demo]。下面列举了几个高级功能，更多语法请按Ctrl + /查看帮助。 代码块@requires_authorizationdef somefunc(param1='', param2=0): '''A docstring''' if param1 &gt; param2: # interesting print 'Greater' return (param2 - param1 + 1) or Noneclass SomeClass: pass&gt;&gt;&gt; message = '''interpreter... prompt''' LaTeX 公式可以创建行内公式，例如 $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$。或者块级公式： $$ x = \dfrac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$ 表格 Item Value Qty Computer 1600 USD 5 Phone 12 USD 12 Pipe 1 USD 234 流程图st=&gt;start: Starte=&gt;endop=&gt;operation: My Operationcond=&gt;condition: Yes or No?st-&gt;op-&gt;condcond(yes)-&gt;econd(no)-&gt;op 以及时序图: Alice-&gt;Bob: Hello Bob, how are you?Note right of Bob: Bob thinksBob--&gt;Alice: I am good thanks! 提示：想了解更多，请查看流程图语法以及时序图语法。 复选框使用 - [ ] 和 - [x] 语法可以创建复选框，实现 todo-list 等功能。例如： 已完成事项 待办事项1 待办事项2 注意：目前支持尚不完全，在印象笔记中勾选复选框是无效、不能同步的，所以必须在马克飞象中修改 Markdown 原文才可生效。下个版本将会全面支持。 印象笔记相关笔记本和标签马克飞象增加了@(笔记本)[标签A|标签B]语法, 以选择笔记本和添加标签。 绑定账号后， 输入(自动会出现笔记本列表，请从中选择。 笔记标题马克飞象会自动使用文档内出现的第一个标题作为笔记标题。例如本文，就是第一行的 欢迎使用马克飞象。 快捷编辑保存在印象笔记中的笔记，右上角会有一个红色的编辑按钮，点击后会回到马克飞象中打开并编辑该笔记。 注意：目前用户在印象笔记中单方面做的任何修改，马克飞象是无法自动感知和更新的。所以请务必回到马克飞象编辑。 数据同步马克飞象通过将Markdown原文以隐藏内容保存在笔记中的精妙设计，实现了对Markdown的存储和再次编辑。既解决了其他产品只是单向导出HTML的单薄，又规避了服务端存储Markdown带来的隐私安全问题。这样，服务端仅作为对印象笔记 API调用和数据转换之用。 隐私声明：用户所有的笔记数据，均保存在印象笔记中。马克飞象不存储用户的任何笔记数据。 离线存储马克飞象使用浏览器离线存储将内容实时保存在本地，不必担心网络断掉或浏览器崩溃。为了节省空间和避免冲突，已同步至印象笔记并且不再修改的笔记将删除部分本地缓存，不过依然可以随时通过文档管理打开。 注意：虽然浏览器存储大部分时候都比较可靠，但印象笔记作为专业云存储，更值得信赖。以防万一，请务必经常及时同步到印象笔记。 编辑器相关设置右侧系统菜单（快捷键Ctrl + M）的设置中，提供了界面字体、字号、自定义CSS、vim/emacs 键盘模式等高级选项。 快捷键帮助 Ctrl + /同步文档 Ctrl + S创建文档 Ctrl + Alt + N最大化编辑器 Ctrl + Enter预览文档 Ctrl + Alt + Enter文档管理 Ctrl + O系统菜单 Ctrl + M 加粗 Ctrl + B插入图片 Ctrl + G插入链接 Ctrl + L提升标题 Ctrl + H 关于收费马克飞象为新用户提供 10 天的试用期，试用期过后需要续费才能继续使用。未购买或者未及时续费，将不能同步新的笔记。之前保存过的笔记依然可以编辑。 反馈与建议 微博：@马克飞象，@GGock 邮箱：&#x68;&#117;&#x73;&#116;&#x67;&#111;&#99;&#107;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#99;&#111;&#x6d; 感谢阅读这份帮助文档。请点击右上角，绑定印象笔记账号，开启全新的记录与分享体验吧。 [^demo]: 这是一个示例脚注。请查阅 MultiMarkdown 文档 关于脚注的说明。 限制： 印象笔记的笔记内容使用 ENML 格式，基于 HTML，但是不支持某些标签和属性，例如id，这就导致脚注和TOC无法正常点击。 References 马克飞象]]></content>
       <categories>
         <category>hexo</category>
       </categories>
       <tags>
-        <tag>hexo</tag>
         <tag>markdown</tag>
+        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
