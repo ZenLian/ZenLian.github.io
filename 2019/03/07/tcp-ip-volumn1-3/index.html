@@ -108,10 +108,13 @@
 <meta property="og:site_name" content="Zenlian&#39;s Blog">
 <meta property="og:description" content="IP协议是TCP/IP协议族的核心协议。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-03-18T12:59:41.352Z">
+<meta property="og:image" content="http://zenlian.github.io/2019/03/07/tcp-ip-volumn1-3/3-1.jpg">
+<meta property="og:image" content="http://zenlian.github.io/2019/03/07/tcp-ip-volumn1-3/3-7.jpg">
+<meta property="og:updated_time" content="2019-03-22T15:14:52.168Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《TCP-IP详解卷1》学习笔记(3)-IP协议">
 <meta name="twitter:description" content="IP协议是TCP/IP协议族的核心协议。">
+<meta name="twitter:image" content="http://zenlian.github.io/2019/03/07/tcp-ip-volumn1-3/3-1.jpg">
 
 
 
@@ -290,7 +293,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">14</span></a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">9</span></a>
 
   </li>
 
@@ -486,7 +489,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">2.5k</span>
+                <span title="本文字数">2.8k</span>
               
 
               
@@ -500,7 +503,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">2 分钟</span>
+                <span title="阅读时长">3 分钟</span>
               
             </div>
           
@@ -528,7 +531,7 @@
 <p>无连接（connectionless）这个术语的意思是IP并不维护任何关于后续数据报的状态信息。每个数据报的处理是相互独立的。这也说明， IP数据报可以不按发送顺序接收。如果一信源向相同的信宿发送两个连续的数据报（先是A，然后是B），每个数据报都是独立地进行路由选择，可能选择不同的路线，因此B可能在A到达之前先到达。</p>
 </blockquote>
 <h1 id="IP首部"><a href="#IP首部" class="headerlink" title="IP首部"></a>IP首部</h1><p>不含选项的普通IP首部长度固定为20字节，首部格式如下：</p>
-
+<img src="/2019/03/07/tcp-ip-volumn1-3/3-1.jpg">
 <blockquote>
 <p>网络中传输的字节序为大端，即先传输高字节。比如IP地址为192.168.1.3，先传192，再传168、1、3。然而许多主机都是以小端形式存储数据的，同样的IP地址在主机上从低到高的存储次序为3、1、168、192，所以传输首部之前必须先转换为网络字节序。库函数htons(3)、htonl(3)实现了这个功能。</p>
 </blockquote>
@@ -567,7 +570,7 @@
 </ul>
 <h1 id="IP路由选择"><a href="#IP路由选择" class="headerlink" title="IP路由选择"></a>IP路由选择</h1><p>IP路由选择的概念很简单：根据一个IP数据报的目的IP地址，IP层决定将该报文发给谁。</p>
 <h2 id="路由表"><a href="#路由表" class="headerlink" title="路由表"></a>路由表</h2><p>IP层维护着一张路由表，可以通过<code>route</code>命令查看。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ route -n</span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">0.0.0.0         192.168.1.1     255.255.255.255 UG    256    0        0 eth0</span><br><span class="line">192.168.10.0    192.168.1.1     255.255.255.0   U     256    0        0 eth0</span><br><span class="line">192.168.19.90   192.168.1.1     255.255.255.0   UHG   256    0        0 eth0</span><br><span class="line">127.0.0.0       0.0.0.0         255.0.0.0       U     256    0        0 lo</span><br><span class="line">127.0.0.1       0.0.0.0         255.255.255.255 U     256    0        0 lo</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ route -n</span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">0.0.0.0         192.168.1.1     255.255.255.255 UG    256    0        0 eth0</span><br><span class="line">192.168.10.0    192.168.1.1     255.255.255.0   UG    256    0        0 eth0</span><br><span class="line">192.168.19.90   192.168.1.1     255.255.255.255 UHG   256    0        0 eth0</span><br><span class="line">127.0.0.0       0.0.0.0         255.0.0.0       U     256    0        0 lo</span><br><span class="line">127.0.0.1       0.0.0.0         255.255.255.255 U     256    0        0 lo</span><br></pre></td></tr></table></figure>
 <p>每条路由表项包含以下条目：</p>
 <ul>
 <li><p><strong>目的IP地址（Destination）</strong></p>
@@ -588,7 +591,9 @@
 <p>为数据报的传输指定一个网络接口。</p>
 </li>
 </ul>
-<p>举个例子，==========</p>
+<p>举个例子，以上路由表输出的第二项：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">192.168.10.0    192.168.1.1     255.255.255.0   UG    256    0        0 eth0</span><br></pre></td></tr></table></figure>
+<p>表示目的地址为<code>192.168.10</code>网段的报文，从<code>eth0</code>接口发出，下一站路由器是<code>192.168.1.1</code>。</p>
 <h2 id="关键点"><a href="#关键点" class="headerlink" title="关键点"></a>关键点</h2><ul>
 <li>得到目的IP地址后，IP层搜寻路由表寻找匹配的条目。没有匹配条目则采用默认路由。</li>
 <li>目的IP地址始终不变。</li>
@@ -596,14 +601,15 @@
 </ul>
 <h1 id="子网划分"><a href="#子网划分" class="headerlink" title="子网划分"></a>子网划分</h1><h2 id="为什么要划分子网？"><a href="#为什么要划分子网？" class="headerlink" title="为什么要划分子网？"></a>为什么要划分子网？</h2><p>A类和B类地址为主机号分配了24位和16位的空间，实际上在一个网络中不会安排如此多的主机。于是在得到一个特定的网络号后，通常对主机号进一步进行划分，分配一定的比特作为子网号，剩下的才用作主机号。</p>
 <h2 id="子网掩码"><a href="#子网掩码" class="headerlink" title="子网掩码"></a>子网掩码</h2><p>主机知道自己的IP地址，同时还需要知道自己所在的子网。子网掩码确定了一个IP地址中多少比特用于子网号，多少比特用于主机号。</p>
-
+<img src="/2019/03/07/tcp-ip-volumn1-3/3-7.jpg">
+<p>如上图，子网掩码<code>255.255.255.0</code>表示前24位为网络号和子网号，子网掩码<code>255.255.192.0</code>表示前26位为网络号和子网号。假设主机地址是<code>140.252.1.100</code>，则可以表示为<code>140.252.1.100/24</code>和<code>140.252.1.100/26</code>。</p>
 <hr>
 <h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ol>
 <li>《TCP/IP详解卷1：协议》</li>
 </ol>
 <!--我要的幸福-孙燕姿-->
 
-    <div id="aplayer-OFgYHWyf" class="aplayer aplayer-tag-marker meting-tag-marker" data-id="000zD4ew1qBo82" data-server="tencent" data-type="song" data-mode="circulation" data-autoplay="true" data-mutex="true" data-listmaxheight="340px" data-preload="auto" data-theme="#ad7a86" data-fixed="true" data-volume=" 0.3" data-lrctype="0"></div>
+    <div id="aplayer-ElzrFsIs" class="aplayer aplayer-tag-marker meting-tag-marker" data-id="000zD4ew1qBo82" data-server="tencent" data-type="song" data-mode="circulation" data-autoplay="true" data-mutex="true" data-listmaxheight="340px" data-preload="auto" data-theme="#ad7a86" data-fixed="true" data-volume=" 0.3" data-lrctype="0"></div>
 
       
     </div>
@@ -723,7 +729,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">14</span>
+                    <span class="site-state-item-count">9</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -891,7 +897,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">17k</span>
+    <span title="站点总字数">16k</span>
   
 
   
