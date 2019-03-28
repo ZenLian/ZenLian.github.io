@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "E:\\ZJU\\repository\\java_d\\leetcode"
 		}
 	],
 	"settings": {}
