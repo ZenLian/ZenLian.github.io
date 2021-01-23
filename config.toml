@@ -1,0 +1,4 @@
+baseURL = "zenlian.github.io/"
+languageCode = "en-us"
+title = "ZenLian"
+theme = "hyde"
