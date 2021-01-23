@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: 'Checking out...'
+      uses: actions/checkout@v2
+
     - name: 'Building...'
       uses: reuixiy/hugo-deploy@v1
       env:
