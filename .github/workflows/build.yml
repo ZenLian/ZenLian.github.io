@@ -1,23 +1,30 @@
-name: build
+name: github pages
 
 on:
   push:
     branches:
-    - hugo
+      - hugo  # Set a branch to deploy
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  deploy:
+    runs-on: ubuntu-18.04
     steps:
-    - name: 'Checking out...'
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
 
-    - name: 'Building...'
-      uses: reuixiy/hugo-deploy@v1
-      env:
-        DEPLOY_REPO: ZenLian/ZenLian.github.io
-        DEPLOY_BRANCH: gh-pages
-        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-        TZ: Asia/Shanghai
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          # extended: true
+
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
