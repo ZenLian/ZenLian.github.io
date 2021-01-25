@@ -1,0 +1,65 @@
+---
+title: "并查集"
+date: 2020-04-08T13:56:00+08:00
+tags: ["算法"]
+---
+
+## 概念
+
+并查集（union-find），是一种用于**不相交集合**之间合并与查找的数据结构。
+
+- 一个集合由不同的元素组成，有一个代表元素用来代表这个集合
+- 不同集合之间的元素各不相同
+
+提供两个操作：
+
+- `union(x, y)` ：将 `x` 与 `y` 所在集合进行合并。
+- `find(x)` ：查找元素 `x` 所在集合的代表元素。
+
+## 不相交集合森林
+
+![image1.png](image1.png)
+
+- `find(x)` ：沿着 `x` 一直向上找到根节点；
+- `union(x, y)` ：调用 `find` 找到 `x` 和 `y` 的根节点 `px` 和 `py`，令 `px` 的根节点为 `py`。
+
+## 路径压缩
+
+`find` 操作与元素所在节点的深度有关，采用**路径压缩**可以优化：
+
+![image2.png](image2.png)
+
+## 实现
+
+leetcode 上遇到 DSU 问题时，如果元素是连续的整数，可以用一个简单数组代表这个不相交集合森林。
+
+```cpp
+class Dsu {
+public:
+    // 总共 n 个元素 1~n，0 表示根
+    Dsu(int n) : pa(n + 1, 0) { }
+    int findSet(int x)
+    {
+        if (pa[x] == 0) {
+            return pa[x];
+        }
+        // 路径压缩
+        pa[x] = findSet(pa[x]);
+    }
+    void unionSet(int x, int y)
+    {
+        x = findSet(x);
+        y = findSet(y);
+        if (x != y) {
+            pa[x] = y;
+        }
+    }
+private:
+    // pa[x] 表示 x 的父节点
+    vector<int> pa;
+};
+```
+
+## 练习
+
+[684. 冗余连接](https://leetcode-cn.com/problems/redundant-connection/)
