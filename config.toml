@@ -12,7 +12,7 @@ copyright = "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0
 theme = "meme"
 
 # `hugo new` 新建文章自动打开的文本编辑器
-newContentEditor = ""
+newContentEditor = "code"
 
 # i18n
 defaultContentLanguage = "zh"
@@ -218,6 +218,39 @@ identifier = "lang-switcher"
 #identifier = "search"
 #post = "search"
 
+[[menu.home]]
+url = "https://github.com/ZenLian"
+name = ""
+weight = 2
+pre = "external"
+post = "github"
+
+[[menu.socials]]
+url = "https://github.com/ZenLian"
+name = " "
+weight = 1
+pre = "external"
+post = "github"
+
+[[menu.socials]]
+url = "https://www.douban.com/people/73582537/"
+name = ""
+weight = 2
+pre = "external"
+post = "douban"
+
+[[menu.links]]
+url = "/archives/"
+name = "归档"
+weight = 1
+pre = "internal"
+
+[[menu.links]]
+url = "/tags/"
+name = "标签"
+weight = 2
+pre = "internal"
+
 
 ##########################################
 # 主题配置
@@ -265,7 +298,7 @@ siteBrandSVGFill = "#fff"
 # 如果否，则会使用你的站点标题作为默认值，并
 # 以文字的形式显示，下方可配置字号和字色。字
 # 体请到底部的字体部分配置。单位：em。
-siteBrandFontSize = 1
+siteBrandFontSize = 1.5
 siteBrandFontColor = "var(--color-contrast-high)"
 
 
@@ -296,7 +329,7 @@ activeInSection = true
 # 3. posts     文章摘要
 # 4. page      普通页面
 
-homeLayout = "posts"
+homeLayout = "poetry"
 
 ## 「诗意人生」
 # 诗句，支持 Markdown
@@ -373,7 +406,7 @@ enableTree = true
 # `sections`，则无法关闭树状布局
 
 # 是否显示文章标题
-displayPosts = true
+displayPosts = false
 
 # 是否显示每一分类下的文章数
 displayPostsCount = true
@@ -1135,14 +1168,14 @@ postNavInSection = true
 # 极简页脚
 
 # 是否开启
-enableMinimalFooter = false
-enableVerticalBarStructure = false
+enableMinimalFooter = true
+enableVerticalBarStructure = true
 # 说明：如果开启此项，显示在右边的部类或分区
 #      将会包含全部的第一级部类或分区，并且
 #      以竖线（|）分隔开来。
 
 # 是否开启关于页面的极简页脚
-enableAboutPageMinimalFooter = false
+enableAboutPageMinimalFooter = true
 
 
 ######################################

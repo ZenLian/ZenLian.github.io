@@ -2,6 +2,7 @@
 title: 搭建git服务器
 date: 2019-02-24 17:30:24
 slug: "git-server"
+dropCap: true
 tags:
 - git
 ---
