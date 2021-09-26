@@ -1,7 +1,7 @@
 ##########################################
 # 站点配置
 
-baseURL = "https://blog.zenlian.xyz/"
+#baseURL = "https://blog.zenlian.xyz/"
 title = "ZenLian"
 languageCode = "zh-CN"
 hasCJKLanguage = true
