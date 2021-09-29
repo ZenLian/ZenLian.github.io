@@ -7,4 +7,8 @@ toc: true
 tags: ["游戏开发"]
 ---
 
-SourceModifierList
+游戏中会有很多数值时刻发生着变化，比如角色的攻击力、移速等，
+
+```c#
+multiplier = SourceModifierList(inst, )
+```

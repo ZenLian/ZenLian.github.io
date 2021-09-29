@@ -69,7 +69,7 @@ linkify = true
 strikethrough = true
 table = true
 taskList = true
-typographer = false
+typographer = true
 [markup.goldmark.parser]
 attribute = true
 autoHeadingID = true
@@ -143,7 +143,6 @@ baseName = "search"
 [outputs]
 page = ["HTML"]
 home = ["HTML", "SectionsAtom", "SectionsRSS", "SearchIndex"]
-#home = ["HTML", "SectionsAtom", "SectionsRSS"]
 section = ["HTML"]
 taxonomy = ["HTML"]
 term = ["HTML"]
@@ -217,40 +216,6 @@ identifier = "lang-switcher"
 #weight = 8
 #identifier = "search"
 #post = "search"
-
-[[menu.home]]
-url = "https://github.com/ZenLian"
-name = ""
-weight = 2
-pre = "external"
-post = "github"
-
-[[menu.socials]]
-url = "https://github.com/ZenLian"
-name = " "
-weight = 1
-pre = "external"
-post = "github"
-
-[[menu.socials]]
-url = "https://www.douban.com/people/73582537/"
-name = ""
-weight = 2
-pre = "external"
-post = "douban"
-
-[[menu.links]]
-url = "/archives/"
-name = "归档"
-weight = 1
-pre = "internal"
-
-[[menu.links]]
-url = "/tags/"
-name = "标签"
-weight = 2
-pre = "internal"
-
 
 ##########################################
 # 主题配置
@@ -1102,7 +1067,7 @@ editText = "Edit Me?"
 # 文章分享
 
 # 是否开启
-enablePostShare = true
+enablePostShare = false
 
 # 是否显示（全局设置）
 displayPostShare = true
