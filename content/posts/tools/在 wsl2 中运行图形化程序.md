@@ -1,7 +1,7 @@
 ---
 title: "在 wsl2 中运行图形化程序"
 slug: "gui-apps-in-wsl2"
-date: 2022-02-23T19:47:01+08:00
+date: 2022-02-21T22:47:01+08:00
 dropCap: true
 tags:
 - tools
@@ -22,13 +22,13 @@ tags:
 
 ### 显卡驱动支持
 
-安装虚拟显卡驱动支持。这样可以为你的 wsl 开启一个虚拟 GPU（vGPU），从而享受硬件渲染加速效果。
+安装最新的虚拟显卡驱动支持。这样可以为你的 wsl 开启一个虚拟 GPU（vGPU），从而享受硬件渲染加速效果。
 
-3 大厂商有各自的驱动支持：
+3 大厂商的最新驱动支持：
 
-- [Intel]
-- [AMD]
-- [NVIDIA]
+- [Intel](https://www.intel.cn/content/www/cn/zh/download/19344/intel-graphics-windows-dch-drivers.html?)
+- [AMD](https://www.amd.com/en/support/kb/release-notes/rn-rad-win-wsl-support)
+- [NVIDIA](https://developer.nvidia.com/cuda/wsl)
 
 ## 升级 wsl
 
