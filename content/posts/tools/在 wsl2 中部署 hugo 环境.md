@@ -3,7 +3,9 @@ title: "在 wsl2 中部署 hugo 环境"
 slug: "hugo-in-wsl2"
 date: 2021-01-29T14:33:37+08:00
 dropCap: true
-tags: ["tools"]
+tags:
+- tools
+- wsl
 ---
 
 有了 vscode 的 remote ssh 后，可以直接用 vscode 打开 wsl2 中的 hugo-site 目录，毕竟在 linux 环境中敲命令行比 powershell 舒服多了。
