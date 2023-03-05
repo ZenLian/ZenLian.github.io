@@ -9,7 +9,7 @@ $overlay0: #9ca0b0;
 $surface2: #acb0be;
 $surface0: #ccd0da;
 $base: #eff1f5;
-$mantle:#e6e9ef;
+$mantle: #e6e9ef;
 $crust: #dce0e8;
 
 * {
@@ -33,7 +33,7 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-  transition: all .5s;
+  transition: all 0.5s;
 }
 a:hover {
   color: $lavender;
@@ -42,17 +42,22 @@ a:hover {
 header {
   color: $text;
   background-color: $crust;
-  padding: 1em 5em;
+  padding: 1em 0;
+  position: fixed;
+  width: 100%;
+  // box-shadow: 0px -1px 6px $text;
+}
+
+.header-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
-  width: 100%;
-  box-shadow: 0px -1px 6px $text;
+  margin: 0 auto;
+  max-width: 36em;
+}
 
-  .site-brand {
-    font-size: 27px;
-  }
+.site-brand {
+  font-size: 27px;
 }
 
 .menu-item {
@@ -170,7 +175,8 @@ article {
     margin: 1em 0;
     line-height: 1.5;
   }
-  ol, ul {
+  ol,
+  ul {
     padding-left: 2em;
     line-height: 2;
   }
@@ -178,7 +184,7 @@ article {
     color: $text;
     text-decoration: underline;
     text-decoration-color: $overlay0;
-    transition: all .5s;
+    transition: all 0.5s;
   }
   a:hover {
     color: $lavender;
@@ -229,4 +235,3 @@ article {
     content: ".";
   }
 }
-
