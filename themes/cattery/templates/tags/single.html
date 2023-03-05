@@ -1,0 +1,20 @@
+{% import "macros/article.html" as article %}
+{% extends "base.html" %}
+
+{% block main %}
+<article class="article">
+  <h1 class="page-title">{{ term.name }}</h1>
+  <ul class="post-list">
+    {%- for page in term.pages -%}
+    <li class="post-item">
+      <span class="post-item-left">
+        <span class="post-item-date">{{ article::date(page=page) }}</span>
+        <a class="post-item-title" href="{{ page.permalink | safe }}">{{ page.title }}</a>
+      </span>
+      <span class="post-item-right">{{ article::tags(page=page) }}</span>
+    </li>
+    {%- endfor -%}
+  </ul>
+</article>
+{% endblock %}
+

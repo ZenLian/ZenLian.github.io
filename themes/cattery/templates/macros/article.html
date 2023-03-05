@@ -1,0 +1,15 @@
+{% macro date(page) %}
+<time datetime="{{ page.date }}">{{ page.date | date }}</time>
+{% endmacro %}
+
+{% macro tags(page) %}
+{%- if page.taxonomies and page.taxonomies.tags %}
+<ul class="tag-list">
+  {%- for tag in page.taxonomies.tags %}
+  <li class="tag-item">
+    <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}">#{{ tag }}</a>
+  </li>
+  {%- endfor %}
+</ul>
+{%- endif %}
+{% endmacro %}

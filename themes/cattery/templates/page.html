@@ -1,0 +1,21 @@
+{% import "macros/article.html" as article %}
+{% extends "base.html" %}
+
+{% block title %}
+  <title>{{ page.title }} | {{ config.title }}</title>
+{% endblock %}
+
+{% block main %}
+<article>
+  <h1 class="post-title page-title">
+    {{ page.title }}
+  </h1>
+  <div class="post-meta">
+    <span>{{ article::tags(page=page) }}</span>
+    <time datetime="{{ page.date | date }}">{{ page.date | date }}</time>
+  </div>
+  <div class="post-content">
+    {{ page.content | safe }}
+  </div>
+</article>
+{% endblock %}

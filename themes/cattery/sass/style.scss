@@ -1,0 +1,232 @@
+$blue: #1e66f5;
+$lavender: #7287fd;
+$red: #d20f39;
+$green: #40a02b;
+$text: #4c4f69;
+$subtext1: #5c5f77;
+$subtext0: #6c6f85;
+$overlay0: #9ca0b0;
+$surface2: #acb0be;
+$surface0: #ccd0da;
+$base: #eff1f5;
+$mantle:#e6e9ef;
+$crust: #dce0e8;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  color: $text;
+  background-color: $base;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: all .5s;
+}
+a:hover {
+  color: $lavender;
+}
+
+header {
+  color: $text;
+  background-color: $crust;
+  padding: 1em 5em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  box-shadow: 0px -1px 6px $text;
+
+  .site-brand {
+    font-size: 27px;
+  }
+}
+
+.menu-item {
+  display: inline-block;
+  margin-left: 0.5em;
+  color: #4c4f69;
+}
+
+main {
+  display: block;
+  padding: 7em 1em;
+}
+
+article {
+  width: 36em;
+  margin: 0 auto;
+  display: block;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2em;
+  margin: 0.5em 0 1.5em;
+}
+
+.post-list {
+  list-style-type: none;
+}
+
+.post-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 1em;
+}
+
+.post-item-date {
+  color: $surface2;
+}
+
+.post-item-title {
+  color: $text;
+}
+
+.post-item-title:hover {
+  color: $blue;
+}
+
+.tag-item {
+  display: inline-block;
+  color: $text;
+  background-color: $crust;
+  font-size: 14px;
+  padding: 1px 5px;
+  // border: solid;
+  border-radius: 10px;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+// tags/list
+.term-list {
+  line-height: 1.5;
+  li::marker {
+    color: $surface2;
+  }
+  .term-count {
+    color: $surface2;
+  }
+}
+
+// 404 page
+.page-not-found {
+  text-align: center;
+  padding: 8em 0;
+  .poetry-line {
+    font-size: 1.5em;
+    line-height: 2;
+  }
+}
+
+// markdown
+.post-title {
+  margin: 0.5em 0;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5em 0;
+  font-size: 14px;
+  time {
+    color: $surface2;
+  }
+}
+
+.post-content {
+  margin: 5em 0;
+
+  h1 {
+    margin: 1.5em 0;
+  }
+  h2 {
+    margin: 1em 0;
+  }
+  h3 {
+    margin: 0.7em 0;
+  }
+  h4 {
+    margin: 0.5em 0;
+  }
+  p {
+    margin: 1em 0;
+    line-height: 1.5;
+  }
+  ol, ul {
+    padding-left: 2em;
+    line-height: 2;
+  }
+  a {
+    color: $text;
+    text-decoration: underline;
+    text-decoration-color: $overlay0;
+    transition: all .5s;
+  }
+  a:hover {
+    color: $lavender;
+    text-decoration-color: $lavender;
+  }
+  code {
+    color: $text;
+    background-color: $crust;
+  }
+  p > code {
+    padding: 1px 2px;
+  }
+  pre {
+    background-color: $crust !important;
+    overflow: auto;
+    padding: 1em;
+    word-wrap: normal;
+    font-size: 0.9em;
+    code {
+      display: block;
+      background-color: inherit;
+    }
+  }
+  blockquote {
+    border-left: 4px solid $surface0;
+    padding-left: 0.5em;
+  }
+  hr {
+    border: none;
+    text-align: center;
+    margin: 1em 0;
+  }
+  hr::after {
+    content: "···";
+    letter-spacing: 2em;
+    padding-left: 2em;
+  }
+
+  .footnote-definition {
+    display: flex;
+  }
+  .footnote-definition-label {
+    vertical-align: text-bottom;
+    margin: 1em 0;
+    font-size: inherit;
+  }
+  .footnote-definition-label::after {
+    content: ".";
+  }
+}
+

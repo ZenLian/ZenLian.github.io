@@ -1,0 +1,29 @@
+name = "cattery"
+description = "a cuty theme for zola"
+license = "MIT"
+homepage = "https://github.com/zenlian/cattery"
+# The minimum version of Zola required
+min_version = "0.15.0"
+# An optional live demo URL
+demo = "https://zenlian.github.io/cattery"
+
+# The theme author info: you!
+[author]
+name = "zenlian"
+homepage = "https://github.com/zenlian"
+
+# If this is porting a theme from another static site engine, provide
+# the info of the original author here
+[original]
+author =  "reuixiy/hugo-theme-meme"
+homepage = "https://io-oi.me"
+repo = "https://www.github.com/reuixiy/hugo-theme-meme"
+
+# Any variable there can be overridden in the end user `config.toml`
+# You don't need to prefix variables by the theme name but as this will
+# be merged with user data, some kind of prefix or nesting is preferable
+# Use snake_casing to be consistent with the rest of Zola
+[extra]
+
+page_404_content = "Opps! You're stuck in limbo."
+

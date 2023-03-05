@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{%- block main %}
+<article>
+  <div class="page-not-found">
+  {% if config.extra.page_404_content %}
+    {% for line in config.extra.page_404_content %}
+    <p class="poetry-line">{{ line }}</p>
+    {% endfor %}
+  {% else %}
+  <h1 class="page-title">404</h1>
+  {% endif %}
+  </div>
+</article>
+{% endblock -%}

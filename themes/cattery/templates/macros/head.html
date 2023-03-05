@@ -1,0 +1,27 @@
+{% macro basic_meta() %}
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+{% endmacro %}
+
+{% macro page_meta() %}
+{% if config.description %}
+  {% if page.content %}
+  <meta name="description" content="{{ page.content | truncate(length=180) | striptags | safe }}">
+  {% else %}
+  <meta name="description" content="{{ config.description | truncate(length=150) | striptags | safe }}">
+  {% endif %}
+{% endif %}
+{% endmacro %}
+
+{% macro style() %}
+<link href="{{ get_url(path='style.css', trailing_slash=false) | safe }}" rel="stylesheet"/>
+{% endmacro %}
+
+{% macro title() %}
+<title>{{ config.title }}</title>
+{% endmacro %}
