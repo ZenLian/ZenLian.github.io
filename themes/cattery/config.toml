@@ -70,7 +70,6 @@ render_emoji = true
 # smart_punctuation = false
 
 [extra]
-# page_404_content = ["Opps! You're stuck in limbo."]
 page_404_content = ["空山不见人", "但闻人语响"]
 
 navigation = [

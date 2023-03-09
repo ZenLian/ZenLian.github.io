@@ -25,5 +25,18 @@ repo = "https://www.github.com/reuixiy/hugo-theme-meme"
 # Use snake_casing to be consistent with the rest of Zola
 [extra]
 
-page_404_content = "Opps! You're stuck in limbo."
+page_404_content = ["Oops!", "You're stuck in limbo."]
+
+navigation = [
+  { icon = "mdi:tags", label = "tags", path = "tags"},
+  { icon = "mdi:user", label = "about", path = "about"}
+]
+
+socials = [
+  { icon = "mdi:github", link = "https://github.com/zenlian" },
+  { icon = "mdi:email", link = "mailto://zeninglian@gmail.com" }
+]
+
+[extra.copyright]
+site = ["CC BY-NC-SA 4.0", "https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"]
 
