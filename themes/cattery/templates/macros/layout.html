@@ -6,14 +6,26 @@
   </div>
   <nav class="nav">
     <ul class="menu-list">
+      {% if config.extra.socials %}
+        {% for item in config.extra.navigation %}
+        <li class="menu-item">
+          {% set link = "" %}
+          {% if item.path %}
+            {% set link = get_url(path=item.path) %}
+          {% else %}
+            {% set link = item.link %}
+          {% endif %}
+          <a href="{{link}}">
+            <iconify-icon icon="{{item.icon}}" class="menu-icon"></iconify-icon>
+            <span class="menu-label">{{item.label}}</span>
+          </a>
+        </li>
+        {% endfor %}
+      {% endif %}
       <li class="menu-item">
-        <a href="{{get_url(path='tags/')}}">
-          tags
-        </a>
-      </li>
-      <li class="menu-item">
-        <a href="{{get_url(path='about/')}}">
-          about
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
         </a>
       </li>
     </ul>
@@ -24,5 +36,25 @@
 
 {% macro footer() %}
 <footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  {% if config.extra.copyright and config.extra.copyright.site %}
+  <div class="site-copyright">
+      <a href="{{config.extra.copyright.site[1]}}">{{config.extra.copyright.site[0]}}</a>
+  </div>
+  {% endif %}
+  {% if config.extra.socials %}
+  <ul class="socials">
+    {% for item in config.extra.socials %}
+    <li class="socials-item">
+      <a href="{{item.link}}">
+        <iconify-icon icon="{{item.icon}}" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
 </footer>
 {% endmacro %}

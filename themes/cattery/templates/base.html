@@ -19,6 +19,7 @@
     <!-- To automatically render math in text elements, include the auto-render extension: -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
         onload="renderMathInElement(document.body);"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
     {%- endblock -%}
   </head>
   <body>
@@ -34,6 +35,6 @@
   </body>
 
   {% block js %}
-  <script src="{{ get_url(path='js/main.js', trailing_slash=false) | safe }}"/></script>
+  <script src="{{ get_url(path='js/cattery.js', trailing_slash=false) | safe }}"/></script>
   {% endblock js %}
 </html>

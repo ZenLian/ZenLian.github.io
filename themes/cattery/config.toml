@@ -59,7 +59,7 @@ taxonomies = [
 # Whether to do syntax highlighting
 # Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
 highlight_code = true
-# highlight_theme = "visual-studio-dark"
+highlight_theme = "visual-studio-dark"
 
 # When set to "true", emoji aliases translated to their corresponding
 # Unicode emoji equivalent in the rendered Markdown files. (e.g.: :smile: => 😄)
@@ -73,8 +73,16 @@ render_emoji = true
 # page_404_content = ["Opps! You're stuck in limbo."]
 page_404_content = ["空山不见人", "但闻人语响"]
 
-[languages]
+navigation = [
+  { icon = "mdi:tags", label = "标签", path = "tags"},
+  { icon = "mdi:user", label = "关于", path = "about"}
+]
 
-[languages.zh]
-[languags.zh.extra]
-page_404_content = ["空山不见人，但闻人语响。"]
+socials = [
+  { icon = "mdi:github", link = "https://github.com/zenlian" },
+  { icon = "mdi:email", link = "mailto://zeninglian@gmail.com" }
+]
+
+[extra.copyright]
+site = ["CC BY-NC-SA 4.0", "https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"]
+
