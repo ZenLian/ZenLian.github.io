@@ -1,33 +1,67 @@
 :root {
+  --color-rosewater: #dc8a78;
+  --color-flamingo: #dd7878;
+  --color-pink: #ea76cb;
+  --color-mauve: #8839ef;
+  --color-red: #d20f39;
+  --color-maroon: #e64553;
+  --color-peach: #fe640b;
+  --color-yellow: #df8e1d;
+  --color-green: #40a02b;
+  --color-teal: #179299;
+  --color-sky: #04a5e5;
+  --color-sapphire: #209fb5;
   --color-blue: #1e66f5;
   --color-lavender: #7287fd;
-  --color-red: #d20f39;
-  --color-green: #40a02b;
   --color-text: #4c4f69;
   --color-subtext1: #5c5f77;
   --color-subtext0: #6c6f85;
+  --color-overlay2: #7c7f93;
+  --color-overlay1: #8c8fa1;
   --color-overlay0: #9ca0b0;
   --color-surface2: #acb0be;
+  --color-surface1: #bcc0cc;
   --color-surface0: #ccd0da;
   --color-base: #eff1f5;
   --color-mantle: #e6e9ef;
   --color-crust: #dce0e8;
+
+  --color-header: var(--color-crust);
+  --color-code: var(--color-crust);
+  --color-tag: var(--color-crust);
 }
 
 :root[data-theme="dark"] {
+  --color-rosewater: #f5e0dc;
+  --color-flamingo: #f2cdcd;
+  --color-pink: #f5c2e7;
+  --color-mauve: #cba6f7;
+  --color-red: #f38ba8;
+  --color-maroon: #eba0ac;
+  --color-peach: #fab387;
+  --color-yellow: #f9e2af;
+  --color-green: #a6e3a1;
+  --color-teal: #94e2d5;
+  --color-sky: #89dceb;
+  --color-sapphire: #74c7ec;
   --color-blue: #89b4fa;
   --color-lavender: #b4befe;
-  --color-red: #f38ba8;
-  --color-green: #a6e3a1;
   --color-text: #cdd6f4;
   --color-subtext1: #bac2de;
   --color-subtext0: #a6adc8;
+  --color-overlay2: #9399b2;
+  --color-overlay1: #7f849c;
   --color-overlay0: #6c7086;
   --color-surface2: #585b70;
+  --color-surface1: #45475a;
   --color-surface0: #313244;
   --color-base: #1e1e2e;
   --color-mantle: #181825;
   --color-crust: #11111b;
+
+  --color-header: var(--color-mantle);
+  --color-code: var(--color-surface0);
+  --color-tag: var(--color-surface1);
 }
 
 * {
@@ -53,11 +87,38 @@ a {
   text-decoration: none;
   transition: all 0.5s;
 }
+
 a:hover {
   color: var(--color-lavender);
 }
 
-icon {
+::selection {
+  background-color: var(--color-surface1);
+}
+
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: inherit;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-surface2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-overlay0);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-overlay2);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: var(--color-base);
 }
 
 header {
@@ -155,7 +216,7 @@ article {
 .tag-item {
   display: inline-block;
   color: var(--color-text);
-  background-color: var(--color-crust);
+  background-color: var(--color-tag);
   font-size: 14px;
   padding: 1px 5px;
   // border: solid;
@@ -239,21 +300,38 @@ article {
   }
   code {
     color: var(--color-text);
-    background-color: var(--color-crust);
+    background-color: var(--color-code);
   }
   p > code {
     padding: 1px 2px;
   }
   pre {
-    background-color: var(--color-crust) !important;
+    background-color: var(--color-code) !important;
+    padding: 1rem;
     overflow: auto;
-    padding: 1em;
     word-wrap: normal;
     font-size: 0.9em;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      td {
+        padding: 0;
+      }
+      td:nth-of-type(1) {
+        text-align: center;
+        user-select: none;
+      }
+    }
+    mark {
+      display: block;
+    }
     code {
       display: block;
       background-color: inherit;
     }
+  }
+  pre[data-linenos] {
+    padding: 1rem 0;
   }
   blockquote {
     border-left: 4px solid var(--color-surface0);
