@@ -6,7 +6,10 @@ slug = "cpp-traits"
 tags = ["cpp", "traits"]
 +++
 
-以前看《Effective C++》时，很多条款都没有仔细看，对类型萃取有点印象，但又说不出个所以然来。最近在看侯捷老师的[《C++STL 与泛型编程》](https://www.bilibili.com/video/BV1Hb411K763?t=1156&p=44)视频课程，讲到迭代器 iterator_traits 的作用时，又回过头去看《Effective C++》中的 “条款 47：请使用 traits class 表现类型信息”，才晃然大悟。
+以前看《Effective C++》时，很多条款都没有仔细看，对类型萃取有点印象，但又说不出个所以然来。
+最近在看侯捷老师的[《C++STL 与泛型编程》](https://www.bilibili.com/video/BV1Hb411K763?t=1156&p=44) 视频课程，
+讲到迭代器 iterator_traits 的作用时，又回过头去看《Effective C++》中的
+“条款 47：请使用 traits class 表现类型信息”，才晃然大悟。
 
 ## 迭代器类型萃取
 
@@ -16,9 +19,9 @@ tags = ["cpp", "traits"]
 
 1. **input**：只能读取和向前移动一步。即只支持 `value = *iter`。
 1. **output**：只能写入和向前移动一步。即只支持 `*iter = value`。
-1. **forward**：只能向前移动一步，每个位置可多次读写。即`iter++`。
-1. **bidirectional**：可以向前、向后移动一步。即`iter++`、`iter--`。
-1. **random**：支持随机访问，向前、向后移动任意偏移量，即`iter + offset`。
+1. **forward**：只能向前移动一步，每个位置可多次读写。即 `iter++`。
+1. **bidirectional**：可以向前、向后移动一步。即 `iter++`、`iter--`。
+1. **random**：支持随机访问，向前、向后移动任意偏移量，即 `iter + offset`。
 
 泛型算法使用迭代器时，有些需要根据迭代器的不同类型采取不同的策略。
 比如 `std::advance()` 函数可以将迭代器移动相应的距离：

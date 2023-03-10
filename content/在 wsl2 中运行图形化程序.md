@@ -7,7 +7,10 @@ dropCap = true
 tags = ["tools", "wsl"]
 +++
 
-以前在 wsl 上运行图形化程序需要额外安装 Xserver，现在巨硬支持直接运行了！[^1]
+以前在 wsl 上运行图形化程序需要用 MobaXterm 等支持 Xserver 的终端,
+现在微软把图形化功能集成进去了, 可以直接运行！[^1]
+
+---
 
 ## 准备工作
 
@@ -48,5 +51,9 @@ wsl --shutdown
 ## 运行图形程序
 
 不需要额外的配置，直接在 wsl 里运行图形化程序，图形界面就会在 windows 上出现。
+
+---
+
+## Rerefences
 
 [^1]: <https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps>

@@ -50,3 +50,19 @@ window.addEventListener(
     once: true,
   }
 );
+
+let lastScrollY = 0;
+
+window.addEventListener("scroll", () => {
+  const deltaScrollY = window.scrollY - lastScrollY;
+  lastScrollY = window.scrollY;
+
+  const header = document.getElementById("header");
+  const h = -header.clientHeight;
+  if (deltaScrollY > 0) {
+    header.style.top = h + "px";
+  } else {
+    // header.setAttribute("style", "top: 0px");
+    header.style.top = 0;
+  }
+});

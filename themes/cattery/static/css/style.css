@@ -27,7 +27,7 @@
   --color-crust: #dce0e8;
 
   --color-header: var(--color-crust);
-  --color-code: var(--color-crust);
+  --color-pre: var(--color-crust);
   --color-tag: var(--color-crust);
 }
 
@@ -60,8 +60,19 @@
   --color-crust: #11111b;
 
   --color-header: var(--color-mantle);
-  --color-code: var(--color-surface0);
+  --color-pre: var(--color-surface0);
   --color-tag: var(--color-surface1);
+}
+
+:root[data-colormode="colorful"] {
+  --color-h: var(--color-lavender);
+  --color-li: var(--color-sky);
+  --color-quote: var(--color-sapphire);
+  --color-hr: var(--color-blue);
+  --color-link: var(--color-blue);
+  --color-code: var(--color-pink);
+  --color-tagbg: var(--color-teal);
+  --color-tagfg: var(--color-base);
 }
 
 * {
@@ -85,7 +96,7 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-  transition: color 0.5s;
+  transition: all 0.5s;
 }
 
 a:hover {
@@ -125,8 +136,9 @@ header {
   background-color: var(--color-header);
   padding: 1em 0;
   position: fixed;
+  top: 0;
   width: 100%;
-  /* box-shadow: 0px -1px 6px $text; */
+  transition: top 500ms;
 }
 
 .header-inner {
@@ -218,6 +230,16 @@ article {
   font-size: 14px;
   padding: 1px 5px;
   border-radius: 10px;
+  transition: all 300ms;
+}
+
+.tag-item:hover {
+  color: var(--color-tagfg, var(--color-lavender));
+  background-color: var(--color-tagbg, var(--color-tag));
+}
+.tag-item a {
+  color: inherit;
+  transition: 50ms;
 }
 
 /* tags/list */
@@ -225,7 +247,7 @@ article {
   line-height: 1.5;
 }
 .term-list li::marker {
-  color: var(--color-surface2);
+  color: var(--color-overlay2);
 }
 .term-list .term-count {
   color: var(--color-surface2);
@@ -262,15 +284,19 @@ article {
 }
 
 .post-content h1 {
+  color: var(--color-h, var(--color-text));
   margin: 1.5em 0;
 }
 .post-content h2 {
+  color: var(--color-h, var(--color-text));
   margin: 1em 0;
 }
 .post-content h3 {
+  color: var(--color-h, var(--color-text));
   margin: 0.7em 0;
 }
 .post-content h4 {
+  color: var(--color-h, var(--color-text));
   margin: 0.5em 0;
 }
 .post-content p {
@@ -282,55 +308,59 @@ article {
   padding-left: 2em;
   line-height: 2;
 }
+.post-content li::marker {
+  color: var(--color-li, var(--color-overlay2));
+}
 .post-content a {
-  color: var(--color-text);
+  color: var(--color-link, var(--color-text));
   text-decoration: underline;
-  text-decoration-color: var(--color-overlay0);
-  transition: all 0.5s;
+  text-decoration-color: var(--color-link, var(--color-overlay0));
 }
 .post-content a:hover {
-  color: var(--color-lavender);
-  text-decoration-color: var(--color-lavender);
+  color: var(--color-link, var(--color-lavender));
+  text-decoration-color: var(--color-link, var(--color-lavender));
 }
 
 .post-content code {
-  color: var(--color-text);
-  background-color: var(--color-code);
-}
-.post-content p > code {
+  color: var(--color-code, var(--color-subtext0));
+  background-color: var(--color-pre);
   padding: 1px 2px;
 }
-pre {
-  background-color: var(--color-code) !important;
+
+.post-content pre {
+  background-color: var(--color-pre) !important;
   padding: 1rem;
   overflow: auto;
   word-wrap: normal;
   font-size: 0.9em;
 }
-pre[data-linenos] {
+.post-content pre[data-linenos] {
   padding: 1rem 0;
 }
-pre table {
+.post-content pre table {
   width: 100%;
   border-collapse: collapse;
 }
-pre table td {
+.post-content pre table td {
   padding: 0;
 }
-pre table td:nth-of-type(1) {
+.post-content pre table td:nth-of-type(1) {
   text-align: center;
   user-select: none;
 }
-pre mark {
+.post-content pre mark {
   display: block;
 }
-pre code {
+.post-content pre code {
   display: block;
+  color: var(--color-text);
   background-color: inherit;
+  padding: 0;
 }
 
 .post-content blockquote {
-  border-left: 4px solid var(--color-surface0);
+  border-left: 4px solid var(--color-quote, var(--color-surface0));
+  color: var(--color-overlay2);
   padding-left: 0.5em;
 }
 .post-content hr {
@@ -340,6 +370,7 @@ pre code {
 }
 .post-content hr::after {
   content: "···";
+  color: var(--color-hr);
   letter-spacing: 2em;
   padding-left: 2em;
 }

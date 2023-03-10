@@ -25,6 +25,8 @@ repo = "https://www.github.com/reuixiy/hugo-theme-meme"
 # Use snake_casing to be consistent with the rest of Zola
 [extra]
 
+colormode = "normal" # or "colorful"
+
 page_404_content = ["Oops!", "You're stuck in limbo."]
 
 navigation = [

@@ -67,7 +67,10 @@ render_emoji = true
 # smart_punctuation = false
 
 [extra]
+colormode = "colorful" # "normal" "colorful"
+
 page_404_content = ["空山不见人", "但闻人语响"]
+
 navigation = [
   { icon = "mdi:tags", label = "标签", path = "tags"},
   { icon = "mdi:user", label = "关于", path = "about"}
