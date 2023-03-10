@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>使用 GNU stow 管理你的 dotfiles | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    使用 GNU stow 管理你的 dotfiles
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/tools/">#tools</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/dotfiles/">#dotfiles</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2020-02-16">2020-02-16</time>
+  </div>
+  <div class="post-content">
+    <p>你的 home 目录下是否散落着各种各样的配置文件（dotfiles）？这些配置文件有些直接在 home 目录下，有些在 .config 目录下，和其他文件混在一起难以管理和同步。我曾经将这些配置文件都移动到一个单独的 dotfiles 目录中，然后写个 bash 脚本软链接到 home 目录下。虽然能用，但用起来还是不太顺手。直到我看到<a href="http://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html">这篇文章</a>，原来 GNU stow 已经替我完成了这些软链接管理。</p>
+<hr />
+<p><a href="https://www.gnu.org/software/stow/">GNU stow</a> 最初是用来管理从源码安装的程序的，但是也可以用于管理你的 dotfiles<sup class="footnote-reference"><a href="#1">1</a></sup>，配合 git 食用更佳。</p>
+<p>比如我有 zsh, git 和 tmux 的配置需要管理，如果不使用 stow，那么这些配置文件会散落在 HOME 目录下：</p>
+<pre data-lang="plaintext" class="language-plaintext z-code"><code class="language-plaintext" data-lang="plaintext"><span class="z-text z-plain">$HOME
+├── .config
+│  └── zsh
+│    ├── .zshrc
+│    └── [其他 zsh 相关文件]
+├── .gitconfig
+├── .tmux.conf
+├── .tmux
+│  └── [其他 tmux 相关文件]
+└── .zshenv
+</span></code></pre>
+<p>使用 stow 来管理的话，就可以把属于同一个程序的配置文件组织在一起。在任意地方新建一个 dotfiles 目录，然后为每个程序建立一个自己的配置文件夹，把属于它的配置丢进去：</p>
+<pre data-lang="plaintext" class="language-plaintext z-code"><code class="language-plaintext" data-lang="plaintext"><span class="z-text z-plain">dotfiles
+├── git
+│  └── .gitconfig
+├── tmux
+│  ├── .tmux.conf
+│  └── .tmux
+│     └── [其他 tmux 相关文件]
+└── zsh
+   ├── .config
+   │  └── zsh
+   │    ├── .zshrc
+   │    └── [其他 zsh 相关文件]
+   └── .zshenv
+</span></code></pre>
+<p>然后在 dotfiles 中执行 stow 命令：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-cd z-shell">cd</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-meta z-group z-expansion z-tilde"><span class="z-variable z-language z-tilde z-shell">~</span></span>/dotfiles</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">stow</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>t</span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">HOME</span></span> git</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">stow</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>t</span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">HOME</span></span> tmux</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">stow</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>t</span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">HOME</span></span> zsh</span>
+</span></code></pre>
+<p>stow 会负责把 dotfiles 中的配置文件软链接至你的 HOME 目录下。</p>
+<p>如果你的 dotfiles 直接位于 HOME 目录下（<code>~/dotfiles/</code>），那么可以省略 <code>-t $HOME</code> 参数，stow 默认会软链接到上级目录。</p>
+<p>这样一来配置文件的结构变得清晰许多，管理起来也很方便，要修改配置的时候到 dotfiles 中对应的目录去找就可以了。最后把这个 dotfiles 往 github 上一丢，完事儿。</p>
+<p><a href="https://github.com/ZenLian/dotfiles.git">我的 dotfiles</a> 中使用一个简单的 bash 安装脚本：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-variable z-other z-readwrite z-assignment z-shell">list</span><span class="z-keyword z-operator z-assignment z-shell">=</span><span class="z-punctuation z-section z-parens z-begin z-shell">(</span>zsh git tmux nvim ranger conda<span class="z-punctuation z-section z-parens z-end z-shell">)</span>
+<span class="z-keyword z-control z-loop z-for z-shell">for</span><span class="z-meta z-group z-for z-shell"> i <span class="z-keyword z-control z-in z-shell">in</span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-expansion z-parameter z-begin z-shell">{</span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-variable z-other z-readwrite z-shell">list<span class="z-punctuation z-section z-braces z-begin z-shell">[</span><span class="z-variable z-language z-array z-shell">*</span><span class="z-punctuation z-section z-braces z-end z-shell">]</span></span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-section z-expansion z-parameter z-end z-shell">}</span></span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-loop z-do z-shell">do</span>
+    <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">stow</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>t</span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">HOME</span></span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">i</span></span></span> <span class="z-keyword z-operator z-logical z-or z-shell">||</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-exit z-shell">exit</span></span><span class="z-meta z-function-call z-arguments z-shell"> -1</span>
+<span class="z-keyword z-control z-loop z-end z-shell">done</span>
+</span></code></pre>
+<p>在 <code>list</code> 中列出所有要安装的配置文件，执行 <code>install.sh</code> 就可以装上自己需要的配置了。</p>
+<hr />
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><a href="http://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html">http://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html</a></p>
+</div>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>

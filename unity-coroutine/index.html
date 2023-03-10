@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>Unity 协程的原理探究 | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    Unity 协程的原理探究
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/game-development/">#game-development</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2021-08-29">2021-08-29</time>
+  </div>
+  <div class="post-content">
+    <h2 id="unity-xie-cheng">Unity 协程</h2>
+<p>Unity 基于 c# 的 <code>yield</code>  引入了 <a href="https://docs.unity3d.com/2020.1/Documentation/Manual/Coroutines.html">Coroutine</a>，用于异步编程，用起来非常方便。</p>
+<p><code>Coroutine</code> 可以理解为一个能够在 <code>yield</code> 处主动暂停执行的函数，等下一帧开始时再继续执行。</p>
+<p>假如我们需要逐渐提高一个物体的 alpha 值（不透明度），直到它完全看不见，如果你在 <code>Update</code>  方法中调用下面的 <code>Fade()</code> ：</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-type z-cs">void</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">Fade</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs">
+</span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-keyword z-control z-loop z-for z-cs">for</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-cs">float</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-assignment z-variable z-loop z-cs">=</span> <span class="z-constant z-numeric z-float z-decimal z-cs">1<span class="z-storage z-type z-numeric z-cs">f</span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-cs">&gt;=</span> <span class="z-constant z-numeric z-integer z-decimal z-cs">0</span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-cs">-=</span> <span class="z-constant z-numeric z-float z-decimal z-cs">0<span class="z-punctuation z-separator z-decimal z-cs">.</span>1<span class="z-storage z-type z-numeric z-cs">f</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+    <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-support z-type z-cs">Color</span> <span class="z-variable z-other z-cs">c</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-variable z-other z-cs">renderer</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">material</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">color</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-variable z-other z-cs">c</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">a</span> <span class="z-keyword z-operator z-assignment z-cs">=</span> <span class="z-variable z-other z-cs">ft</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-variable z-other z-cs">renderer</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">material</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">color</span> <span class="z-keyword z-operator z-assignment z-cs">=</span> <span class="z-variable z-other z-cs">c</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<p>试图通过 for 循环逐步降低 alpha 值，但实际达不到渐变的效果。由于 <code>Update</code>  方法是每帧调用一次，玩家只能看到在下一帧渲染时 alpha 值立刻变为 0。</p>
+<h3 id="ding-yi-coroutine-de-fang-fa">定义 Coroutine 的方法</h3>
+<p>当然我们可以改动 <code>Update</code>  中的逻辑使它逐帧降低 alpha 值，但通过 <code>Coroutine</code>  更加方便。 <code>Coroutine</code>  可以看作是一个可以主动暂停执行的函数，并在<strong>下一帧</strong>时从暂停处恢复执行。</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-support z-type z-cs">IEnumerator</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">Fade</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs">
+</span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-keyword z-control z-loop z-for z-cs">for</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-cs">float</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-assignment z-variable z-loop z-cs">=</span> <span class="z-constant z-numeric z-float z-decimal z-cs">1<span class="z-storage z-type z-numeric z-cs">f</span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-cs">&gt;=</span> <span class="z-constant z-numeric z-integer z-decimal z-cs">0</span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-cs">-=</span> <span class="z-constant z-numeric z-float z-decimal z-cs">0<span class="z-punctuation z-separator z-decimal z-cs">.</span>1<span class="z-storage z-type z-numeric z-cs">f</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+    <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-support z-type z-cs">Color</span> <span class="z-variable z-other z-cs">c</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-variable z-other z-cs">renderer</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">material</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">color</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-variable z-other z-cs">c</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">a</span> <span class="z-keyword z-operator z-assignment z-cs">=</span> <span class="z-variable z-other z-cs">ft</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-variable z-other z-cs">renderer</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">material</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">color</span> <span class="z-keyword z-operator z-assignment z-cs">=</span> <span class="z-variable z-other z-cs">c</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-keyword z-control z-flow z-return z-cs">yield return</span> <span class="z-constant z-language z-cs">null</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<ul>
+<li>返回类型必须是 <code>IEnumerator</code></li>
+<li>在 <code>yield return null</code>  处暂停执行，并在下一帧时从这里恢复执行</li>
+</ul>
+<blockquote>
+<p>带有 <code>yield</code> 关键字的方法是一个迭代器方法，原理后文会详细解释</p>
+</blockquote>
+<h3 id="qi-dong-coroutine">启动 Coroutine</h3>
+<p>通过 <code>StartCoroutine</code>  启动 <code>Coroutine</code> ：</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-type z-cs">void</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">Update</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs">
+</span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-keyword z-control z-conditional z-if z-cs">if</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-variable z-other z-cs">Input</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">GetKeyDown</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-string z-quoted z-double z-cs"><span class="z-punctuation z-definition z-string z-begin z-cs">&quot;</span>f<span class="z-punctuation z-definition z-string z-end z-cs">&quot;</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span></span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+    <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span></span><span class="z-meta z-block z-cs">
+        <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">StartCoroutine</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">Fade</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    </span><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<p>这样就能实现渐隐效果了。</p>
+<blockquote>
+<p><code>StartCoroutine</code> 属于 <code>MonoBehaviour</code> 的方法，也就是说协程是挂在 <code>MonoBehaviour</code> 组件上的，对象禁用时协程也会停止。</p>
+</blockquote>
+<h3 id="ding-shi-ren-wu">定时任务</h3>
+<p><code>Coroutine</code>  在 <code>yeild</code>  返回之后，会在下一帧恢复执行。实际上 unity 还提供了 <code>WaitForSeconds</code>  函数控制 <code>Coroutine</code>  两次执行之间的间隔时间：</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-support z-type z-cs">IEnumerator</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">Fade</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs">
+</span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-keyword z-control z-loop z-for z-cs">for</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-cs">float</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-assignment z-variable z-loop z-cs">=</span> <span class="z-constant z-numeric z-float z-decimal z-cs">1<span class="z-storage z-type z-numeric z-cs">f</span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-cs">&gt;=</span> <span class="z-constant z-numeric z-integer z-decimal z-cs">0</span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-variable z-other z-cs">ft</span> <span class="z-keyword z-operator z-cs">-=</span> <span class="z-constant z-numeric z-float z-decimal z-cs">0<span class="z-punctuation z-separator z-decimal z-cs">.</span>1<span class="z-storage z-type z-numeric z-cs">f</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+    <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-support z-type z-cs">Color</span> <span class="z-variable z-other z-cs">c</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-variable z-other z-cs">renderer</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">material</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">color</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-variable z-other z-cs">c</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">a</span> <span class="z-keyword z-operator z-assignment z-cs">=</span> <span class="z-variable z-other z-cs">ft</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-variable z-other z-cs">renderer</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">material</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">color</span> <span class="z-keyword z-operator z-assignment z-cs">=</span> <span class="z-variable z-other z-cs">c</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-keyword z-control z-flow z-return z-cs">yield return</span> <span class="z-meta z-instance z-cs"><span class="z-keyword z-operator z-new z-cs">new</span></span><span class="z-meta z-instance z-cs"> </span><span class="z-meta z-instance z-cs"><span class="z-support z-type z-cs">WaitForSeconds</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-instance z-cs"><span class="z-meta z-group z-cs"><span class="z-constant z-numeric z-float z-decimal z-cs">0<span class="z-punctuation z-separator z-decimal z-cs">.</span>1<span class="z-storage z-type z-numeric z-cs">f</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<p>唯一的不同是 <code>yield return null</code>  改成了 <code>yield return new WaitForSeconds(0.1f)</code> ，这样 <code>yield</code>  返回之后会在 <code>0.1</code>  秒之后才恢复执行。
+这同样能实现之前的渐隐效果，而且 0.1 秒调用一次而不是每帧调用一次，可以降低引擎的负担。对于一些不需要每帧调用，只需要定时调用的任务来说， <code>Coroutine</code>  对性能更加友好。</p>
+<h3 id="ting-zhi-coroutine">停止 Coroutine</h3>
+<p>有两种情况下 Coroutine 会停止执行：</p>
+<ol>
+<li><code>StopCoroutine</code>  和 <code>StopAllCoroutines</code> 可以分别用来显式停止指定协程和所有协程。</li>
+<li>当 <code>GameObject</code>  通过 <code>SetActive(false)</code>  被隐藏时，挂在 <code>GameObject</code> 上的所有 Coroutine 会自动停止。</li>
+</ol>
+<p>协程既可以用字符串开启、停止，也可以直接调用迭代器方法开始、停止。</p>
+<ul>
+<li><strong>字符串方式</strong>。用字符串开启的协程只能用字符串停止。</li>
+</ul>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">StartCoroutine</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-string z-quoted z-double z-cs"><span class="z-punctuation z-definition z-string z-begin z-cs">&quot;</span>Fade<span class="z-punctuation z-definition z-string z-end z-cs">&quot;</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 开启 Coroutine
+</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">StopCoroutine</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-string z-quoted z-double z-cs"><span class="z-punctuation z-definition z-string z-begin z-cs">&quot;</span>Fade<span class="z-punctuation z-definition z-string z-end z-cs">&quot;</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 停止 Coroutine
+</span></span></code></pre>
+<ul>
+<li><strong>迭代器方式</strong>。<code>StartCoroutine</code> 会返回一个 Coroutine 对象，停止的时候作为参数传给 <code>StopCoroutine</code>。</li>
+</ul>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-support z-type z-cs">Coroutine</span> <span class="z-variable z-other z-cs">fadeRoutine</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">StartCoroutine</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">Fade</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+<span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">StopCoroutine</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-variable z-other z-cs">fadeRoutine</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+</span></code></pre>
+<h3 id="bu-tong-de-yield-zhi-ling">不同的 yield 指令</h3>
+<p>除了 <code>yield return null</code> （等待下一帧再继续执行）和 <code>WaitForSeconds(s)</code> （等待 <code>s</code> 秒游戏时间后再继续执行）外，unity 还提供了不同的 yield 指令用于实现不同情境下的协程等待操作：</p>
+<ul>
+<li><code>yield return null</code>：等待下一帧继续执行</li>
+<li><code>WaitForSeconds(s)</code>：等待 <code>s</code> 秒后再执行，使用的是 scaled time</li>
+<li><code>WaitForSecondsRealTime(s)</code>：等待 <code>s</code> 秒真实时间后再执行</li>
+<li><code>WaitUntil(Func&lt;bool&gt; predict)</code>：等待直到 <code>predict</code> 返回 <code>true</code></li>
+<li><code>WaitWhile(Func&lt;bool&gt; predict)</code>：等待 <code>predict</code> 返回 <code>false</code></li>
+<li><code>WaitForEndOfFrame()</code>：等待这一帧结束时再执行</li>
+<li><code>WaitForFixedUpdate()</code>：等待下一次 <code>FixedUpdate</code> 时执行</li>
+</ul>
+<hr />
+<h2 id="die-dai-qi-he-foreach">迭代器和 foreach</h2>
+<p>Coroutine 的实现依赖于 c# 中的 <code>yield</code> 关键字，要理解 <code>yield</code>，必须先理解 c# 中的迭代概念。</p>
+<p>一般来说，可以被遍历的集合都需要实现 <code>IEnumerable</code> 接口，只要实现了 <code>IEnumerable</code>，那么这个集合就可以用 <code>foreach</code> 语法遍历了。</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-keyword z-control z-loop z-foreach z-cs">foreach</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">item</span> <span class="z-keyword z-control z-flow z-cs">in</span> <span class="z-variable z-other z-cs">collection</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+<span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">DoSomething</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-variable z-other z-cs">item</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+</span></code></pre>
+<p>以上是 <code>foreach</code> 语句的基本用法，其中被遍历的集合 <code>collection</code> 必须是一个 <code>IEnumerable&lt;T&gt;</code> 或 <code>IEnumerable</code>。</p>
+<blockquote>
+<p>只以泛型接口为例，非泛型接口的原理也是一样的。</p>
+</blockquote>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-interface z-cs"><span class="z-storage z-type z-interface z-cs">interface</span> <span class="z-entity z-name z-interface z-cs">IEnumerable</span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-begin z-cs">&lt;</span></span><span class="z-meta z-generic z-cs"><span class="z-support z-type z-cs">T</span></span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-end z-cs">&gt;</span></span>
+</span><span class="z-meta z-interface z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-support z-type z-cs">IEnumerator</span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-begin z-cs">&lt;</span></span><span class="z-meta z-generic z-cs"><span class="z-support z-type z-cs">T</span></span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-end z-cs">&gt;</span></span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">GetEnumerator</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs"><span class="z-punctuation z-terminator z-cs">;</span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<p><code>IEnumerable&lt;T&gt;</code> 中最主要的方法就是 <code>GetEnumerator</code>，也就是获得这个集合的迭代器，返回类型为 <code>IEnumerator&lt;T&gt;</code>。迭代器在所有语言中都是类似的，可以看作是一个指向集合内元素的指针，可以移动。</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-interface z-cs"><span class="z-storage z-type z-interface z-cs">interface</span> <span class="z-entity z-name z-interface z-cs">IEnumerator</span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-begin z-cs">&lt;</span></span><span class="z-meta z-generic z-cs"><span class="z-support z-type z-cs">T</span></span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-end z-cs">&gt;</span></span>
+</span><span class="z-meta z-interface z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-storage z-type z-cs">bool</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">MoveNext</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs"><span class="z-punctuation z-terminator z-cs">;</span></span>
+    <span class="z-support z-type z-cs">T</span> <span class="z-variable z-other z-member z-cs">Current</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<p><code>IEnumerator&lt;T&gt;</code> 主要有 2 个方法/属性：</p>
+<ul>
+<li><code>MoveNext()</code>：移动至下一个集合元素，不能再移动（遍历结束）时返回 <code>false</code></li>
+<li><code>Current</code>：获得当前指向的元素</li>
+</ul>
+<p>有了集合的迭代器，要遍历这个集合，只需要不断调用 <code>MoveNext()</code> 移到下一个元素，然后用 <code>Current</code> 取出当前元素。</p>
+<p>那么最开始的 <code>foreach</code> 语句就可以理解为这样：</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">enumerator</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-variable z-other z-cs">collection</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">GetEnumerator</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+<span class="z-keyword z-control z-loop z-while z-cs">while</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span><span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">MoveNext</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+<span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">item</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">Current</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">DoSomething</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-variable z-other z-cs">item</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+</span></code></pre>
+<blockquote>
+<p>这只是一个 foreach 基本原理的简单示例，实际的实现要考虑异常等其他因素，比这个语句要复杂一些。</p>
+</blockquote>
+<hr />
+<h2 id="yield">yield</h2>
+<p>c# 引入的 <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/yield">yield</a> 可以大大简化迭代器的编写。</p>
+<h3 id="die-dai-qi-fang-fa">迭代器方法</h3>
+<p>有了 <code>yield</code> 的方法就不再是普通的方法，而是一个<strong>迭代器方法</strong>（iterator method），调用的时候只是生成一个迭代器，而不会执行函数体。</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-support z-type z-cs">IEnumerator</span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-begin z-cs">&lt;</span></span><span class="z-meta z-generic z-cs"><span class="z-storage z-type z-cs">int</span></span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-end z-cs">&gt;</span></span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">GetEnumerator</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs">
+</span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">DoSomething</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-string z-quoted z-double z-cs"><span class="z-punctuation z-definition z-string z-begin z-cs">&quot;</span>start<span class="z-punctuation z-definition z-string z-end z-cs">&quot;</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-keyword z-control z-flow z-return z-cs">yield return</span> <span class="z-constant z-numeric z-integer z-decimal z-cs">0</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">DoSomething</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-string z-quoted z-double z-cs"><span class="z-punctuation z-definition z-string z-begin z-cs">&quot;</span>mid<span class="z-punctuation z-definition z-string z-end z-cs">&quot;</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-keyword z-control z-flow z-return z-cs">yield return</span> <span class="z-constant z-numeric z-integer z-decimal z-cs">1</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">DoSomething</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-string z-quoted z-double z-cs"><span class="z-punctuation z-definition z-string z-begin z-cs">&quot;</span>end<span class="z-punctuation z-definition z-string z-end z-cs">&quot;</span></span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<p>调用迭代器方法返回一个 <code>IEnumerator&lt;int&gt;</code> 迭代器，内部保存了函数体的执行状态。</p>
+<blockquote>
+<p>这里需要特别注意，由于 <code>GetEnumerator</code> 是一个迭代器方法，<code>enumerator = GetEnumerator()</code> 只是生成了一个迭代器，保存了 GetEnumerator 函数内的状态，而不会执行 GetEnumerator 内的语句，这也是理解迭代器方法的关键点。</p>
+</blockquote>
+<p>每次调用该迭代器的 <code>MoveNext()</code> 方法都会继续执行函数，直到遇见 <code>yield</code> 语句挂起，下一次调用 <code>MoveNext()</code> 时再继续执行。</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 不会执行函数体，也就是 DoSomething(&quot;start&quot;) 不会被调用到
+</span><span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">enumerator</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">GetEnumerator</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+
+<span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 开始执行方法，直到 yield return
+</span><span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">MoveNext</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 会执行以下语句：
+</span>                       <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span>   DoSomething(&quot;start&quot;);
+</span>                       <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span>   yield return 0;
+</span>
+
+<span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> Current 可以取到 yield return 的返回值
+</span><span class="z-storage z-type z-cs">int</span> <span class="z-variable z-other z-cs">x</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">Current</span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> x == 0
+</span>
+<span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">MoveNext</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 执行以下语句：
+</span>                       <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span>   DoSomething(&quot;mid&quot;);
+</span>                       <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span>   yield return 1;
+</span>
+<span class="z-variable z-other z-cs">x</span> <span class="z-keyword z-operator z-assignment z-cs">=</span> <span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">Current</span><span class="z-punctuation z-terminator z-statement z-cs">;</span> <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 取到 yield 返回值，x = 1
+</span>
+<span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">MoveNext</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span> <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 执行最后一部分语句：
+</span>                                          <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span>   DoSomething(&quot;end&quot;)
+</span>                                          <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 执行结束，MoveNext() 将返回 false
+</span></span></code></pre>
+<h3 id="fan-hui-lei-xing">返回类型</h3>
+<p>迭代器方法可以返回的类型有：</p>
+<ul>
+<li><code>IEnumerator</code></li>
+<li><code>IEnumerator&lt;T&gt;</code></li>
+<li><code>IEnumerable</code></li>
+<li><code>IEnumerable&lt;T&gt;</code></li>
+<li><code>IAsyncEnumerable&lt;T&gt;</code></li>
+</ul>
+<p>最后一个是用于异步迭代器的，暂时不讨论。</p>
+<p>返回 <code>IEnumerable</code> 的迭代器方法本质上和返回 <code>IEnumerator</code> 的是一样的，其 <code>GetEnumerator()</code> 会返回相应的迭代器（<code>IEnumerator</code>）。</p>
+<p>如果返回类型是泛型接口 <code>IEnumerator&lt;T&gt;</code> 和 <code>IEnumerable&lt;T&gt;</code>，那么必须保证 <code>yield return</code> 的返回值可以被隐式转换为 <code>T</code> 类型。</p>
+<hr />
+<h2 id="zai-tan-unity-xie-cheng">再探 unity 协程</h2>
+<p>有了之前的基础，协程的基本原理其实也就很简单了：</p>
+<ul>
+<li><code>StartCoroutine</code> 在内部保存了迭代器方法</li>
+<li>每一帧的特定时机(update 之后)调用协程中迭代器的 <code>MoveNext()</code> 推动协程执行</li>
+<li><code>MoveNext()</code> 返回 <code>false</code> ，协程结束</li>
+</ul>
+<p>基于这些原理，我们甚至可以模拟 unity 写出一个简化版的 Coroutine。</p>
+<h3 id="sheng-ming-zhou-qi-kong-zhi">生命周期控制</h3>
+<p>首先需要模拟 Unity 的游戏对象生命周期控制，主要作用只是承载协程的生命周期和验证协程的正确性，所以越简单越好：</p>
+<ul>
+<li>游戏内对象都继承自基类 GameObject，没有其他组件。相当于所有 GameObject 只有一个 MonoBehaviour 组件。</li>
+<li>GameEngine 控制游戏逻辑
+<ul>
+<li>用一个列表保存所有 GameObject</li>
+<li>初始化时添加所有 gameobject</li>
+<li>Run 方法模拟游戏的帧循环，每次循环就是一帧，调用所有 gameobject 的 update 方法</li>
+</ul>
+</li>
+</ul>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">GameEngine</span>
+</span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-storage z-modifier z-access z-cs">private</span> <span class="z-support z-type z-cs">GameObject</span><span class="z-meta z-brackets z-cs"><span class="z-punctuation z-section z-brackets z-begin z-cs">[</span><span class="z-punctuation z-section z-brackets z-end z-cs">]</span></span> <span class="z-variable z-other z-member z-cs">_gameobjects</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">Init</span>(GameObject[] gameobjects)
+    </span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-support z-type z-cs">_gameobjects</span> = <span class="z-variable z-other z-member z-cs">gameobjects</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+
+    <span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">Run</span>()
+    </span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-meta z-method z-constructor z-cs"><span class="z-entity z-name z-function z-constructor z-cs">while</span> <span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span></span><span class="z-meta z-method z-constructor z-cs"><span class="z-meta z-method z-parameters z-cs"><span class="z-support z-type z-cs">true</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span>
+        </span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+            <span class="z-keyword z-control z-loop z-foreach z-cs">foreach</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">obj</span> <span class="z-keyword z-control z-flow z-cs">in</span> <span class="z-variable z-other z-cs">_gameobjects</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+            <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+                <span class="z-variable z-other z-cs">obj</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">Update</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+            <span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+        <span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<h3 id="kai-qi-xie-cheng">开启协程</h3>
+<p>Unity 中 <code>StartCoroutine</code> 是 <code>MonoBehaviour</code> 的一个方法，我们这里对应的就是 <code>GameObject</code> 中的方法。</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">GameObject</span>
+</span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-support z-type z-cs">Coroutine</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">StartCoroutine</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-support z-type z-cs">IEnumerator</span> <span class="z-variable z-parameter z-cs">enumerator</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs"><span class="z-punctuation z-terminator z-cs">;</span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<blockquote>
+<p>这里只考虑 <code>yield return null</code> 形式的协程，不考虑延时、协程嵌套等。</p>
+</blockquote>
+<ul>
+<li>传入一个迭代器方法，需要把这个迭代器保存到 <code>Coroutine</code> 句柄中，用于管理协程的继续执行和停止；</li>
+<li><code>StartCoroutine</code> 中应该调用 <code>enumerator.MoveNext()</code> 开始执行协程，直到 <code>yield</code>；</li>
+<li>这里只考虑 <code>yield return null</code> 类型的协程，就不需要调用 <code>enumerator.Current</code> 检查迭代器方法的返回值了；</li>
+<li>因为 <code>yield return null</code> 挂起的协程，放在一个集合里，等到 <code>Update</code> 之后再同一处理。</li>
+</ul>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">GameObject</span>
+</span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+    <span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-storage z-modifier z-cs">readonly</span> <span class="z-support z-type z-cs">HashSet</span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-begin z-cs">&lt;</span></span><span class="z-meta z-generic z-cs"><span class="z-support z-type z-cs">Coroutine</span></span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-end z-cs">&gt;</span></span> <span class="z-variable z-other z-member z-cs">Coroutines</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-meta z-instance z-cs"><span class="z-keyword z-operator z-new z-cs">new</span></span><span class="z-meta z-instance z-cs"> </span><span class="z-meta z-instance z-cs"><span class="z-support z-type z-cs">HashSet</span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-begin z-cs">&lt;</span></span><span class="z-meta z-generic z-cs"><span class="z-support z-type z-cs">Coroutine</span></span><span class="z-meta z-generic z-cs"><span class="z-punctuation z-definition z-generic z-end z-cs">&gt;</span></span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-instance z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+
+    <span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-support z-type z-cs">Coroutine</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">StartCoroutine</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-support z-type z-cs">IEnumerator</span> <span class="z-variable z-parameter z-cs">enumerator</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs">
+    </span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-support z-type z-cs">Coroutine</span> <span class="z-variable z-other z-cs">coroutine</span> <span class="z-keyword z-operator z-assignment z-variable z-cs">=</span> <span class="z-meta z-instance z-cs"><span class="z-keyword z-operator z-new z-cs">new</span></span><span class="z-meta z-instance z-cs"> </span><span class="z-meta z-instance z-cs"><span class="z-support z-type z-cs">Coroutine</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-instance z-cs"><span class="z-meta z-group z-cs"><span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+
+        <span class="z-keyword z-control z-conditional z-if z-cs">if</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-keyword z-operator z-cs">!</span><span class="z-variable z-other z-cs">enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">MoveNext</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span></span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+            <span class="z-keyword z-control z-flow z-return z-cs">return</span> <span class="z-variable z-other z-cs">coroutine</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+
+        <span class="z-variable z-other z-cs">Coroutines</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">Add</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-variable z-other z-cs">coroutine</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-keyword z-control z-flow z-return z-cs">return</span> <span class="z-variable z-other z-cs">coroutine</span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<h3 id="chu-li-gua-qi-de-xie-cheng">处理挂起的协程</h3>
+<p>因 <code>yield return null</code> 挂起的协程的处理时机在 <code>Update</code> 之后，只需要遍历 <code>GameObject</code> 上的协程，执行迭代器的 <code>MoveNext()</code> 方法即可。如果协程完成执行（<code>MoveNext()</code> 返回 <code>false</code>），则将其从 <code>GameObject</code> 维护的集合中移除。</p>
+<pre data-lang="cs" class="language-cs z-code"><code class="language-cs" data-lang="cs"><span class="z-source z-cs"><span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">GameObject</span>
+</span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+...
+    <span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-storage z-type z-cs">void</span> <span class="z-meta z-method z-cs"><span class="z-entity z-name z-function z-cs">YieldNull</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span><span class="z-meta z-method z-cs">
+    </span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-keyword z-control z-loop z-foreach z-cs">foreach</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">coroutine</span> <span class="z-keyword z-control z-flow z-cs">in</span> <span class="z-variable z-other z-cs">Coroutines</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+        <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+            <span class="z-keyword z-control z-conditional z-if z-cs">if</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-keyword z-operator z-cs">!</span><span class="z-variable z-other z-cs">coroutine</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-variable z-other z-cs">Enumerator</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">MoveNext</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span></span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+                <span class="z-variable z-other z-cs">Coroutines</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">Remove</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-variable z-other z-cs">coroutine</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+        <span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+
+<span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">GameEngine</span>
+</span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+...
+    <span class="z-storage z-modifier z-access z-cs">public</span> <span class="z-meta z-class z-cs"><span class="z-storage z-type z-class z-cs">class</span> <span class="z-entity z-name z-class z-cs">Run</span>()
+    </span><span class="z-meta z-class z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+        <span class="z-meta z-method z-constructor z-cs"><span class="z-entity z-name z-function z-constructor z-cs">while</span> <span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-begin z-cs">(</span></span></span><span class="z-meta z-method z-constructor z-cs"><span class="z-meta z-method z-parameters z-cs"><span class="z-support z-type z-cs">true</span></span><span class="z-meta z-method z-parameters z-cs"><span class="z-punctuation z-section z-parameters z-end z-cs">)</span></span>
+        </span><span class="z-meta z-method z-body z-cs"><span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+            <span class="z-keyword z-control z-loop z-foreach z-cs">foreach</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">obj</span> <span class="z-keyword z-control z-flow z-cs">in</span> <span class="z-variable z-other z-cs">_gameobjects</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+            <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+                <span class="z-variable z-other z-cs">obj</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">Update</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+            <span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+
+            <span class="z-comment z-line z-double-slash z-cs"><span class="z-punctuation z-definition z-comment z-cs">//</span> 处理挂起的协程
+</span>            <span class="z-keyword z-control z-loop z-foreach z-cs">foreach</span> <span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span><span class="z-meta z-group z-cs"><span class="z-storage z-type z-variable z-cs">var</span> <span class="z-variable z-other z-cs">obj</span> <span class="z-keyword z-control z-flow z-cs">in</span> <span class="z-variable z-other z-cs">_gameobjects</span><span class="z-punctuation z-section z-group z-end z-cs">)</span></span>
+            <span class="z-meta z-block z-cs"><span class="z-punctuation z-section z-block z-begin z-cs">{</span>
+                <span class="z-variable z-other z-cs">obj</span><span class="z-punctuation z-accessor z-dot z-cs">.</span><span class="z-meta z-function-call z-cs"><span class="z-variable z-function z-cs">YieldNull</span><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-begin z-cs">(</span></span></span><span class="z-meta z-function-call z-cs"><span class="z-meta z-group z-cs"><span class="z-punctuation z-section z-group z-end z-cs">)</span></span></span><span class="z-punctuation z-terminator z-statement z-cs">;</span>
+            <span class="z-punctuation z-section z-block z-end z-cs">}</span></span>
+        <span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+    <span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+<span class="z-punctuation z-section z-block z-end z-cs">}</span></span></span>
+</span></code></pre>
+<p>至此就完成了一个极简版的协程，虽然只能支持 <code>yield return null</code>，但也可以借此理解协程的内部原理。</p>
+<hr />
+<p>如果要实现 Unity 那样完整的协程，至少还需要考虑以下因素：</p>
+<ul>
+<li>不同类型的协程返回值。包括 <code>WaitForSeconds</code>、<code>WaitUntil</code> 等，这就需要在每次 <code>enumerator.MoveNext()</code> 之后用 <code>enumerator.Current</code> 检查 <code>yield</code> 返回值，根据不同的返回值做不同的处理。</li>
+<li>不同的协程处理时机。不同类型的协程，其处理时机也应该是不同的，比如 <code>WaitForEndOfFrame</code> 显然就应该在帧末处理而不是在 <code>Update</code> 之后。</li>
+<li>协程的嵌套。Unity 可以 <code>yield return</code> 另一个协程，就像函数的嵌套调用一样，要实现这一点可能需要使用栈来管理。</li>
+</ul>
+<hr />
+<h2 id="references">References</h2>
+<ol>
+<li><a href="https://docs.unity3d.com/2020.1/Documentation/Manual/Coroutines.html">Coroutines | Unity</a></li>
+<li><a href="https://docs.microsoft.com/en-us/dotnet/csharp/iterators">iterators | C#</a></li>
+<li><a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/yield">yield | C#</a></li>
+</ol>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>

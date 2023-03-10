@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>Hello, hugo! | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    Hello, hugo!
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/tools/">#tools</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/hugo/">#hugo</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2021-01-27">2021-01-27</time>
+  </div>
+  <div class="post-content">
+    <p>说来惭愧，我的博客已经荒废许久，上一篇是在两年前折腾 hexo 的时候。后来不更新的原因一方面当然是因为懒，另一方面是觉得当时搭起来的博客有两个硬伤：</p>
+<ol>
+<li>编译速度慢。hexo 的编译速度是我最忍受不了的地方，随便加一点东西都要编译半天。而且 hexo 使用的 nodejs 依赖关系显得有些复杂。</li>
+<li>不能自动部署。我需要同时维护博客源码和生成的静态网站源码，既要把博客源码 push 到 github 上去，还要把输出的网站源码也 push 上去。编译已经很慢了，再维护两份代码仓库就更让人心烦。</li>
+</ol>
+<p>前段时间我脑子一热又想写博客了，于是在网上搜了一下，发现这两个问题都可以解决了。</p>
+<p>第 1 个问题的解决方案是 hugo。hugo 是 hexo 的完美替代，它是用 golang 编写的，最大的优点就是快，编译几乎是秒速。而且 hugo 完全没有其他依赖，只需要一个可执行文件，简直就是我的理想型。</p>
+<p>第 2 个问题，可以用 github actions 解决。有现成的 github actions 可以实现 hugo 的自动部署，本地只需要维护博客仓库就可以了，push 到 github 时会触发 github actions 帮我们执行编译并部署到 github-pages 的操作，详见我的<a href="https://zenlian.github.io/posts/github-actions-hugo/">另一篇博文</a>。</p>
+<hr />
+<p>记录一下 hugo 搭建过程中遇到的一些新的概念和问题。</p>
+<h2 id="nei-rong-guan-li">内容管理</h2>
+<h3 id="fen-qu">分区</h3>
+<p>hugo 的文章都放在 content 目录下，采用 sections 管理文章的分类。sections 的组织结构是遵循你的目录结构的，每个目录都是一个分区。你的文章所在分区是由它的位置决定的，你无法在文章的 metadata 中修改它的分区。</p>
+<p>content 根目录下的每个文件夹会自动成为一个分区。如果文件夹不在 content 根目录下，那么需要新建一个 _index.md 文件使它成为分区。分区和目录一样是树状结构，因此很适合作为文章的分类使用，比 hexo 在文章中使用 categories 指定分类要更科学些。</p>
+<pre data-lang="plaintext" class="language-plaintext z-code"><code class="language-plaintext" data-lang="plaintext"><span class="z-text z-plain">content
+├── life/
+└── tech/
+   ├── cpp/
+   │ └── _index.md
+   └── misc/
+</span></code></pre>
+<p>如上的目录结构中，有 life 和 tech 两个分区，而 tech 下又有 cpp 子分区。misc 不是分区，因为它既不在根目录下，也没有 <code>_index.md</code> 文件。<code>_index.md</code> 文件 metadata 中的 title 可以指定分区名。</p>
+<h3 id="url-guan-li">URL 管理</h3>
+<p>首先需要在 config.toml 中的 <code>baseURL</code> 指定网站的 url：</p>
+<pre data-lang="toml" class="language-toml z-code"><code class="language-toml" data-lang="toml"><span class="z-source z-toml"><span class="z-meta z-tag z-key z-toml"><span class="z-entity z-name z-tag z-toml">baseURL</span></span> <span class="z-punctuation z-definition z-key-value z-toml">=</span> <span class="z-string z-quoted z-double z-basic z-toml"><span class="z-punctuation z-definition z-string z-begin z-toml">&quot;</span>https://example.com/<span class="z-punctuation z-definition z-string z-end z-toml">&quot;</span></span>
+</span></code></pre>
+<p>如果你有一个 <code>content/posts/article.md</code> 文件，编译后输出的对应 url 是 <code>https://example.com/posts/article/</code>。</p>
+<p>如果你要让文件命名为中文，而生成的 url 为英文，可以用 <code>slug</code> 指定。比如你有一篇文章 <code>content/posts/引言.md</code>，在文章的 metadata 中添加：</p>
+<pre data-lang="yaml" class="language-yaml z-code"><code class="language-yaml" data-lang="yaml"><span class="z-source z-yaml"><span class="z-entity z-other z-document z-begin z-yaml">---</span>
+<span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">title</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-string z-quoted z-double z-yaml"><span class="z-punctuation z-definition z-string z-begin z-yaml">&quot;</span>引言<span class="z-punctuation z-definition z-string z-end z-yaml">&quot;</span></span>
+<span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">slug</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-string z-quoted z-double z-yaml"><span class="z-punctuation z-definition z-string z-begin z-yaml">&quot;</span>introdution<span class="z-punctuation z-definition z-string z-end z-yaml">&quot;</span></span>
+<span class="z-entity z-other z-document z-begin z-yaml">---</span>
+</span></code></pre>
+<p>这样文件名和显示的文章名都是中文，而对应的 url 变为 <code>https://example.com/posts/introdution/</code>。</p>
+<h3 id="tu-pian-zi-yuan">图片资源</h3>
+<p>图片位置以及引用方法有两种：</p>
+<ol>
+<li>所有的图片都放在 <code>static/images</code> 目录下，markdown 文件中通过路径 <code>![](/images/XXX.png</code> 引用</li>
+<li>图片和 markdown 文件放在一起。在同一目录下建立一个和 markdown 文件同名的文件夹，把图片放在里面，用相对路径引用：<code>![](XXX.png)</code>。也可以把一篇文章和它的其他资源文件放在同一个单独的文件夹里，比如文章写在 <code>/posts/article/index.md</code> 中，图片位于 <code>/posts/article/img.png</code>，这样也可以直接在文章中用相对路径引用 <code>![](img.png)</code>。</li>
+</ol>
+<h2 id="zhu-ti-meme">主题 MemE</h2>
+<p>用 hexo 的时候使用的是 NexT 主题，既然换了 hugo 就想尝试点新鲜的。我无意间点进了<a href="https://io-oi.me/">reuixiy 的博客</a>（怎么点进去的我已经忘了），觉得这个博客的主题 <a href="https://github.com/reuixiy/hugo-theme-meme">MemE</a> 简洁而优雅，很符合我的审美 <del>（假设我有）</del>，就决定是它了。</p>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>管理游戏中的数值修改 | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    管理游戏中的数值修改
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/game-development/">#game-development</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2021-09-25">2021-09-25</time>
+  </div>
+  <div class="post-content">
+    <p>游戏中会有很多数值时刻发生着变化，比如角色的攻击力、移速等会因为各种 buff 发生改变，这些 buff 的来源也可能有很多，比如自身技能、敌人技能或者队友给你加的 buff 等等，这些 buff 还可以叠加，持续时间结束之后需要移除。这些对基础数值的修改称为 <code>modifier</code>。</p>
+<p>为了完成 <code>modifier</code> 的管理，饥荒 mod 为我们提供了一个思路。</p>
+<hr />
+<h2 id="sourcemodifierlist">SourceModifierList</h2>
+<p>饥荒中提供了一个类 <code>SourceModifierList</code> 用来管理这样的数值修改，先来看看怎么用的。</p>
+<p>饥荒中所有需要战斗的实体都依赖于一个组件 <code>combat</code>，<code>combat</code> 为角色提供了攻击力，基本公式为：攻击力 = 基础攻击 * 攻击系数。</p>
+<p>攻击系数就是一个 <code>SourceModifierList</code>：</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-comment z-line z-lua"><span class="z-punctuation z-definition z-comment z-lua">--</span> self 是 combat 组件，self.inst 是 combat 挂载的对象
+</span><span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">externaldamagemultipliers</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-function z-lua">SourceModifierList</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">inst</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+</span></code></pre>
+<p>默认的修改值为 1，修改方法是所有 <code>modifier</code> 相乘（即基础攻击力 * 1）。</p>
+<h3 id="tian-jia-modifier">添加 modifier</h3>
+<p>角色吃下电羊果冻后，使角色攻击力乘以 1.5 倍，这时就需要添加一个 modifier</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-comment z-line z-lua"><span class="z-punctuation z-definition z-comment z-lua">--</span> food 是电羊果冻，用于移除时的索引
+</span><span class="z-variable z-other z-lua">inst</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">components</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">combat</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">externaldamagemultipliers</span><span class="z-punctuation z-accessor z-lua">:</span><span class="z-meta z-property z-lua"><span class="z-variable z-function z-lua">AddModifier</span></span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-other z-lua">food</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-constant z-numeric z-float z-decimal z-lua">1<span class="z-punctuation z-separator z-decimal z-lua">.</span>5</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+</span></code></pre>
+<h3 id="yi-chu-modifier">移除 modifier</h3>
+<p>电羊果冻持续时间结束后，移除对应的 modifier，角色攻击力就会恢复正常</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-variable z-other z-lua">inst</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">components</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">combat</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">externaldamagemultipliers</span><span class="z-punctuation z-accessor z-lua">:</span><span class="z-meta z-property z-lua"><span class="z-variable z-function z-lua">RemoveModifier</span></span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-other z-lua">food</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+</span></code></pre>
+<h3 id="ji-suan-gong-ji-li">计算攻击力</h3>
+<p>计算攻击力时，只需要调用 <code>Get()</code> 方法</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span> <span class="z-meta z-name z-function"><span class="z-variable z-other z-lua">Combat</span><span class="z-punctuation z-accessor z-lua">:</span><span class="z-meta z-property z-lua"><span class="z-entity z-name z-function z-lua">CalcDamage</span></span></span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-constant z-language z-lua">...</span>
+    <span class="z-keyword z-control z-return z-lua">return</span> <span class="z-variable z-other z-lua">basedamage</span> <span class="z-keyword z-operator z-arithmetic z-lua">*</span> <span class="z-variable z-other z-lua">externaldamagemultipliers</span><span class="z-punctuation z-accessor z-lua">:</span><span class="z-meta z-property z-lua"><span class="z-variable z-function z-lua">Get</span></span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+</span></code></pre>
+<hr />
+<h2 id="shi-xian">实现</h2>
+<blockquote>
+<p>以下代码都只保留关键结构，省略了很多细节</p>
+</blockquote>
+<p><code>SourceModifierList</code> 的实现也不复杂，维护了这几个私有变量：</p>
+<ul>
+<li><code>_modifiers</code>：内部用一个字典保存每个来源（source）对应的 modifier，当然一个 source 可能对应多个 modifier，所以每个 source 又对应一个字典，字典中再用字符串 key 标识不同的 modifier。</li>
+<li><code>_modifier</code>：保存最终计算出的修改值</li>
+<li><code>_fn</code>：计算修改值的函数，默认为两两相乘。也就是最终的 <code>_modifier</code> 是由 <code>_modifiers</code> 中的所有数值相乘得到的。</li>
+<li><code>_base</code>：基值，默认为 1。如果 <code>_fn</code> 是加法就应该设为 0。</li>
+</ul>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-variable z-other z-lua">SourceModifierList</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-function z-lua">Class</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-parameter z-function z-lua">self</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">inst</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">base_value</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">fn</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">inst</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-other z-lua">inst</span>
+
+    <span class="z-comment z-line z-lua"><span class="z-punctuation z-definition z-comment z-lua">--</span> Private members
+</span>    <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifiers</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-meta z-mapping z-lua"><span class="z-punctuation z-section z-block z-begin z-lua">{</span><span class="z-punctuation z-section z-block z-end z-lua">}</span></span>
+    <span class="z-keyword z-control z-conditional z-lua">if</span> <span class="z-variable z-other z-lua">base_value</span> <span class="z-keyword z-operator z-comparison z-lua">~=</span> <span class="z-constant z-language z-null z-lua">nil</span> <span class="z-meta z-block z-lua"><span class="z-keyword z-control z-conditional z-lua">then</span>
+        <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifier</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-other z-lua">base_value</span>
+        <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_base</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-other z-lua">base_value</span>
+    <span class="z-meta z-block z-lua"><span class="z-keyword z-control z-conditional z-lua">else</span></span></span><span class="z-meta z-block z-lua">
+        <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifier</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-constant z-numeric z-integer z-decimal z-lua">1</span>
+        <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_base</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-constant z-numeric z-integer z-decimal z-lua">1</span>
+    <span class="z-keyword z-control z-end z-lua">end</span></span>
+
+    <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_fn</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-other z-lua">fn</span> <span class="z-keyword z-operator z-logical z-lua">or</span> <span class="z-variable z-other z-lua">SourceModifierList</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">multiply</span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+
+<span class="z-variable z-other z-lua">SourceModifierList</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua"><span class="z-entity z-name z-function z-lua">multiply</span></span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-parameter z-function z-lua">a</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">b</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-keyword z-control z-return z-lua">return</span> <span class="z-variable z-other z-lua">a</span> <span class="z-keyword z-operator z-arithmetic z-lua">*</span> <span class="z-variable z-other z-lua">b</span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+
+<span class="z-variable z-other z-lua">SourceModifierList</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua"><span class="z-entity z-name z-function z-lua">additive</span></span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-parameter z-function z-lua">a</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">b</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-keyword z-control z-return z-lua">return</span> <span class="z-variable z-other z-lua">a</span> <span class="z-keyword z-operator z-arithmetic z-lua">+</span> <span class="z-variable z-other z-lua">b</span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+
+<span class="z-variable z-other z-lua">SourceModifierList</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua"><span class="z-entity z-name z-function z-lua">boolean</span></span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-parameter z-function z-lua">a</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">b</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-keyword z-control z-return z-lua">return</span> <span class="z-variable z-other z-lua">a</span> <span class="z-keyword z-operator z-logical z-lua">or</span> <span class="z-variable z-other z-lua">b</span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+</span></code></pre>
+<p><code>SetModifier</code> 时，把 modifier 存入字典，然后重新计算 <code>_modifier</code> 结果。</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span> <span class="z-meta z-name z-function"><span class="z-variable z-other z-lua">SourceModifierList</span><span class="z-punctuation z-accessor z-lua">:</span><span class="z-meta z-property z-lua"><span class="z-entity z-name z-function z-lua">SetModifier</span></span></span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-parameter z-function z-lua">source</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">modifier</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">key</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-keyword z-control z-conditional z-lua">if</span> <span class="z-variable z-other z-lua">key</span> <span class="z-keyword z-operator z-comparison z-lua">==</span> <span class="z-constant z-language z-null z-lua">nil</span> <span class="z-meta z-block z-lua"><span class="z-keyword z-control z-conditional z-lua">then</span>
+        <span class="z-variable z-other z-lua">key</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-string z-quoted z-double z-lua"><span class="z-punctuation z-definition z-string z-begin z-lua">&quot;</span>key<span class="z-punctuation z-definition z-string z-end z-lua">&quot;</span></span>
+    <span class="z-keyword z-control z-end z-lua">end</span></span>
+
+    <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifiers</span><span class="z-meta z-brackets z-lua"><span class="z-punctuation z-section z-brackets z-begin z-lua">[</span><span class="z-variable z-other z-lua">source</span><span class="z-punctuation z-section z-brackets z-end z-lua">]</span></span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-meta z-mapping z-lua"><span class="z-punctuation z-section z-block z-begin z-lua">{</span>
+        </span><span class="z-meta z-mapping z-key z-lua"><span class="z-meta z-brackets z-lua"><span class="z-punctuation z-section z-brackets z-begin z-lua">[</span><span class="z-variable z-other z-lua">key</span><span class="z-punctuation z-section z-brackets z-end z-lua">]</span></span></span><span class="z-meta z-mapping z-lua"> </span><span class="z-meta z-mapping z-lua"><span class="z-punctuation z-separator z-key-value z-lua">=</span></span><span class="z-meta z-mapping z-value z-lua"> <span class="z-variable z-other z-lua">modifier</span>
+    </span><span class="z-meta z-mapping z-lua"><span class="z-punctuation z-section z-block z-end z-lua">}</span></span>,
+    <span class="z-variable z-function z-lua">RecalculateModifier</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+</span></code></pre>
+<p>重新计算（<code>RecalculateModifier</code>）也很简单，调用 <code>_fn</code> 遍历所有的 modifier 计算一遍即可。</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-storage z-modifier z-lua">local</span> <span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span> <span class="z-meta z-name z-function"><span class="z-entity z-name z-function z-lua">RecalculateModifier</span></span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-parameter z-function z-lua">inst</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-storage z-modifier z-lua">local</span> <span class="z-variable z-other z-lua">m</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-other z-lua">inst</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_base</span>
+    <span class="z-keyword z-control z-loop z-lua">for</span> <span class="z-variable z-other z-lua">source</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-other z-lua">modifiers</span> <span class="z-keyword z-control z-loop z-lua">in</span> <span class="z-support z-function z-builtin z-lua">pairs</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-other z-lua">inst</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifiers</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span> <span class="z-meta z-block z-lua"><span class="z-keyword z-control z-lua">do</span>
+        <span class="z-keyword z-control z-loop z-lua">for</span> <span class="z-variable z-other z-lua">k</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-other z-lua">v</span> <span class="z-keyword z-control z-loop z-lua">in</span> <span class="z-support z-function z-builtin z-lua">pairs</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-other z-lua">modifiers</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span> <span class="z-meta z-block z-lua"><span class="z-keyword z-control z-lua">do</span>
+            <span class="z-variable z-other z-lua">m</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-other z-lua">inst</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua"><span class="z-variable z-function z-lua">_fn</span></span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-other z-lua">m</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-other z-lua">v</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+        <span class="z-keyword z-control z-end z-lua">end</span></span>
+    <span class="z-keyword z-control z-end z-lua">end</span></span>
+    <span class="z-variable z-other z-lua">inst</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifier</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-other z-lua">m</span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+</span></code></pre>
+<p><code>RemoveModifier</code> 把对应项从 <code>_modifiers</code> 字典移除，再重新计算 <code>_modifier</code>。</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-comment z-line z-lua"><span class="z-punctuation z-definition z-comment z-lua">--</span> Key is optional if you want to remove the entire source
+</span><span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span> <span class="z-meta z-name z-function"><span class="z-variable z-other z-lua">SourceModifierList</span><span class="z-punctuation z-accessor z-lua">:</span><span class="z-meta z-property z-lua"><span class="z-entity z-name z-function z-lua">RemoveModifier</span></span></span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-parameter z-function z-lua">source</span><span class="z-punctuation z-separator z-comma z-lua">,</span> <span class="z-variable z-parameter z-function z-lua">key</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-storage z-modifier z-lua">local</span> <span class="z-variable z-other z-lua">modifiers</span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifiers</span><span class="z-meta z-brackets z-lua"><span class="z-punctuation z-section z-brackets z-begin z-lua">[</span><span class="z-variable z-other z-lua">source</span><span class="z-punctuation z-section z-brackets z-end z-lua">]</span></span>
+    <span class="z-keyword z-control z-conditional z-lua">if</span> <span class="z-variable z-other z-lua">key</span> <span class="z-keyword z-operator z-comparison z-lua">~=</span> <span class="z-constant z-language z-null z-lua">nil</span> <span class="z-meta z-block z-lua"><span class="z-keyword z-control z-conditional z-lua">then</span>
+        <span class="z-variable z-other z-lua">modifiers</span><span class="z-meta z-brackets z-lua"><span class="z-punctuation z-section z-brackets z-begin z-lua">[</span><span class="z-variable z-other z-lua">key</span><span class="z-punctuation z-section z-brackets z-end z-lua">]</span></span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-constant z-language z-null z-lua">nil</span>
+        <span class="z-keyword z-control z-conditional z-lua">if</span> <span class="z-support z-function z-builtin z-lua">next</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-other z-lua">modifiers</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span> <span class="z-keyword z-operator z-comparison z-lua">~=</span> <span class="z-constant z-language z-null z-lua">nil</span> <span class="z-meta z-block z-lua"><span class="z-keyword z-control z-conditional z-lua">then</span>
+            <span class="z-comment z-line z-lua"><span class="z-punctuation z-definition z-comment z-lua">--</span>this source still has other keys
+</span>            <span class="z-variable z-function z-lua">RecalculateModifier</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+            <span class="z-keyword z-control z-return z-lua">return</span>
+        <span class="z-keyword z-control z-end z-lua">end</span></span>
+    <span class="z-keyword z-control z-end z-lua">end</span></span>
+
+    <span class="z-comment z-line z-lua"><span class="z-punctuation z-definition z-comment z-lua">--</span>remove the entire source
+</span>    <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifiers</span><span class="z-meta z-brackets z-lua"><span class="z-punctuation z-section z-brackets z-begin z-lua">[</span><span class="z-variable z-other z-lua">source</span><span class="z-punctuation z-section z-brackets z-end z-lua">]</span></span> <span class="z-keyword z-operator z-assignment z-lua">=</span> <span class="z-constant z-language z-null z-lua">nil</span>
+    <span class="z-variable z-function z-lua">RecalculateModifier</span><span class="z-meta z-function-call z-arguments z-lua"><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span></span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+</span></code></pre>
+<p>计算 <code>_modifier</code> 值是在添加和移除 modifier 时执行的，因此调用 <code>Get()</code> 时，只是简单地返回 <code>_modifier</code> 而已：</p>
+<pre data-lang="lua" class="language-lua z-code"><code class="language-lua" data-lang="lua"><span class="z-source z-lua"><span class="z-meta z-function z-lua"><span class="z-meta z-block z-lua"><span class="z-storage z-type z-function z-lua">function</span> <span class="z-meta z-name z-function"><span class="z-variable z-other z-lua">SourceModifierList</span><span class="z-punctuation z-accessor z-lua">:</span><span class="z-meta z-property z-lua"><span class="z-entity z-name z-function z-lua">Get</span></span></span><span class="z-meta z-group z-lua"><span class="z-punctuation z-section z-group z-begin z-lua">(</span><span class="z-punctuation z-section z-group z-end z-lua">)</span></span>
+    <span class="z-keyword z-control z-return z-lua">return</span> <span class="z-variable z-language z-this z-lua">self</span><span class="z-punctuation z-accessor z-lua">.</span><span class="z-meta z-property z-lua">_modifier</span>
+<span class="z-keyword z-control z-end z-lua">end</span></span></span>
+</span></code></pre>
+<p>以上就是 <code>SourceModifier</code> 的基本原理，完全可以应用在其他游戏中。</p>
+<p>饥荒中还实现了更多实用的功能，比如</p>
+<ul>
+<li>计算所有相同 <code>source</code> 的 modifier 值</li>
+<li>计算所有相同 <code>key</code> 的 modifier 值</li>
+<li><code>source</code> 对象销毁时，自动调用 <code>RemoveModifier</code></li>
+</ul>
+<p>这些可以根据游戏实际需求选择实现。</p>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>

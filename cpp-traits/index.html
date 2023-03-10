@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>C++ 类型萃取的实现 | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    C++ 类型萃取的实现
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/cpp/">#cpp</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/traits/">#traits</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2020-04-01">2020-04-01</time>
+  </div>
+  <div class="post-content">
+    <p>以前看《Effective C++》时，很多条款都没有仔细看，对类型萃取有点印象，但又说不出个所以然来。
+最近在看侯捷老师的<a href="https://www.bilibili.com/video/BV1Hb411K763?t=1156&amp;p=44">《C++STL 与泛型编程》</a> 视频课程，
+讲到迭代器 iterator_traits 的作用时，又回过头去看《Effective C++》中的
+“条款 47：请使用 traits class 表现类型信息”，才晃然大悟。</p>
+<h2 id="die-dai-qi-lei-xing-cui-qu">迭代器类型萃取</h2>
+<p>类型萃取，就是在<strong>编译期</strong>取得类型相关的信息。 <code>iterator_traits</code>  用于迭代器的类型萃取，它是一个模板类，用具体的迭代器作为模板参数传入时，可以返回该迭代器的类型相关信息。</p>
+<p>具体来说，STL 中有 5 种迭代器（C++20 之前）：</p>
+<ol>
+<li><strong>input</strong>：只能读取和向前移动一步。即只支持 <code>value = *iter</code>。</li>
+<li><strong>output</strong>：只能写入和向前移动一步。即只支持 <code>*iter = value</code>。</li>
+<li><strong>forward</strong>：只能向前移动一步，每个位置可多次读写。即 <code>iter++</code>。</li>
+<li><strong>bidirectional</strong>：可以向前、向后移动一步。即 <code>iter++</code>、<code>iter--</code>。</li>
+<li><strong>random</strong>：支持随机访问，向前、向后移动任意偏移量，即 <code>iter + offset</code>。</li>
+</ol>
+<p>泛型算法使用迭代器时，有些需要根据迭代器的不同类型采取不同的策略。
+比如 <code>std::advance()</code> 函数可以将迭代器移动相应的距离：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> IterT<span class="z-punctuation z-separator z-c++">,</span> <span class="z-storage z-type z-c++">typename</span> DistT</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span>
+<span class="z-storage z-type z-c">void</span> <span class="z-meta z-function z-c++"><span class="z-meta z-toc-list z-full-identifier z-c++"><span class="z-entity z-name z-function z-c++">advance</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++">IterT<span class="z-keyword z-operator z-c">&amp;</span> <span class="z-variable z-parameter z-c++">iter</span><span class="z-punctuation z-separator z-c++">,</span> DistT <span class="z-variable z-parameter z-c++">d</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></code></pre>
+<p>需要根据迭代器的类型执行不同的操作</p>
+<ul>
+<li>如果是 random 迭代器，则直接使用一次算术运算</li>
+<li>否则需要执行连续多次自增或自减</li>
+</ul>
+<p>这就是使用类型萃取实现的。</p>
+<h2 id="shi-xian">实现</h2>
+<h3 id="iterator-tag">iterator_tag</h3>
+<p>首先，类型萃取定义了 5 种结构体表示 5 种迭代器的类型：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">input_iterator_tag</span></span><span class="z-meta z-struct z-c++"> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+<span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">output_iterator_tag</span></span><span class="z-meta z-struct z-c++"> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+<span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">forward_iterator_tag</span></span><span class="z-meta z-struct z-c++"><span class="z-punctuation z-separator z-c++">:</span> <span class="z-storage z-modifier z-c++">public</span> <span class="z-entity z-other z-inherited-class z-c++">input_iterator_tag</span> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"> </span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+<span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">bidirectional_iterator_tag</span></span><span class="z-meta z-struct z-c++"><span class="z-punctuation z-separator z-c++">:</span> <span class="z-storage z-modifier z-c++">public</span> <span class="z-entity z-other z-inherited-class z-c++">forward_iterator_tag</span> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+<span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">random_access_iterator_tag</span></span><span class="z-meta z-struct z-c++"><span class="z-punctuation z-separator z-c++">:</span> <span class="z-storage z-modifier z-c++">public</span> <span class="z-entity z-other z-inherited-class z-c++">bidirectional_iterator_tag</span> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></code></pre>
+<h3 id="iterator-category">iterator_category</h3>
+<p>其次，显式要求每个容器内定义的迭代器必须有一个嵌套定义的 <code>iterator_category</code> 类型，来说明自己属于那种类型的迭代器。如 <code>deque</code> 的迭代器属于 random 迭代器：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-keyword z-operator z-variadic z-c++">...</span></span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span> <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 省略模板参数
+</span> <span class="z-meta z-class z-c++"><span class="z-storage z-type z-c++">class</span> </span><span class="z-meta z-class z-c++"><span class="z-entity z-name z-class z-c++">deque</span></span><span class="z-meta z-class z-c++"> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++">
+ <span class="z-storage z-modifier z-c++">public</span><span class="z-punctuation z-section z-class z-c++">:</span>
+     <span class="z-meta z-class z-c++"><span class="z-storage z-type z-c++">class</span> </span><span class="z-meta z-class z-c++"><span class="z-entity z-name z-class z-c++">iterator</span></span><span class="z-meta z-class z-c++"> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++">
+     <span class="z-storage z-modifier z-c++">public</span><span class="z-punctuation z-section z-class z-c++">:</span>
+         <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 表示自己是一个 random 迭代器
+</span>         <span class="z-storage z-type z-c++">typedef</span> random_access_iterator_tag <span class="z-entity z-name z-type z-typedef z-c++">iterator_category</span><span class="z-punctuation z-terminator z-c++">;</span>
+         <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span>...
+</span>     </span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+     <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span>...
+</span> </span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></code></pre>
+<p><code>list</code> 的迭代器属于 bidirectional 迭代器：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-keyword z-operator z-variadic z-c++">...</span></span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span> <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 省略模板参数
+</span><span class="z-meta z-class z-c++"><span class="z-storage z-type z-c++">class</span> </span><span class="z-meta z-class z-c++"><span class="z-entity z-name z-class z-c++">list</span></span><span class="z-meta z-class z-c++"> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++">
+<span class="z-storage z-modifier z-c++">public</span><span class="z-punctuation z-section z-class z-c++">:</span>
+    <span class="z-meta z-class z-c++"><span class="z-storage z-type z-c++">class</span> </span><span class="z-meta z-class z-c++"><span class="z-entity z-name z-class z-c++">iterator</span></span><span class="z-meta z-class z-c++"> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++">
+ <span class="z-storage z-modifier z-c++">public</span><span class="z-punctuation z-section z-class z-c++">:</span>
+        <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 表示自己是一个 bidirectional 迭代器
+</span>        <span class="z-storage z-type z-c++">typedef</span> bidirectional_iterator_tag <span class="z-entity z-name z-type z-typedef z-c++">iterator_category</span><span class="z-punctuation z-terminator z-c++">;</span>
+        <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span>...
+</span>    </span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+    <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span>...
+</span></span></span><span class="z-meta z-class z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></code></pre>
+<h3 id="iterator-traits">iterator_traits</h3>
+<p>最后，还需要用一个 <code>iterator_traits</code> 模板类统一获取迭代器的类型信息，本质是：迭代器说它自己是什么类型，就是什么类型：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> IterT</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span>
+<span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">iterator_traits</span></span><span class="z-meta z-struct z-c++"> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++">
+    <span class="z-storage z-type z-c++">typedef</span> <span class="z-storage z-modifier z-c++">typename</span> IterT<span class="z-punctuation z-accessor z-double-colon z-c++">::</span>iterator_category <span class="z-entity z-name z-type z-typedef z-c++">iterator_category</span><span class="z-punctuation z-terminator z-c++">;</span>
+    <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span>...
+</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></code></pre>
+<p>泛型算法想要知道迭代器的类型，自己去查迭代器的 <code>iterator_category</code>  就行了，为什么还要通过 <code>iterator_traits</code>  呢？多此一举吗？</p>
+<p>原因在于原生指针没有 <code>iterator_category</code>  的定义。由于指针可以看作 random 迭代器，于是可以针对指针类型另外定义一个偏特化版本的：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> IterT</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span>
+<span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">iterator_traits</span></span><span class="z-meta z-struct z-c++"><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span>IterT<span class="z-keyword z-operator z-c">*</span><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span>
+<span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++">
+    <span class="z-storage z-type z-c++">typedef</span> random_access_iterator_tag <span class="z-entity z-name z-type z-typedef z-c++">iterator_category</span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span>
+</span></code></pre>
+<p>现在用 <code>iterator_traits&lt;IterT&gt;::iterator_category</code> 就能知道 <code>IterT</code> 所属的迭代器类型了，并且对迭代器和原生指针都适用。<code>iterator_traits</code> 就像一个萃取机器，凡是想知道 <code>IterT</code> 类型信息的，只要把 <code>IterT</code>传给它，它的 <code>iterator_category</code> 就能回答你的问题。</p>
+<p>实际上 <code>iterator_traits</code> 不仅能回答你关于迭代器的所属类型，还能回答你迭代器所指对象的类型等其他类型信息，实现的方式是一样的。</p>
+<p>以上就是类型萃取的实现。</p>
+<h2 id="bian-yi-qi-lei-xing-pan-duan">编译期类型判断</h2>
+<p>既然可以用 <code>iterator_traits&lt;IterT&gt;::iterator_category</code> 得到迭代器的类型，那么 <code>std::advance</code>  怎么根据不同的类型执行不同的操作呢？虽然可以使用 if-else 来判断，但是这样会有运行时开销，辛辛苦苦实现的编译期类型萃取就白瞎了。</p>
+<p>也就是要解决 <code>std::advance</code> 怎么在编译期判断 <code>iterator_traits</code> 的类型的问题。
+答案是使用<strong>函数重载</strong>。</p>
+<p>首先针对不同的迭代器定义 <code>doAdvance</code> 不同的重载版本实现：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 针对 random access 迭代器
+</span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> IterT<span class="z-punctuation z-separator z-c++">,</span> <span class="z-storage z-type z-c++">typename</span> DistT</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span>
+<span class="z-storage z-type z-c">void</span> <span class="z-meta z-function z-c++"><span class="z-meta z-toc-list z-full-identifier z-c++"><span class="z-entity z-name z-function z-c++">doAdvance</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++">IterT<span class="z-keyword z-operator z-c">&amp;</span> <span class="z-variable z-parameter z-c++">iter</span><span class="z-punctuation z-separator z-c++">,</span> DistT <span class="z-variable z-parameter z-c++">d</span><span class="z-punctuation z-separator z-c++">,</span> <span class="z-variable z-parameter z-c++">random_access_iterator_tag</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span><span class="z-meta z-function z-c++">
+</span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++">
+    iter <span class="z-keyword z-operator z-assignment z-augmented z-c">+=</span> d<span class="z-punctuation z-terminator z-c++">;</span>
+</span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span>
+<span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 针对 bidirectional 迭代器
+</span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> IterT<span class="z-punctuation z-separator z-c++">,</span> <span class="z-storage z-type z-c++">typename</span> DistT</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span>
+<span class="z-storage z-type z-c">void</span> <span class="z-meta z-function z-c++"><span class="z-meta z-toc-list z-full-identifier z-c++"><span class="z-entity z-name z-function z-c++">doAdvance</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++">IterT<span class="z-keyword z-operator z-c">&amp;</span> <span class="z-variable z-parameter z-c++">iter</span><span class="z-punctuation z-separator z-c++">,</span> DistT <span class="z-variable z-parameter z-c++">d</span><span class="z-punctuation z-separator z-c++">,</span> <span class="z-variable z-parameter z-c++">bidirectional_iterator_tag</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span><span class="z-meta z-function z-c++">
+</span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++">
+    <span class="z-keyword z-control z-c++">if</span> <span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span>d <span class="z-keyword z-operator z-comparison z-c">&gt;=</span> <span class="z-constant z-numeric z-integer z-decimal z-c++">0</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span> <span class="z-keyword z-control z-c++">while</span> <span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span>d<span class="z-keyword z-operator z-arithmetic z-c">--</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span> <span class="z-keyword z-operator z-arithmetic z-c">++</span>iter<span class="z-punctuation z-terminator z-c++">;</span> <span class="z-punctuation z-section z-block z-end z-c++">}</span></span>
+    <span class="z-keyword z-control z-c++">else</span> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span> <span class="z-keyword z-control z-c++">while</span> <span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span>d<span class="z-keyword z-operator z-arithmetic z-c">++</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span> <span class="z-keyword z-operator z-arithmetic z-c">--</span>iter<span class="z-punctuation z-terminator z-c++">;</span> <span class="z-punctuation z-section z-block z-end z-c++">}</span></span>
+</span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span>
+<span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 针对 input 迭代器
+</span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> IterT<span class="z-punctuation z-separator z-c++">,</span> <span class="z-storage z-type z-c++">typename</span> DistT</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span>
+<span class="z-storage z-type z-c">void</span> <span class="z-meta z-function z-c++"><span class="z-meta z-toc-list z-full-identifier z-c++"><span class="z-entity z-name z-function z-c++">doAdvance</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++">IterT<span class="z-keyword z-operator z-c">&amp;</span> <span class="z-variable z-parameter z-c++">iter</span><span class="z-punctuation z-separator z-c++">,</span> DistT <span class="z-variable z-parameter z-c++">d</span><span class="z-punctuation z-separator z-c++">,</span> <span class="z-variable z-parameter z-c++">input_iterator_tag</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span><span class="z-meta z-function z-c++">
+</span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++">
+    <span class="z-keyword z-control z-c++">if</span> <span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span>d <span class="z-keyword z-operator z-comparison z-c">&lt;</span> <span class="z-constant z-numeric z-integer z-decimal z-c++">0</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span>
+        <span class="z-keyword z-control z-flow z-throw z-c++">throw</span> <span class="z-meta z-function-call z-c++">std<span class="z-punctuation z-accessor z-double-colon z-c++">::</span><span class="z-variable z-function z-c++">out_of_range</span><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function-call z-c++"><span class="z-meta z-group z-c++"><span class="z-string z-quoted z-double z-c"><span class="z-punctuation z-definition z-string z-begin z-c">&quot;</span>Negetive distance<span class="z-punctuation z-definition z-string z-end z-c">&quot;</span></span></span></span><span class="z-meta z-function-call z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+    <span class="z-punctuation z-section z-block z-end z-c++">}</span></span>
+    <span class="z-keyword z-control z-c++">while</span> <span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span>d<span class="z-keyword z-operator z-arithmetic z-c">--</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span> <span class="z-keyword z-operator z-arithmetic z-c">++</span>iter<span class="z-punctuation z-terminator z-c++">;</span>
+</span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span>
+<span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 由于 forward_iterator_tag 继承于 input_iterator_tag，
+</span><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> advance 的实现也一样
+</span><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 不需要给 forward 迭代器再定义一个重载版本
+</span></span></code></pre>
+<p><code>advance</code> 只需要额外传入一个参数调用 <code>doAdvance</code> 即可：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> IterT<span class="z-punctuation z-separator z-c++">,</span> <span class="z-storage z-type z-c++">typename</span> DistT</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span>
+<span class="z-storage z-type z-c">void</span> <span class="z-meta z-function z-c++"><span class="z-meta z-toc-list z-full-identifier z-c++"><span class="z-entity z-name z-function z-c++">advance</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function z-parameters z-c++"><span class="z-meta z-group z-c++">IterT<span class="z-keyword z-operator z-c">&amp;</span> <span class="z-variable z-parameter z-c++">iter</span><span class="z-punctuation z-separator z-c++">,</span> DistT <span class="z-variable z-parameter z-c++">d</span><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span><span class="z-meta z-function z-c++">
+</span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++">
+    <span class="z-meta z-function-call z-c++"><span class="z-variable z-function z-c++">doAdvance</span><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function-call z-c++"><span class="z-meta z-group z-c++">iter<span class="z-punctuation z-separator z-c++">,</span> d<span class="z-punctuation z-separator z-c++">,</span>
+             iterator_traits<span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span>IterT<span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span><span class="z-meta z-function-call z-c++"><span class="z-punctuation z-accessor z-c++">::</span><span class="z-variable z-function z-c++">iterator_category</span><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-begin z-c++">(</span></span></span><span class="z-meta z-function-call z-c++"></span><span class="z-meta z-function-call z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span>
+             </span></span><span class="z-meta z-function-call z-c++"><span class="z-meta z-group z-c++"><span class="z-punctuation z-section z-group z-end z-c++">)</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></span><span class="z-meta z-function z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span>
+</span></code></pre>
+<h2 id="qi-ta-lei-xing-cui-qu">其他类型萃取</h2>
+<p>除了 <code>iterator_traits</code>  之外，标准库中还定义了其他的萃取模板类。如<code>allocator_traits</code>  用于萃取分配器的类型相关信息， <code>char_traits</code>  用于萃取字符类型等。
+另外还有一堆最基本、同时也是最强大的类型萃取定义在 <code>&lt;type_traits&gt;</code>  头文件中，这里的类型萃取大多数依赖于编译器的内置功能，比如可以通过 <code>is_class&lt;T&gt;::value</code>  判断 <code>T</code>  是不是一个类， <code>is_copy_constructible&lt;T&gt;::value</code>  判断 <code>T</code>  有没有拷贝构造函数， <code>remove_reference&lt;T&gt;::type</code>  把 <code>T</code>  的引用去掉等等。</p>
+<p><code>remove_reference&lt;T&gt;</code>  很简单，也是通过模板特化实现的：</p>
+<pre data-lang="cpp" class="language-cpp z-code"><code class="language-cpp" data-lang="cpp"><span class="z-source z-c++"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 定义一个泛化版本，返回原本就没有引用的类型
+</span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> T</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span> <span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">remove_reference</span></span><span class="z-meta z-struct z-c++">      <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-storage z-type z-c++">typedef</span> T <span class="z-entity z-name z-type z-typedef z-c++">type</span><span class="z-punctuation z-terminator z-c++">;</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+<span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 定义一个左值引用的特化版本，去掉左值引用
+</span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> T</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span> <span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">remove_reference</span></span><span class="z-meta z-struct z-c++"><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span>T<span class="z-keyword z-operator z-c">&amp;</span><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span>  <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-storage z-type z-c++">typedef</span> T <span class="z-entity z-name z-type z-typedef z-c++">type</span><span class="z-punctuation z-terminator z-c++">;</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+<span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 定义一个通用引用的特化版本，去掉右值引用
+</span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-template z-c++">template</span><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span></span><span class="z-meta z-template z-c++"><span class="z-storage z-type z-c++">typename</span> T</span><span class="z-meta z-template z-c++"><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span></span> <span class="z-meta z-struct z-c++"><span class="z-storage z-type z-c++">struct</span> </span><span class="z-meta z-struct z-c++"><span class="z-entity z-name z-struct z-c++">remove_reference</span></span><span class="z-meta z-struct z-c++"><span class="z-punctuation z-section z-generic z-begin z-c++">&lt;</span>T<span class="z-keyword z-operator z-arithmetic z-c">&amp;&amp;</span><span class="z-punctuation z-section z-generic z-end z-c++">&gt;</span> <span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-begin z-c++">{</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-storage z-type z-c++">typedef</span> T <span class="z-entity z-name z-type z-typedef z-c++">type</span><span class="z-punctuation z-terminator z-c++">;</span></span></span><span class="z-meta z-struct z-c++"><span class="z-meta z-block z-c++"><span class="z-punctuation z-section z-block z-end z-c++">}</span></span></span><span class="z-punctuation z-terminator z-c++">;</span>
+</span></code></pre>
+<p>一些其他的类型萃取就无法通过模板特化实现了，比如如何知道一个类有没有拷贝构造函数？只能依赖于编译器提供的内置功能。</p>
+<h2 id="zong-jie">总结</h2>
+<ul>
+<li>类型萃取使得类型信息在编译期可用，通过模板和模板特化实现</li>
+<li>函数重载可以实现编译期类型判断</li>
+</ul>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>

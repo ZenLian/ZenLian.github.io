@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>在 wsl2 中运行图形化程序 | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    在 wsl2 中运行图形化程序
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/tools/">#tools</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/wsl/">#wsl</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2022-02-21">2022-02-21</time>
+  </div>
+  <div class="post-content">
+    <p>以前在 wsl 上运行图形化程序需要用 MobaXterm 等支持 Xserver 的终端,
+现在微软把图形化功能集成进去了, 可以直接运行！<sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<hr />
+<h2 id="zhun-bei-gong-zuo">准备工作</h2>
+<h3 id="xi-tong-ban-ben">系统版本</h3>
+<p>首先你的 windows 版本必须在 <code>Windows 11 Build 22000</code> 以上。</p>
+<p>没错，是 Windows 11，不想升级的就别往下看了。</p>
+<p>在 设置-&gt;系统-&gt;关于 中可以查看操作系统版本。如果版本不满足要求，可以 <a href="https://insider.windows.com">加入 windows 预览体验计划</a> 获取最新的版本。</p>
+<h3 id="xian-qia-qu-dong-zhi-chi">显卡驱动支持</h3>
+<p>安装最新的虚拟显卡驱动支持。这样可以为你的 wsl 开启一个虚拟 GPU（vGPU），从而享受硬件渲染加速效果。</p>
+<p>3 大厂商的最新驱动支持：</p>
+<ul>
+<li><a href="https://www.intel.cn/content/www/cn/zh/download/19344/intel-graphics-windows-dch-drivers.html?">Intel</a></li>
+<li><a href="https://www.amd.com/en/support/kb/release-notes/rn-rad-win-wsl-support">AMD</a></li>
+<li><a href="https://developer.nvidia.com/cuda/wsl">NVIDIA</a></li>
+</ul>
+<h2 id="sheng-ji-wsl">升级 wsl</h2>
+<p>原来没有 wsl 的直接安装一个发行版就行。原来就有的 wsl 需要升级。</p>
+<p>windows 中以管理员身份运行：</p>
+<pre data-lang="powershell" class="language-powershell z-code"><code class="language-powershell" data-lang="powershell"><span class="z-source z-powershell">wsl <span class="z-keyword z-operator z-assignment z-powershell">-</span><span class="z-keyword z-operator z-assignment z-powershell">-</span>update
+</span></code></pre>
+<p>重启一下 wsl 就行了：</p>
+<pre data-lang="powershell" class="language-powershell z-code"><code class="language-powershell" data-lang="powershell"><span class="z-source z-powershell">wsl <span class="z-keyword z-operator z-assignment z-powershell">-</span><span class="z-keyword z-operator z-assignment z-powershell">-</span>shutdown
+</span></code></pre>
+<h2 id="yun-xing-tu-xing-cheng-xu">运行图形程序</h2>
+<p>不需要额外的配置，直接在 wsl 里运行图形化程序，图形界面就会在 windows 上出现。</p>
+<hr />
+<h2 id="rerefences">Rerefences</h2>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><a href="https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps">https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps</a></p>
+</div>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>

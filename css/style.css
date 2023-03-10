@@ -1,0 +1,391 @@
+@import url("syntax.css");
+
+:root {
+  --color-rosewater: #dc8a78;
+  --color-flamingo: #dd7878;
+  --color-pink: #ea76cb;
+  --color-mauve: #8839ef;
+  --color-red: #d20f39;
+  --color-maroon: #e64553;
+  --color-peach: #fe640b;
+  --color-yellow: #df8e1d;
+  --color-green: #40a02b;
+  --color-teal: #179299;
+  --color-sky: #04a5e5;
+  --color-sapphire: #209fb5;
+  --color-blue: #1e66f5;
+  --color-lavender: #7287fd;
+  --color-text: #4c4f69;
+  --color-subtext1: #5c5f77;
+  --color-subtext0: #6c6f85;
+  --color-overlay2: #7c7f93;
+  --color-overlay1: #8c8fa1;
+  --color-overlay0: #9ca0b0;
+  --color-surface2: #acb0be;
+  --color-surface1: #bcc0cc;
+  --color-surface0: #ccd0da;
+  --color-base: #eff1f5;
+  --color-mantle: #e6e9ef;
+  --color-crust: #dce0e8;
+
+  --color-header: var(--color-crust);
+  --color-pre: var(--color-crust);
+  --color-tag: var(--color-crust);
+}
+
+:root[data-theme="dark"] {
+  --color-rosewater: #f5e0dc;
+  --color-flamingo: #f2cdcd;
+  --color-pink: #f5c2e7;
+  --color-mauve: #cba6f7;
+  --color-red: #f38ba8;
+  --color-maroon: #eba0ac;
+  --color-peach: #fab387;
+  --color-yellow: #f9e2af;
+  --color-green: #a6e3a1;
+  --color-teal: #94e2d5;
+  --color-sky: #89dceb;
+  --color-sapphire: #74c7ec;
+  --color-blue: #89b4fa;
+  --color-lavender: #b4befe;
+  --color-text: #cdd6f4;
+  --color-subtext1: #bac2de;
+  --color-subtext0: #a6adc8;
+  --color-overlay2: #9399b2;
+  --color-overlay1: #7f849c;
+  --color-overlay0: #6c7086;
+  --color-surface2: #585b70;
+  --color-surface1: #45475a;
+  --color-surface0: #313244;
+  --color-base: #1e1e2e;
+  --color-mantle: #181825;
+  --color-crust: #11111b;
+
+  --color-header: var(--color-mantle);
+  --color-pre: var(--color-surface0);
+  --color-tag: var(--color-surface1);
+}
+
+:root[data-colormode="colorful"] {
+  --color-h: var(--color-lavender);
+  --color-li: var(--color-sky);
+  --color-quote: var(--color-sapphire);
+  --color-hr: var(--color-blue);
+  --color-link: var(--color-blue);
+  --color-code: var(--color-pink);
+  --color-tagbg: var(--color-teal);
+  --color-tagfg: var(--color-base);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  color: var(--color-text);
+  background-color: var(--color-base);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.5s;
+}
+
+a:hover {
+  color: var(--color-lavender);
+}
+
+::selection {
+  background-color: var(--color-surface1);
+}
+
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: inherit;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-surface2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-overlay0);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-overlay2);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: var(--color-base);
+}
+
+header {
+  background-color: var(--color-header);
+  padding: 1em 0;
+  position: fixed;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  transition: top 500ms;
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+  max-width: 36em;
+}
+
+.site-brand {
+  font-size: 1.5em;
+}
+
+.nav {
+  font-size: 0.8em;
+  color: var(--color-subtext0);
+}
+.menu-item {
+  display: inline-block;
+  margin-left: 0.5em;
+}
+.menu-icon {
+  vertical-align: -0.125em;
+}
+
+#theme-switcher-dark {
+  display: none;
+}
+
+.footer {
+  font-size: 85%;
+  text-align: center;
+  color: var(--color-overlay0);
+  padding: 1em;
+}
+
+.socials-item {
+  display: inline-block;
+  margin: 4px;
+}
+.socials-icon {
+  font-size: 2em;
+}
+
+main {
+  display: block;
+  padding: 7em 1em;
+}
+
+article {
+  width: 36em;
+  margin: 0 auto;
+  display: block;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2em;
+  margin: 0.5em 0 1.5em;
+}
+
+.post-list {
+  list-style-type: none;
+}
+
+.post-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 1em 0;
+}
+
+.post-item-date {
+  color: var(--color-surface2);
+}
+
+.post-item-title {
+  color: var(--color-text);
+}
+
+.post-item-title:hover {
+  color: var(--color-blue);
+}
+
+.tag-item {
+  display: inline-block;
+  color: var(--color-text);
+  background-color: var(--color-tag);
+  font-size: 14px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  transition: all 300ms;
+}
+
+.tag-item:hover {
+  color: var(--color-tagfg, var(--color-lavender));
+  background-color: var(--color-tagbg, var(--color-tag));
+}
+.tag-item a {
+  color: inherit;
+  transition: 50ms;
+}
+
+/* tags/list */
+.term-list {
+  line-height: 1.5;
+}
+.term-list li::marker {
+  color: var(--color-overlay2);
+}
+.term-list .term-count {
+  color: var(--color-surface2);
+}
+
+/* 404 page */
+.page-not-found {
+  text-align: center;
+  padding: 8em 0;
+}
+.poetry-line {
+  font-size: 1.5em;
+  line-height: 2;
+}
+
+.post-title {
+  margin: 0.5em 0;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5em 0;
+  font-size: 14px;
+}
+.post-meta time {
+  color: var(--color-overlay2);
+}
+
+/* markdown */
+.post-content {
+  margin: 5em 0;
+}
+
+.post-content h1 {
+  color: var(--color-h, var(--color-text));
+  margin: 1.5em 0;
+}
+.post-content h2 {
+  color: var(--color-h, var(--color-text));
+  margin: 1em 0;
+}
+.post-content h3 {
+  color: var(--color-h, var(--color-text));
+  margin: 0.7em 0;
+}
+.post-content h4 {
+  color: var(--color-h, var(--color-text));
+  margin: 0.5em 0;
+}
+.post-content p {
+  margin: 1em 0;
+  line-height: 1.5;
+}
+.post-content ol,
+.post-content ul {
+  padding-left: 2em;
+  line-height: 2;
+}
+.post-content li::marker {
+  color: var(--color-li, var(--color-overlay2));
+}
+.post-content a {
+  color: var(--color-link, var(--color-text));
+  text-decoration: underline;
+  text-decoration-color: var(--color-link, var(--color-overlay0));
+}
+.post-content a:hover {
+  color: var(--color-link, var(--color-lavender));
+  text-decoration-color: var(--color-link, var(--color-lavender));
+}
+
+.post-content code {
+  color: var(--color-code, var(--color-subtext0));
+  background-color: var(--color-pre);
+  padding: 1px 2px;
+}
+
+.post-content pre {
+  background-color: var(--color-pre) !important;
+  padding: 1rem;
+  overflow: auto;
+  word-wrap: normal;
+  font-size: 0.9em;
+}
+.post-content pre[data-linenos] {
+  padding: 1rem 0;
+}
+.post-content pre table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.post-content pre table td {
+  padding: 0;
+}
+.post-content pre table td:nth-of-type(1) {
+  text-align: center;
+  user-select: none;
+}
+.post-content pre mark {
+  display: block;
+}
+.post-content pre code {
+  display: block;
+  color: var(--color-text);
+  background-color: inherit;
+  padding: 0;
+}
+
+.post-content blockquote {
+  border-left: 4px solid var(--color-quote, var(--color-surface0));
+  color: var(--color-overlay2);
+  padding-left: 0.5em;
+}
+.post-content hr {
+  border: none;
+  text-align: center;
+  margin: 1em 0;
+}
+.post-content hr::after {
+  content: "···";
+  color: var(--color-hr);
+  letter-spacing: 2em;
+  padding-left: 2em;
+}
+
+.footnote-definition {
+  display: flex;
+}
+.footnote-definition-label {
+  vertical-align: text-bottom;
+  margin: 1em 0;
+  font-size: inherit;
+}
+.footnote-definition-label::after {
+  content: ".";
+}

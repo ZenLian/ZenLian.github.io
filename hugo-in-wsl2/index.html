@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>在 wsl2 中部署 hugo 环境 | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    在 wsl2 中部署 hugo 环境
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/tools/">#tools</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/wsl/">#wsl</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/hugo/">#hugo</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2021-01-29">2021-01-29</time>
+  </div>
+  <div class="post-content">
+    <p>有了 vscode 的 remote ssh 后，可以直接用 vscode 打开 wsl2 中的 hugo-site 目录，毕竟在 linux 环境中敲命令行比 powershell 舒服多了。</p>
+<p>但是 wsl2 是独立的虚拟环境，windows 上不能直接通过 <code>localhost:端口号</code> 的方式访问部署在 wsl2 本地的网络服务。</p>
+<pre data-lang="shell" class="language-shell z-code"><code class="language-shell" data-lang="shell"><span class="z-text z-plain">hugo server
+...
+Web Server is available at //localhost:1313/ (bind address 127.0.0.1)
+</span></code></pre>
+<p>这时打开 windows 上的浏览器访问 <code>localhost:1313</code> 是访问不到博客网站的。</p>
+<p>我们必须将服务部署在 wsl 的虚拟 ip 地址上。</p>
+<hr />
+<p>首先用 <code>ifconfig</code> 查看 wsl 的虚拟 ip 地址：</p>
+<pre data-lang="shell" class="language-shell z-code"><code class="language-shell" data-lang="shell"><span class="z-text z-plain">$ ifconfig
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 172.23.162.136  netmask 255.255.240.0  broadcast 172.23.175.255
+        inet6 fe80::215:5dff:fe98:82e3  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 00:15:5d:98:82:e3  txqueuelen 1000  (Ethernet)
+        RX packets 79159  bytes 47566681 (47.5 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 80374  bytes 116280960 (116.2 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</span></code></pre>
+<p>可以看到 eth0 的 ip 地址是 <code>172.23.162.136</code>，我们把 hugo 服务部署在这个地址上：</p>
+<pre data-lang="shell" class="language-shell z-code"><code class="language-shell" data-lang="shell"><span class="z-text z-plain">$ hugo server --bind 172.23.162.136 --baseURL=http://172.23.162.136
+...
+Web Server is available at http://172.23.162.136:1313/ (bind address 172.23.162.136)
+</span></code></pre>
+<p>现在再访问 <code>http://172.23.162.136:1313/</code> 就可以看到博客网站了。</p>
+<hr />
+<p>这个方法的缺点是，wsl 的虚拟 ip 地址是由 windows 分配的，每次重启都会更换。不想每次都手动查询地址再输入命令，可以封装一个简单的 bash 脚本：</p>
+<pre data-lang="shell" class="language-shell z-code"><code class="language-shell" data-lang="shell"><span class="z-text z-plain">#!/bin/bash
+IPADDRESS=$(ifconfig eth0 | grep &quot;inet\b&quot; | awk &#39;{print $2}&#39; | cut -d/ -f1)
+echo $IPADDRESS
+hugo server --bind $IPADDRESS --baseURL=http://$IPADDRESS
+</span></code></pre>
+<p>把这个脚本保存为 <code>start-server.sh</code> 放在根目录，每次需要本地运行 hugo server 的时候只有运行这个 bash 脚本就行了。</p>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>

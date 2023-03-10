@@ -1,0 +1,93 @@
+.z-code {
+  color: var(--color-text);
+  background-color: var(--color-pre);
+}
+
+.z-function {
+  color: var(--color-blue);
+}
+
+.z-punctuation {
+  color: var(--color-text);
+}
+
+.z-none {
+  color: var(--color-text);
+}
+.z-string,
+.z-constant,
+.z-symbol {
+  color: var(--color-green);
+}
+.z-numeric,
+.z-null {
+  color: var(--color-peach);
+}
+
+.z-property {
+  color: var(--color-lavender);
+}
+
+.z-keyword {
+  color: var(--color-mauve);
+}
+.z-operator {
+  color: var(--color-teal);
+}
+.z-special-method {
+  color: var(--color-red);
+}
+
+.z-variable {
+  color: var(--color-text);
+}
+.z-attribute-name {
+  color: var(--color-blue);
+}
+.z-array {
+  color: var(--color-text);
+}
+
+.z-type,
+.z-storage,
+.z-class {
+  color: var(--color-mauve);
+}
+
+.z-comment {
+  color: var(--color-overlay0);
+}
+
+.z-invalid,
+.z-illegal {
+  color: var(--color-base);
+  background-color: var(--color-red);
+}
+.z-deleted {
+  color: var(--color-red);
+}
+.z-inserted {
+  color: var(--color-green);
+}
+.z-changed {
+  color: var(--color-blue);
+}
+.z-ignored {
+  color: var(--color-overlay0);
+}
+.z-untracked {
+  color: var(--color-overlay0);
+}
+
+.z-section.,
+.z-embedded,
+.z-interpolation,
+.z-id,
+.z-support,
+.z-other,
+.z-meta,
+.z-require,
+.z-entity,
+.z-name,
+.z-tag {
+}

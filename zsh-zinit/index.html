@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link href="https://zenlian.github.io/css/style.css" rel="stylesheet"/>
+
+  <title>zinit：让你的 zsh 起飞 | The Ship of Zenlian</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">ZenLian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags" class="menu-icon"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user" class="menu-icon"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      
+<article>
+  <h1 class="post-title page-title">
+    zinit：让你的 zsh 起飞
+  </h1>
+  <div class="post-meta">
+    <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/tools/">#tools</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/zsh/">#zsh</a>
+  </li>
+</ul>
+</span>
+    <time datetime="2020-02-20">2020-02-20</time>
+  </div>
+  <div class="post-content">
+    <p>很多人都是从 <a href="https://github.com/ohmyzsh/ohmyzsh">Oh-My-Zsh</a> 入坑 zsh 的，包括我自己。Oh-My-Zsh 开箱即用，文档齐全，但加了许多插件后，你会发现 zsh 的启动速度明显变慢了。而使用 <a href="https://github.com/zdharma/zinit#option-1---automatic-installation-recommended">zinit</a>，你根本感受不到插件加载的过程。不过 zinit 除了官方英文文档，在网上能找到的其他资料寥寥无几。</p>
+<blockquote>
+<p>zinit 其实不能和 Oh-My-Zsh 进行比较。zinit 只是一个 zsh 插件管理器，而 Oh-My-Zsh 是一个功能齐全的 zsh 框架。如果把 zinit 看作 vim 中的 vim-plug，那 Oh-My-Zsh 就像是 SpaceVim。</p>
+</blockquote>
+<h2 id="an-zhuang">安装</h2>
+<p>官方提供了安装脚本，可以直接安装到 <code>~/.zinit/bin</code> 中，并自动更新你的 .zshrc 文件：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">sh</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>c</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-parens z-begin z-shell">(</span><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">curl</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>fsSL</span> https://raw.githubusercontent.com/zdharma/zinit/master/doc/install.sh</span><span class="z-punctuation z-section z-parens z-end z-shell">)</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<p>如果要安装到其他位置，可以手动 git clone。比如我将 zinit 放在 <code>~/.config/zsh/zinit/bin/</code> 中，这不是 zinit 的默认安装位置，根据文档需要在 .zshrc 中设置一下：</p>
+<pre data-lang="zsh" class="language-zsh z-code"><code class="language-zsh" data-lang="zsh"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-storage z-modifier z-shell">typeset</span> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>A</span> <span class="z-variable z-other z-readwrite z-assignment z-shell">ZINIT</span><span class="z-keyword z-operator z-assignment z-shell">=</span><span class="z-punctuation z-section z-parens z-begin z-shell">(</span>
+    BIN_DIR  <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">HOME</span></span>/.config/zsh/zinit/bin
+    HOME_DIR <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">HOME</span></span>/.config/zsh/zinit
+    COMPINIT_OPTS -C
+<span class="z-punctuation z-section z-parens z-end z-shell">)</span></span>
+</span></code></pre>
+<p>然后添加：</p>
+<pre data-lang="zsh" class="language-zsh z-code"><code class="language-zsh" data-lang="zsh"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-source z-shell">source</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">HOME</span></span>/.config/zsh/zinit/bin/zinit.zsh</span>
+</span></code></pre>
+<p>上面的 source 语句需要在 <code>compinit</code> 之前。所以最好把 <code>compinit</code> 放在最后。</p>
+<h2 id="jia-zai-cha-jian">加载插件</h2>
+<p>插件加载方式： <code>zinit [load|light] &lt;plugin&gt;</code></p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> load zdharma/history-search-multi-word</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> light zsh-users/zsh-syntax-highlighting</span>
+</span></code></pre>
+<p>两种方式的区别:</p>
+<ul>
+<li><code>load</code>  追踪插件的行为，可以用 <code>zinit report &lt;plugin&gt;</code>  查看。 <code>load</code>  后可以用 <code>unload</code>  卸载插件。</li>
+<li><code>light</code>  可以使插件的加载更快，不能查看报告和卸载。</li>
+</ul>
+<p>后面跟着的是插件的 <code>github</code>  仓库地址，非 <code>github</code>  插件需要替换为完整的 <code>url</code> 。</p>
+<h2 id="snippet">snippet</h2>
+<p><code>snippet</code>  可以从给定的 url 直接下载单个文件： <code>zinit snippet &lt;url&gt;</code>
+常用的 Oh-My-Zsh 和 Prezto 甚至可以直接用 OMZ:: 和 PZT:: 前缀简写，为我们整合其中的插件提供了便利：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet OMZ::plugins/git/git.plugin.zsh</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet PZT::modules/helper/init.zsh</span>
+</span></code></pre>
+<h2 id="ice-xiu-shi-fu">ice 修饰符</h2>
+<p><code>ice</code>  修饰符作用于下一条 <code>zinit</code>  语句，允许我们指定一些额外的操作。</p>
+<p>比如要下载多个文件，可以用 <code>svn</code>  修饰符，使用 svn 协议下载整个目录。默认情况下目录中的 <code>*.plugin.zsh</code>, <code>init.zsh</code>, <code>*.zsh-theme</code> 会被 source 进来。</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> ice svn</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet PZT::modules/docker</span>
+</span></code></pre>
+<p>官方 wiki 中解释说因为 ice 易化，所以只会作用于下一条 zinit 指令，然后就马上融化失效了。</p>
+<h2 id="pick">pick&quot;&quot;</h2>
+<p><code>pick</code>  修饰符可以选择需要 source 的文件：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> ice svn pick<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>init.zsh<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet PZT::modules/git</span>
+</span></code></pre>
+<p>这样就只会 source 其中的 init.zsh。</p>
+<h2 id="as-program">as&quot;program&quot;</h2>
+<p>默认情况下，下载的文件会被 source。如果需要下载的是一个可运行的命令，可以使用 <code>as&quot;program&quot;</code> 。zinit 会给指定的文件添加可执行权限，并将其目录添加至 PATH 中。</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> ice as<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>program<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> cp<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>httpstat.sh -&gt; httpstat<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> pick<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>httpstat<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> light b4b4r07/httpstat</span>
+</span></code></pre>
+<p>上面这条命令会将插件目录添加至 <code>PATH</code> ，拷贝 <code>httpstat.sh</code>  到 <code>httpstat</code>  并选中 <code>httpstat</code>  添加执行权限（ <code>chmod +x</code> ）。
+除了 <code>cp</code>  之外也有 <code>mv</code>  修饰符，和命令行中的 <code>cp</code> / <code>mv</code>  含义一致。</p>
+<p>snippets 同样可以使用 as&quot;program&quot; 修饰，用于下载单个可执行文件。</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> ice mv<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>httpstat.sh -&gt; httpstat<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> pick<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>httpstat<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> as<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>program<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet https://github.com/b4b4r07/httpstat/blob/master/httpstat.sh</span>
+</span></code></pre>
+<p>这条命令和上一条的作用是一致的，由于我们只需要 <code>httpstat.sh</code>  这个文件，就不需要下载整个 git 仓库，直接用 <code>snippet</code>  下载单个文件就行了。snippet 比 load/light 都要快。</p>
+<h2 id="as-completion">as&quot;completion&quot;</h2>
+<p><code>as&quot;completion&quot;</code>  作用于 <code>snippet</code>  用于下载单个命令补全文件。</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> ice as<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>completion<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker</span>
+</span></code></pre>
+<h2 id="for-yu-fa">for 语法</h2>
+<p><code>for</code>  语法可以同时加载多个插件，并给多个插件提供共同和单独的 <code>ice</code>  修饰符。</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> as<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>null<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> wait<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>2<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> lucid from<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>gh-r<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> for <span class="z-punctuation z-separator z-continuation z-line z-shell">\
+</span>    mv<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>exa* -&gt; exa<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> sbin       ogham/exa <span class="z-punctuation z-separator z-continuation z-line z-shell">\
+</span>    mv<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>fd* -&gt; fd<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> sbin<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>fd/fd<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span>  @sharkdp/fd <span class="z-punctuation z-separator z-continuation z-line z-shell">\
+</span>    sbin<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>fzf<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span>  junegunn/fzf-bin</span>
+</span></code></pre>
+<ul>
+<li>不需要加 <code>load</code> ，根据 URL 自动识别是插件还是 snippet</li>
+<li><code>light</code>  加载使用 <code>light-mode</code>  修饰</li>
+<li>如果插件名字前缀与 <code>ice</code>  修饰符冲突，需要加 @。如 <code>sharkdp/fd</code>  需要写成 <code>@sharkdp/fd</code> ，否则会被解析成 <code>sh&quot;arkdp/fd&quot;</code> 。</li>
+</ul>
+<h2 id="yan-chi-jia-zai">延迟加载</h2>
+<p>zinit 称之为 <strong>Turbo</strong>模式，通过 <code>wait</code>  修饰符实现。可以让插件的加载延迟到整个 <code>.zshrc</code>  文件已经读取完毕，并且命令提示符已经显示之后。延迟加载那些启动慢的插件，可以大大提升 zsh 的启动速度（虽然 zinit 已经很快了！）。</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> ice wait lucid atload<span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span>_zsh_autosuggest_start<span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span></span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> light zsh-users/zsh-autosuggestions</span>
+</span></code></pre>
+<p>上面这条命令让 autosuggestions 命令延迟加载。 <code>wait</code>  没有参数表示 <code>zshrc</code>  读取完毕后立刻（1ms）加载； <code>lucid</code>  是静默模式，插件加载完成后不显示提示； <code>atload</code>  指定了插件加载之后执行的命令。autosuggetstions 插件使用了 <code>precmd</code> hook， <code>precmd</code> hook 在每条命令提示符显示前都会执行，由于使用了延迟加载，第一条提示符显示前插件还没有被加载，所以第一条提示符显示时 autosuggestions 不可用。这里使用 <code>atload</code>  手动执行一次 <code>precmd</code> hook，正好修复了这个问题。</p>
+<p>我个人没有使用这个功能，因为 zinit 已经很快了。主题插件可能启动会慢一些，但如果让主题插件延迟加载，会先显示一个简单的命令提示符，然后等主题插件加载完毕了再变为主题插件提供的命令提示符，这样的跳变看起来怪怪的。</p>
+<h2 id="chang-yong-guan-li-ming-ling">常用管理命令</h2>
+<h3 id="zi">zi</h3>
+<p>在命令行交互中 <code>zi</code>  是 <code>zinit</code>  的别名。</p>
+<h3 id="geng-xin">更新</h3>
+<ul>
+<li>自更新： <code>zi self-update</code></li>
+<li>更新所有插件： <code>zi update</code> ，等价于 <code>zi update --all</code></li>
+<li>更新特定插件： <code>zi update &lt;plugin&gt;</code> ，插件目录名太长了，一般都用 zinit 的补全</li>
+</ul>
+<h3 id="bu-quan">补全</h3>
+<ul>
+<li>查看已加载的补全： <code>zi clist</code>。对每个插件每行显示 3 个补全，可以用 <code>zi clist 6</code>  指定每行显示 6 个补全。</li>
+<li>清理无用的补全： <code>zi cclear</code></li>
+</ul>
+<h3 id="qing-li">清理</h3>
+<ul>
+<li>清理未加载插件： <code>zi delete --clear</code></li>
+<li>删除所有插件： <code>zi delete --all</code></li>
+</ul>
+<h2 id="ke-xue-shang-wang">科学上网</h2>
+<p>用 snippet 下载 OMZ 上的单个文件时会出现连接失败的问题。如果是整个仓库，用的是 <code>git clone</code>  一般都不会有什么问题，但用 snippet 下载单个文件会用 <code>curl</code>  访问 <code>raw.githubusercontent.com</code> ，这个网址常常挂掉。</p>
+<p>一个较简单的解决办法是用国内的 gitee 镜像。gitee 上有 OMZ 的官方镜像仓库，对于其他 gitee 上没有镜像的 github 仓库可以用自己的 gitee 账号 fork 一个。</p>
+<p>仓库中单个文件的链接后缀是 <code>raw/&lt;分支名&gt;/&lt;路径&gt;</code> 。</p>
+<p>例如加载 <code>OMZ::lib/completion.zsh</code>  这个文件，原本的指令是：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet OMZ::lib/completion.zsh</span>
+</span></code></pre>
+<p>这样可能由于网络的原因下载失败，我们使用 gitee 的镜像仓库，地址是 <code>https://gitee.com/mirrors/oh-my-zsh</code> ，分支是 <code>master</code> ，路径为 <code>lib/completion.zsh</code> ，最终的指令为：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">zinit</span></span><span class="z-meta z-function-call z-arguments z-shell"> snippet https://gitee.com/mirrors/oh-my-zsh/raw/master/lib/completion.zsh</span>
+</span></code></pre>
+<h2 id="references">References</h2>
+<ol>
+<li><a href="https://github.com/zdharma/zinit">https://github.com/zdharma/zinit</a></li>
+<li><a href="https://zdharma.org/zinit/wiki">https://zdharma.org/zinit/wiki</a></li>
+</ol>
+
+  </div>
+</article>
+
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/zenlian/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  
+  <script src="https://zenlian.github.io/js/cattery.js"/></script>
+  
+</html>
