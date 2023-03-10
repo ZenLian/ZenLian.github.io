@@ -70,16 +70,18 @@ render_emoji = true
 # smart_punctuation = false
 
 [extra]
-page_404_content = ["空山不见人", "但闻人语响"]
+colormode = "normal" # "normal" "colorful"
+
+page_404_content = ["Oops", "You're stuck in limbo"]
 
 navigation = [
-  { icon = "mdi:tags", label = "标签", path = "tags"},
-  { icon = "mdi:user", label = "关于", path = "about"}
+  { icon = "mdi:tags", label = "tags", path = "tags"},
+  { icon = "mdi:user", label = "about", path = "about"}
 ]
 
 socials = [
-  { icon = "mdi:github", link = "https://github.com/zenlian" },
-  { icon = "mdi:email", link = "mailto://zeninglian@gmail.com" }
+  { icon = "mdi:github", link = "https://your.github" },
+  { icon = "mdi:email", link = "mailto://your@email" }
 ]
 
 [extra.copyright]

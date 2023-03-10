@@ -1,3 +1,5 @@
+@import url("syntax.css");
+
 :root {
   --color-rosewater: #dc8a78;
   --color-flamingo: #dd7878;
@@ -137,6 +139,7 @@ header {
   padding: 1em 0;
   position: fixed;
   top: 0;
+  z-index: 1;
   width: 100%;
   transition: top 500ms;
 }
@@ -275,7 +278,7 @@ article {
   font-size: 14px;
 }
 .post-meta time {
-  color: var(--color-surface2);
+  color: var(--color-overlay2);
 }
 
 /* markdown */

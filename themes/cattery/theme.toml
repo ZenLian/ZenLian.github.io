@@ -25,20 +25,25 @@ repo = "https://www.github.com/reuixiy/hugo-theme-meme"
 # Use snake_casing to be consistent with the rest of Zola
 [extra]
 
+# set to "colorful" to use full catppuccin palette
 colormode = "normal" # or "colorful"
 
 page_404_content = ["Oops!", "You're stuck in limbo."]
 
+# icon ref to iconify-icon
+# internal 'path'/external 'link' 
 navigation = [
   { icon = "mdi:tags", label = "tags", path = "tags"},
   { icon = "mdi:user", label = "about", path = "about"}
 ]
 
+# social links
 socials = [
   { icon = "mdi:github", link = "https://github.com/zenlian" },
   { icon = "mdi:email", link = "mailto://zeninglian@gmail.com" }
 ]
 
 [extra.copyright]
+# site copyright
 site = ["CC BY-NC-SA 4.0", "https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"]
 

@@ -53,10 +53,13 @@ taxonomies = [
 # build_search_index = true
 
 [markdown]
-# Whether to do syntax highlighting
-# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
+# When set to "true", all code blocks are highlighted.
 highlight_code = true
-highlight_theme = "visual-studio-dark"
+
+# The theme to use for code highlighting.
+# See below for list of allowed values.
+# highlight_theme = "visual-studio-dark"
+highlight_theme = "css"
 
 # When set to "true", emoji aliases translated to their corresponding
 # Unicode emoji equivalent in the rendered Markdown files. (e.g.: :smile: => 😄)
@@ -79,7 +82,4 @@ socials = [
   { icon = "mdi:github", link = "https://github.com/zenlian" },
   { icon = "mdi:email", link = "mailto://zeninglian@gmail.com" }
 ]
-
-[extra.copyright]
-site = ["CC BY-NC-SA 4.0", "https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"]
 
