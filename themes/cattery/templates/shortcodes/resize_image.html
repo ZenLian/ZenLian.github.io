@@ -1,0 +1,4 @@
+{% set image = resize_image(path=path, width=width, height=height, op=op) %}
+<div style="text-align: {% if align %}{{align}}{% else %}center{% endif %};">
+    <img src="{{ image.url }}" style="object-fit: cover;"/>
+</div>

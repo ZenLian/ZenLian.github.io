@@ -14,7 +14,7 @@ tags = ["tools", "dotfiles"]
 
 比如我有 zsh, git 和 tmux 的配置需要管理，如果不使用 stow，那么这些配置文件会散落在 HOME 目录下：
 
-```plaintext
+```
 $HOME
 ├── .config
 │  └── zsh
@@ -29,7 +29,7 @@ $HOME
 
 使用 stow 来管理的话，就可以把属于同一个程序的配置文件组织在一起。在任意地方新建一个 dotfiles 目录，然后为每个程序建立一个自己的配置文件夹，把属于它的配置丢进去：
 
-```plaintext
+```
 dotfiles
 ├── git
 │  └── .gitconfig

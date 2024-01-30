@@ -29,7 +29,7 @@ hugo 的文章都放在 content 目录下，采用 sections 管理文章的分�
 
 content 根目录下的每个文件夹会自动成为一个分区。如果文件夹不在 content 根目录下，那么需要新建一个 \_index.md 文件使它成为分区。分区和目录一样是树状结构，因此很适合作为文章的分类使用，比 hexo 在文章中使用 categories 指定分类要更科学些。
 
-```plaintext
+```
 content
 ├── life/
 └── tech/

@@ -22,7 +22,7 @@ export ZDOTDIR=$HOME/.config/zsh
 
 这样其它的 zsh 配置（如 .zshrc）就可以放在 `$ZDOTDIR` 中而不会污染了 home 目录。zsh 相关配置文件的目录结构如下：
 
-```plaintext
+```
 ~
 ├── .config
 │  └── zsh

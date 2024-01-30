@@ -10,7 +10,7 @@ tags = ["tools", "wsl", "hugo"]
 
 但是 wsl2 是独立的虚拟环境，windows 上不能直接通过 `localhost:端口号` 的方式访问部署在 wsl2 本地的网络服务。
 
-```shell
+```bash
 hugo server
 ...
 Web Server is available at //localhost:1313/ (bind address 127.0.0.1)
@@ -24,7 +24,7 @@ Web Server is available at //localhost:1313/ (bind address 127.0.0.1)
 
 首先用 `ifconfig` 查看 wsl 的虚拟 ip 地址：
 
-```shell
+```bash
 $ ifconfig
 eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 172.23.162.136  netmask 255.255.240.0  broadcast 172.23.175.255
@@ -47,7 +47,7 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
 
 可以看到 eth0 的 ip 地址是 `172.23.162.136`，我们把 hugo 服务部署在这个地址上：
 
-```shell
+```bash
 $ hugo server --bind 172.23.162.136 --baseURL=http://172.23.162.136
 ...
 Web Server is available at http://172.23.162.136:1313/ (bind address 172.23.162.136)
@@ -59,7 +59,7 @@ Web Server is available at http://172.23.162.136:1313/ (bind address 172.23.162.
 
 这个方法的缺点是，wsl 的虚拟 ip 地址是由 windows 分配的，每次重启都会更换。不想每次都手动查询地址再输入命令，可以封装一个简单的 bash 脚本：
 
-```shell
+```bash
 #!/bin/bash
 IPADDRESS=$(ifconfig eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 echo $IPADDRESS

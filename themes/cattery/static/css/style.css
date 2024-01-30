@@ -293,10 +293,25 @@ article {
 .post-content h2 {
   color: var(--color-h, var(--color-text));
   margin: 1em 0;
+  position: relative;
 }
+.post-content h2::before {
+  content: "h2";
+  color: var(--color-surface0);
+  position: absolute;
+  left: -1.5em;
+}
+
 .post-content h3 {
   color: var(--color-h, var(--color-text));
   margin: 0.7em 0;
+  position: relative;
+}
+.post-content h3::before {
+  content: "h3";
+  color: var(--color-surface0);
+  position: absolute;
+  left: -1.6em;
 }
 .post-content h4 {
   color: var(--color-h, var(--color-text));
@@ -322,6 +337,9 @@ article {
 .post-content a:hover {
   color: var(--color-link, var(--color-lavender));
   text-decoration-color: var(--color-link, var(--color-lavender));
+}
+.post-content del {
+  color: var(--color-overlay0);
 }
 
 .post-content code {
@@ -376,6 +394,11 @@ article {
   color: var(--color-hr);
   letter-spacing: 2em;
   padding-left: 2em;
+}
+
+.post-content img {
+  object-fit: cover;
+  width: 100%;
 }
 
 .footnote-definition {
