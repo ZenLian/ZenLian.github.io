@@ -45,9 +45,7 @@ ignored_content = []
 #       {name = "authors"}, # Basic definition: no feed or pagination
 #     ]
 #
-taxonomies = [
-  {name = "tags"},
-]
+taxonomies = [{ name = "tags" }]
 
 # Whether to build a search index to be used later on by a JavaScript library
 # build_search_index = true
@@ -67,7 +65,7 @@ render_emoji = true
 
 # Whether smart punctuation is enabled (changing quotes, dashes, dots in their typographic form)
 # For example, `...` into `…`, `"quote"` into `“curly”` etc
-# smart_punctuation = false
+smart_punctuation = true
 
 [extra]
 colormode = "colorful" # "normal" "colorful"
@@ -75,11 +73,10 @@ colormode = "colorful" # "normal" "colorful"
 page_404_content = ["空山不见人", "但闻人语响"]
 
 navigation = [
-  { icon = "mdi:tags", label = "标签", path = "tags"},
-  { icon = "mdi:user", label = "关于", path = "about"}
+  { icon = "mdi:tags", label = "标签", path = "tags" },
+  { icon = "mdi:user", label = "关于", path = "about" },
 ]
 socials = [
   { icon = "mdi:github", link = "https://github.com/zenlian" },
-  { icon = "mdi:email", link = "mailto://zeninglian@gmail.com" }
+  { icon = "mdi:email", link = "mailto://zeninglian@gmail.com" },
 ]
-
