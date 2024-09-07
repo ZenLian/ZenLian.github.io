@@ -5,7 +5,7 @@ homepage = "https://github.com/zenlian/cattery"
 # The minimum version of Zola required
 min_version = "0.15.0"
 # An optional live demo URL
-demo = "https://zenlian.github.io/cattery"
+demo = "https://zenlian.github.io"
 
 # The theme author info: you!
 [author]
@@ -31,7 +31,7 @@ colormode = "normal" # or "colorful"
 page_404_content = ["Oops!", "You're stuck in limbo."]
 
 # icon ref to iconify-icon
-# internal 'path'/external 'link' 
+# internal 'path'/external 'link'
 navigation = [
   { icon = "mdi:tags", label = "tags", path = "tags"},
   { icon = "mdi:user", label = "about", path = "about"}

@@ -3,7 +3,7 @@ title = "C++ 类型萃取的实现"
 date = 2020-04-01T22:18:04+08:00
 slug = "cpp-traits"
 [taxonomies]
-tags = ["cpp", "traits"]
+tags = ["cpp"]
 +++
 
 以前看《Effective C++》时，很多条款都没有仔细看，对类型萃取有点印象，但又说不出个所以然来。
