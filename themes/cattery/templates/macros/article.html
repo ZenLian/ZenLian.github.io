@@ -1,5 +1,5 @@
 {% macro date(page) %}
-<time datetime="{{ page.date }}">{{ page.date | date }}</time>
+<time datetime="{{ page.date | date }}">{{ page.date | date }}</time>
 {% endmacro %}
 
 {% macro tags(page) %}

@@ -12,7 +12,10 @@
   </h1>
   <div class="post-meta">
     <span>{{ article::tags(page=page) }}</span>
-    <time datetime="{{ page.date | date }}">{{ page.date | date }}</time>
+    <span>
+      <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+      <span>{{ article::date(page=page) }}</span>
+    </span>
   </div>
   <div class="post-content">
     {{ page.content | safe }}

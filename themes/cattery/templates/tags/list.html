@@ -1,15 +1,9 @@
+{% import "macros/taxonomy.html" as T %}
 {% extends "base.html" %}
 
 {% block main %}
 <article>
   <h1 class="page-title">{{ taxonomy.name }}</h1>
-  <ul class="term-list">
-    {%- for term in terms -%}
-    <li>
-      <a href="{{ term.permalink }}">{{ term.name }}</a>
-      <span class="term-count">({{ term.page_count }})</span>
-    </li>
-    {%- endfor -%}
-  </ul>
+  {{ T::tag_cloud() }}
 </article>
 {% endblock %}

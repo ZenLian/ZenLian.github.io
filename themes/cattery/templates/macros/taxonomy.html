@@ -1,0 +1,31 @@
+{% macro tag_list() %}
+<ul class="term-list">
+  {%- for term in terms -%}
+  <li>
+    <a href="{{ term.permalink }}">{{ term.name }}</a>
+    <span class="term-count">({{ term.page_count }})</span>
+  </li>
+  {%- endfor -%}
+</ul>
+{% endmacro %}
+
+{% macro tag_cloud() %}
+  {%- set fontSizeMin = 18 -%}
+  {%- set fontSizeMax = 36 -%}
+  {%- set_global countTotal = 0 -%}
+  {%- for term in terms -%}
+    {% set_global countTotal = term.page_count + countTotal %}
+  {%- endfor -%}
+  {%- set termMin = terms | sort(attribute="page_count") | first -%}
+  {%- set termMax = terms | sort(attribute="page_count") | last -%}
+  {%- set weightMin = termMin.page_count / countTotal -%}
+  {%- set weightMax = termMax.page_count / countTotal -%}
+  {%- set pace = (fontSizeMax - fontSizeMin) / (weightMax - weightMin) -%}
+  <div class="tag-cloud">
+  {%- for term in terms -%}
+    {%- set weight = term.page_count / countTotal -%}
+    {%- set fontSize = pace * (weight - weightMin) + fontSizeMin -%}
+    <a href="{{ term.permalink }}" class="tag-cloud-item" style="font-size: {{fontSize}}px;">{{ term.name }}</a>
+  {%- endfor -%}
+  </div>
+{% endmacro %}

@@ -14,7 +14,31 @@ tags = ["tools", "zola"]
 
 之前 hugo 用的主题是 [MemE](https://github.com/reuixiy/hugo-theme-meme)，zola 里没有对应的主题，所以打算参考原版主题自己写一个。配色上参考了 [catppuccin](https://github.com/catppuccin/catppuccin)，这也是我在 VSCode/Neovim 里一直在用的配色方案。
 
-### 亮暗模式切换
+## 添加 icon
+
+网站中的 icon 图标采用 [iconify](https://iconify.design/) 方案，使用起来非常方便。
+
+只需要在 html 的 `<head>` 中加载以下 js：
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
+```
+
+在用到 icon 的地方，直接用 `<iconify-icon>`，比如：
+
+```html
+<iconify-icon icon="mdi:tags"></iconify-icon>
+```
+
+实际使用时，发现 icon 和文字不对齐。在 `css` 中添加以下属性解决：
+
+```css
+iconify-icon {
+  vertical-align: -0.125em;
+}
+```
+
+## 亮暗模式切换
 
 首先在 css 中定义亮、暗模式下的颜色值：
 

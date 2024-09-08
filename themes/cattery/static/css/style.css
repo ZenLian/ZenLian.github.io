@@ -95,6 +95,13 @@ body {
   background-color: var(--color-base);
 }
 
+iconify-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -163,9 +170,6 @@ header {
 .menu-item {
   display: inline-block;
   margin-left: 0.5em;
-}
-.menu-icon {
-  vertical-align: -0.125em;
 }
 
 #theme-switcher-dark {
@@ -256,6 +260,14 @@ article {
   color: var(--color-surface2);
 }
 
+.tag-cloud {
+  text-align: center;
+}
+.tag-cloud-item {
+  margin: 0.5rem;
+  display: inline-block;
+}
+
 /* 404 page */
 .page-not-found {
   text-align: center;
@@ -276,8 +288,6 @@ article {
   align-items: center;
   margin: 0.5em 0;
   font-size: 14px;
-}
-.post-meta time {
   color: var(--color-overlay2);
 }
 
