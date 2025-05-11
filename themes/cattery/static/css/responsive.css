@@ -1,5 +1,13 @@
-@media (max-width: 738px) {
+@media (max-width: 756px) {
   .main-inner {
     width: auto !important;
+  }
+
+  /* header */
+  .site-brand {
+    margin-left: 1em;
+  }
+  .nav {
+    margin-right: 1em;
   }
 }

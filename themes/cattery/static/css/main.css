@@ -87,7 +87,7 @@ header {
   justify-content: space-between;
   align-items: center;
   margin: 0 auto;
-  max-width: 36em;
+  max-width: 42em;
 }
 
 .site-brand {
@@ -124,15 +124,12 @@ main {
 }
 
 .main-inner {
-  width: 36em;
+  width: 42em;
   margin: 0 auto;
   display: block;
 }
 
 /* article {
-  width: 36em;
-  margin: 0 auto;
-  display: block;
 } */
 
 .page-title {
