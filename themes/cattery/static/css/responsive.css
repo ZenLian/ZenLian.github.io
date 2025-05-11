@@ -1,0 +1,5 @@
+@media (max-width: 738px) {
+  .main-inner {
+    width: auto !important;
+  }
+}
