@@ -3,16 +3,22 @@
 
 {% block main %}
 <article class="article">
- <ul class="post-list">
-   {%- for page in section.pages -%}
-   <li class="post-item">
-     <span class="post-item-left">
-       <span class="post-item-date">{{ article::date(page=page) }}</span>
-       <a class="post-item-title" href="{{ page.permalink | safe }}">{{ page.title }}</a>
-     </span>
-     <span class="post-item-right">{{ article::tags(page=page) }}</span>
-   </li>
-   {%- endfor -%}
- </ul>
+  <ul class="post-list">
+  {%- set prev_year = "" -%}
+  {%- for page in section.pages | sort(attribute="date") | reverse -%}
+    {%- set year = page.date | date(format="%Y") -%}
+    {%- if year != prev_year -%}
+      <ul class="post-year">{{ year }}</ul>
+      {%- set_global prev_year = year -%}
+    {%- endif -%}
+      <li class="post-item">
+        <span class="post-item-left">
+          <span class="post-item-date">{{ page.date | date(format="%m-%d") }}</span>
+          <a class="post-item-title" href="{{ page.permalink | safe }}">{{ page.title }}</a>
+        </span>
+        <span class="post-item-right">{{ article::tags(page=page) }}</span>
+      </li>
+  {%- endfor -%}
+  </ul>
 </article>
 {% endblock %}

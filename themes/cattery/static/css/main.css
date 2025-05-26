@@ -142,6 +142,11 @@ main {
   list-style-type: none;
 }
 
+.post-year {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
 .post-item {
   display: flex;
   justify-content: space-between;
@@ -341,6 +346,56 @@ main {
 .post-content img {
   object-fit: cover;
   width: 100%;
+}
+
+/* toc */
+.post-sidebar {
+  position: fixed;
+  top: 6rem;
+  right: 1rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+#toc-button {
+  font-size: 1.2rem;
+  text-align: right;
+}
+
+.toc-content {
+  max-width: 12rem;
+  padding: 0.5rem 0;
+  text-align: right;
+}
+
+.toc-content a:active {
+  color: var(--color-peach);
+}
+
+.toc-content a:hover {
+  color: var(--color-peach);
+}
+
+.toc-content li {
+  list-style: outside none none;
+}
+
+.toc-content .toc-h2 {
+  color: var(--color-subtext0);
+}
+
+.toc-content .toc-h2::before {
+  content: "#";
+}
+
+.toc-content .toc-h3 {
+  font-size: 0.9rem;
+  color: var(--color-overlay1);
+}
+
+.toc-content .toc-h3::before {
+  content: "·";
 }
 
 .footnote-definition {

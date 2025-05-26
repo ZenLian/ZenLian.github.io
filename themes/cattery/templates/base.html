@@ -32,7 +32,7 @@
     {% endblock %}
   </body>
 
+  <script src="{{ get_url(path='js/cattery.js', trailing_slash=false) | safe }}"></script>
   {% block js %}
-  <script src="{{ get_url(path='js/cattery.js', trailing_slash=false) | safe }}"/></script>
   {% endblock js %}
 </html>

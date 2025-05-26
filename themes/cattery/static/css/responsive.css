@@ -10,4 +10,14 @@
   .nav {
     margin-right: 1em;
   }
+
+  .post-content h2::before {
+    display: none;
+  }
+}
+
+@media (max-width: 1288px) {
+  .post-sidebar {
+    display: none !important;
+  }
 }

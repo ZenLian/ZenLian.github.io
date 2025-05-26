@@ -6,19 +6,48 @@
 {% endblock %}
 
 {% block main %}
-<article>
-  <h1 class="post-title page-title">
-    {{ page.title }}
-  </h1>
-  <div class="post-meta">
-    <span>{{ article::tags(page=page) }}</span>
-    <span>
-      <iconify-icon icon="mdi:calendar-month"></iconify-icon>
-      <span>{{ article::date(page=page) }}</span>
-    </span>
+  <article>
+    <h1 class="post-title page-title">
+      {{ page.title }}
+    </h1>
+    <div class="post-meta">
+      <span>{{ article::tags(page=page) }}</span>
+      <span>
+        <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+        <span>{{ article::date(page=page) }}</span>
+      </span>
+    </div>
+    <div class="post-content">
+      {{ page.content | safe }}
+    </div>
+  </article>
+  {% if page.toc and page.toc | length > 0 %}
+  <div class="post-sidebar">
+    <a id="toc-button" class="toc-button">
+      <iconify-icon icon="mdi:menu"></iconify-icon>
+    </a>
+    <nav class="toc-content" id="toc-content">
+      <ul>
+        {%- for h2 in page.toc -%}
+          <li class="toc-h2">
+            <a href="{{ h2.permalink | safe }}">{{ h2.title }}</a>
+            {%- if h2.children -%}
+              <ul>
+                {%- for h3 in h2.children -%}
+                  <li class="toc-h3">
+                    <a href="{{ h3.permalink | safe }}">{{ h3.title }}</a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif %}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
   </div>
-  <div class="post-content">
-    {{ page.content | safe }}
-  </div>
-</article>
+  {% endif %}
+{% endblock %}
+
+{% block js %}
+<script src="{{ get_url(path='js/page.js', trailing_slash=false) | safe }}"></script>
 {% endblock %}
