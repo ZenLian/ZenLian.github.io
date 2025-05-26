@@ -1,4 +1,4 @@
-@media (max-width: 756px) {
+@media (max-width: 826px) {
   .main-inner {
     width: auto !important;
   }
@@ -9,10 +9,6 @@
   }
   .nav {
     margin-right: 1em;
-  }
-
-  .post-content h2::before {
-    display: none;
   }
 }
 
