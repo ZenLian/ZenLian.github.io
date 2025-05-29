@@ -51,6 +51,7 @@ window.addEventListener(
   }
 );
 
+/** Hide header on scroll down, show on scroll up */
 let lastScrollY = 0;
 
 window.addEventListener("scroll", () => {

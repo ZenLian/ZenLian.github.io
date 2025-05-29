@@ -14,7 +14,7 @@ tags = ["tools", "zsh"]
 
 ## 目录结构
 
-我[使用 stow 管理我的 dotfiles]({{< ref "使用 GNU stow 管理你的 dotfiles.md" >}})，而且不喜欢把配置文件直接放在 home 目录下，能移到 `.config` 目录下的都要移进去。zsh 的配置文件目录由 `ZDOTDIR` 指定，默认为 `$HOME`，可以在 `~/.zshenv` 中指定：
+我[使用 stow 管理我的 dotfiles](@/使用%20GNU%20stow%20管理你的%20dotfiles.md)，而且不喜欢把配置文件直接放在 home 目录下，能移到 `.config` 目录下的都要移进去。zsh 的配置文件目录由 `ZDOTDIR` 指定，默认为 `$HOME`，可以在 `~/.zshenv` 中指定：
 
 ```bash
 export ZDOTDIR=$HOME/.config/zsh
@@ -35,7 +35,7 @@ export ZDOTDIR=$HOME/.config/zsh
 
 ## zinit 插件管理器
 
-如果你觉得 Oh-My-Zsh 启动慢，不妨试试 zinit。zinit 真的可以[让你的 zsh 起飞]({{< ref "/posts/zinit：让你的%20zsh%20起飞.md" >}})，即使不用 Turbo Mode，我在日常使用中也完全感受不到它的加载延迟。zinit 不仅能管理 zsh 插件，理论上还可以帮你管理你的软件，使用 zinit 命令可以自动从 github 或其他地方下载软件包并执行编译、安装、移动等操作。
+如果你觉得 Oh-My-Zsh 启动慢，不妨试试 zinit。zinit 真的可以[让你的 zsh 起飞](@/zinit：让你的%20zsh%20起飞.md)，即使不用 Turbo Mode，我在日常使用中也完全感受不到它的加载延迟。zinit 不仅能管理 zsh 插件，理论上还可以帮你管理你的软件，使用 zinit 命令可以自动从 github 或其他地方下载软件包并执行编译、安装、移动等操作。
 
 ## 借用 Oh-My-Zsh 的配置和插件
 
