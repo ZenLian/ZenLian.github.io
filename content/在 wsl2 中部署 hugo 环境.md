@@ -66,4 +66,4 @@ echo $IPADDRESS
 hugo server --bind $IPADDRESS --baseURL=http://$IPADDRESS
 ```
 
-把这个脚本保存为 `start-server.sh` 放在根目录，每次需要本地运行 hugo server 的时候只有运行这个 bash 脚本就行了。
+把这个脚本保存为 `start-server.sh` 放在根目录，每次需要本地运行 hugo server 的时候只要运行这个 bash 脚本就行了。
