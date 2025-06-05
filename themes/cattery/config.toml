@@ -70,6 +70,8 @@ render_emoji = true
 [extra]
 colormode = "normal" # "normal" "colorful"
 
+site_brand = "Cattery"
+
 page_404_content = ["Oops", "You're stuck in limbo"]
 
 navigation = [
