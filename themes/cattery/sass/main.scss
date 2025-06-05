@@ -1,9 +1,11 @@
-@import url("fonts.css");
-@import url("syntax.css");
+@use "fonts";
+@use "syntax";
 
-@import url("theme.css");
+@use "theme";
 
-@import url("responsive.css");
+@use "responsive";
+
+@use "components/callouts";
 
 * {
   box-sizing: border-box;
@@ -22,8 +24,8 @@ body {
   -webkit-text-size-adjust: none;
   -moz-text-size-adjust: none;
   text-size-adjust: none;
-  color: var(--color-text);
-  background-color: var(--color-base);
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-base));
 }
 
 iconify-icon {
@@ -40,11 +42,11 @@ a {
 }
 
 a:hover {
-  color: var(--color-lavender);
+  color: rgb(var(--color-lavender));
 }
 
 ::selection {
-  background-color: var(--color-surface1);
+  background-color: rgb(var(--color-surface1));
 }
 
 ::-webkit-scrollbar {
@@ -57,23 +59,23 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-surface2);
+  background-color: rgb(var(--color-surface2));
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-overlay0);
+  background-color: rgb(var(--color-overlay0));
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background-color: var(--color-overlay2);
+  background-color: rgb(var(--color-overlay2));
 }
 
 ::-webkit-scrollbar-corner {
-  background-color: var(--color-base);
+  background-color: rgb(var(--color-base));
 }
 
 header {
-  background-color: var(--color-header);
+  background-color: rgb(var(--color-header));
   padding: 1em 0;
   position: fixed;
   top: 0;
@@ -96,7 +98,7 @@ header {
 
 .nav {
   font-size: 0.8em;
-  color: var(--color-subtext0);
+  color: rgb(var(--color-subtext0));
 }
 .menu-item {
   display: inline-block;
@@ -106,7 +108,7 @@ header {
 .footer {
   font-size: 85%;
   text-align: center;
-  color: var(--color-overlay0);
+  color: rgb(var(--color-overlay0));
   padding: 1em;
 }
 
@@ -154,12 +156,12 @@ main {
 }
 
 .post-item-date {
-  color: var(--color-surface2);
+  color: rgb(var(--color-surface2));
   font-family: "Fira Code", sans-serif;
 }
 
 .post-item-title {
-  color: var(--color-text);
+  color: rgb(var(--color-text));
 }
 
 .post-item-title:hover {
@@ -168,8 +170,8 @@ main {
 
 .tag-item {
   display: inline-block;
-  color: var(--color-text);
-  background-color: var(--color-tag);
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-tag));
   font-size: 0.8rem;
   padding: 0.05rem 0.3rem;
   border-radius: 0.5rem;
@@ -177,8 +179,8 @@ main {
 }
 
 .tag-item:hover {
-  color: var(--color-tagfg, var(--color-lavender));
-  background-color: var(--color-tagbg, var(--color-tag));
+  color: rgb(var(--color-tagfg));
+  background-color: rgb(var(--color-tagbg));
 }
 .tag-item a {
   color: inherit;
@@ -190,10 +192,10 @@ main {
   line-height: 1.5;
 }
 .term-list li::marker {
-  color: var(--color-overlay2);
+  color: rgb(var(--color-overlay2));
 }
 .term-list .term-count {
-  color: var(--color-surface2);
+  color: rgb(var(--color-surface2));
 }
 
 .tag-cloud {
@@ -224,7 +226,7 @@ main {
   align-items: center;
   margin: 0.5em 0;
   font-size: 0.8em;
-  color: var(--color-overlay2);
+  color: rgb(var(--color-overlay2));
 }
 
 /* markdown */
@@ -233,30 +235,30 @@ main {
 }
 
 .post-content h1 {
-  color: var(--color-h, var(--color-text));
+  color: rgb(var(--color-h));
   margin: 1.5em 0;
 }
 .post-content h2 {
-  color: var(--color-h, var(--color-text));
+  color: rgb(var(--color-h));
   margin: 1em 0;
   position: relative;
 }
 .post-content h2::before {
   content: "#";
-  color: var(--color-surface0);
+  color: rgb(var(--color-surface0));
   position: absolute;
   left: -1em;
   font-weight: bold;
 }
 
 .post-content h3 {
-  color: var(--color-h, var(--color-text));
+  color: rgb(var(--color-h));
   margin: 0.7em 0;
   position: relative;
 }
 
 .post-content h4 {
-  color: var(--color-h, var(--color-text));
+  color: rgb(var(--color-h));
   margin: 0.5em 0;
 }
 .post-content p {
@@ -270,30 +272,30 @@ main {
   line-height: 2;
 }
 .post-content li::marker {
-  color: var(--color-li, var(--color-overlay2));
+  color: rgb(var(--color-li));
 }
 .post-content a {
-  color: var(--color-link, var(--color-text));
+  color: rgb(var(--color-link));
   text-decoration: underline;
-  text-decoration-color: var(--color-link, var(--color-overlay0));
+  text-decoration-color: rgb(var(--color-link));
 }
 .post-content a:hover {
-  color: var(--color-link, var(--color-lavender));
-  text-decoration-color: var(--color-link, var(--color-lavender));
+  color: rgb(var(--color-link));
+  text-decoration-color: rgb(var(--color-link));
 }
 .post-content del {
-  color: var(--color-overlay0);
+  color: rgb(var(--color-overlay0));
 }
 
 .post-content code {
-  color: var(--color-code, var(--color-subtext0));
+  color: rgb(var(--color-code));
   font-family: "Fira Code", "I.Ming", monospace;
-  background-color: var(--color-pre);
+  background-color: rgb(var(--color-pre));
   padding: 0.05em 0.1em;
 }
 
 .post-content pre {
-  background-color: var(--color-pre) !important;
+  background-color: rgb(var(--color-pre)) !important;
   padding: 1rem;
   overflow: auto;
   word-wrap: normal;
@@ -321,14 +323,14 @@ main {
 .post-content pre code {
   font-family: "Fira Code", monospace;
   display: block;
-  color: var(--color-text);
+  color: rgb(var(--color-text));
   background-color: inherit;
   padding: 0;
 }
 
 .post-content blockquote {
-  border-left: 0.2em solid var(--color-quote, var(--color-surface0));
-  color: var(--color-overlay2);
+  border-left: 0.2em solid rgb(var(--color-quote));
+  color: rgb(var(--color-overlay2));
   padding-left: 0.5em;
 }
 .post-content hr {
@@ -338,7 +340,7 @@ main {
 }
 .post-content hr::after {
   content: "···";
-  color: var(--color-hr);
+  color: rgb(var(--color-hr));
   letter-spacing: 2em;
   padding-left: 2em;
 }
@@ -370,11 +372,11 @@ main {
 }
 
 .toc-content a:active {
-  color: var(--color-peach);
+  color: rgb(var(--color-peach));
 }
 
 .toc-content a:hover {
-  color: var(--color-peach);
+  color: rgb(var(--color-peach));
 }
 
 .toc-content li {
@@ -382,7 +384,7 @@ main {
 }
 
 .toc-content .toc-h2 {
-  color: var(--color-subtext0);
+  color: rgb(var(--color-subtext0));
 }
 
 .toc-content .toc-h2::before {
@@ -391,7 +393,7 @@ main {
 
 .toc-content .toc-h3 {
   font-size: 0.9rem;
-  color: var(--color-overlay1);
+  color: rgb(var(--color-overlay1));
 }
 
 .toc-content .toc-h3::before {
@@ -409,12 +411,3 @@ main {
 .footnote-definition-label::after {
   content: ".";
 }
-
-/* shotcodes/callout */
-.callout {
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgb(var(--color-blue), 0.6);
-  background-color: rgb(var(--color-blue), 0.1);
-  padding: 0.8rem;
-};

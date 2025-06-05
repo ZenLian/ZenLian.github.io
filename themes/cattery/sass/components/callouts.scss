@@ -1,0 +1,34 @@
+/* shotcodes/callout */
+.callout {
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  border-radius: 0.2rem;
+  border-width: 1px;
+  border-style: solid;
+
+  // default: note
+  --color-callout: var(--color-blue);
+  border-color: rgb(var(--color-callout), 0.6);
+  background-color: rgb(var(--color-callout), 0.1);
+};
+
+.callout[type="info"] {
+  --color-callout: var(--color-blue);
+}
+
+.callout[type="warning"] {
+  --color-callout: var(--color-yellow);
+}
+
+.callout[type="error"] {
+  --color-callout: var(--color-red);
+}
+
+.callout[type="quote"] {
+  --color-callout: var(--color-overlay1);
+}
+
+.callout-header {
+  font-weight: bold;
+  color: rgb(var(--color-callout));
+}
