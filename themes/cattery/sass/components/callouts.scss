@@ -5,30 +5,85 @@
   border-radius: 0.2rem;
   border-width: 1px;
   border-style: solid;
-
+  border-color: rgb(var(--callout-color), 0.6);
+  background-color: rgb(var(--callout-color), 0.1);
   // default: note
-  --color-callout: var(--color-blue);
-  border-color: rgb(var(--color-callout), 0.6);
-  background-color: rgb(var(--color-callout), 0.1);
+  --callout-color: var(--color-blue);
+  --callout-icon: url("https://api.iconify.design/mdi/pencil-outline.svg");
 };
 
+.callout[type] {
+  --callout-color: var(--color-blue);
+  --callout-icon: url("https://api.iconify.design/mdi/pencil.svg");
+}
+
 .callout[type="info"] {
-  --color-callout: var(--color-blue);
+  --callout-color: var(--color-blue);
+  --callout-icon: url("https://api.iconify.design/mdi/information.svg");
 }
 
-.callout[type="warning"] {
-  --color-callout: var(--color-yellow);
+.callout[type="todo"] {
+  --callout-color: var(--color-lavender);
+  --callout-icon: url("https://api.iconify.design/mdi/check-circle-outline.svg");
 }
 
-.callout[type="error"] {
-  --color-callout: var(--color-red);
+.callout[type="tip"], .callout[type="help"], .callout[type="important"] {
+  --callout-color: var(--color-sky);
+  --callout-icon: url("https://api.iconify.design/mdi/fire.svg");
 }
 
-.callout[type="quote"] {
-  --color-callout: var(--color-overlay1);
+.callout[type="success"], .callout[type="check"] {
+  --callout-color: var(--color-green);
+  --callout-icon: url("https://api.iconify.design/mdi/check.svg");
 }
 
-.callout-header {
+.callout[type="faq"], .callout[type="question"], .callout[type="help"] {
+  --callout-color: var(--color-rosewater);
+  --callout-icon: url("https://api.iconify.design/mdi/question-mark-circle.svg");
+}
+
+.callout[type="warning"], .callout[type="caution"], .callout[type="attention"] {
+  --callout-color: var(--color-yellow);
+  --callout-icon: url("https://api.iconify.design/mdi/warning.svg");
+}
+
+.callout[type="error"], .callout[type="danger"], .callout[type="fail"] {
+  --callout-color: var(--color-red);
+  --callout-icon: url("https://api.iconify.design/mdi/cross-circle.svg");
+}
+
+.callout[type="bug"] {
+  --callout-color: var(--color-maroon);
+  --callout-icon: url("https://api.iconify.design/mdi/ladybug.svg");
+}
+
+.callout[type="example"] {
+  --callout-color: var(--color-mauve);
+  --callout-icon: url("https://api.iconify.design/mdi/format-list-bulleted.svg");
+}
+
+.callout[type="quote"], .callout[type="cite"] {
+  --callout-color: var(--color-overlay1);
+  --callout-icon: url("https://api.iconify.design/mdi/format-quote-close.svg");
+}
+
+.callout-title {
   font-weight: bold;
-  color: rgb(var(--color-callout));
+  color: rgb(var(--callout-color));
+}
+
+.callout-icon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background-color: currentColor;
+  mask-image: var(--callout-icon);
+  -webkit-mask-image: var(--callout-icon);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-position: 50%;
+  -webkit-mask-position: 50%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  vertical-align: -0.125em;
 }
