@@ -11,9 +11,9 @@ Obsidian 中有 **callouts** 语法用来创建醒目的提示框，能够在笔
 ## 用法
 
 ```md
-{%/* callout(type='note', name="Note") */%}
-- **type** 表示 callout 类型，默认为 'note'
-- **name** 为 callout 的标题，默认为 type 对应的首字母大写的字符串。
+{%/* callout(type="note", name="Note") */%}
+- **type** 表示 callout 类型，默认为 "note"
+- **name** 为 callout 的标题，默认为 type 的首字母大写
 
 hello
 {%/* end */%}
@@ -21,9 +21,9 @@ hello
 
 渲染结果如下：
 
-{% callout(type='note', name="Note") %}
-- **type** 表示 callout 类型，默认为 'note'
-- **name** 为 callout 的标题，默认为 type 对应的首字母大写的字符串。
+{% callout(type="note", name="Note") %}
+- **type** 表示 callout 类型，默认为 "note"
+- **name** 为 callout 的标题，默认为 type 的首字母大写
 {% end %}
 
 ## 效果

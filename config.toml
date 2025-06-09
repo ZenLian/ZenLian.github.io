@@ -70,7 +70,7 @@ smart_punctuation = true
 [extra]
 colormode = "colorful" # "normal" "colorful"
 
-site_brand = "MorisLian"
+site_brand = "Moris Lian"
 
 page_404_content = ["空山不见人", "但闻人语响"]
 

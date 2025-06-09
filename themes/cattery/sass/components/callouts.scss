@@ -10,7 +10,7 @@
   // default: note
   --callout-color: var(--color-blue);
   --callout-icon: url("https://api.iconify.design/mdi/pencil-outline.svg");
-};
+}
 
 .callout[type] {
   --callout-color: var(--color-blue);
@@ -27,27 +27,35 @@
   --callout-icon: url("https://api.iconify.design/mdi/check-circle-outline.svg");
 }
 
-.callout[type="tip"], .callout[type="help"], .callout[type="important"] {
+.callout[type="tip"],
+.callout[type="important"] {
   --callout-color: var(--color-sky);
   --callout-icon: url("https://api.iconify.design/mdi/fire.svg");
 }
 
-.callout[type="success"], .callout[type="check"] {
+.callout[type="success"],
+.callout[type="check"] {
   --callout-color: var(--color-green);
   --callout-icon: url("https://api.iconify.design/mdi/check.svg");
 }
 
-.callout[type="faq"], .callout[type="question"], .callout[type="help"] {
+.callout[type="faq"],
+.callout[type="question"],
+.callout[type="help"] {
   --callout-color: var(--color-rosewater);
   --callout-icon: url("https://api.iconify.design/mdi/question-mark-circle.svg");
 }
 
-.callout[type="warning"], .callout[type="caution"], .callout[type="attention"] {
+.callout[type="warning"],
+.callout[type="caution"],
+.callout[type="attention"] {
   --callout-color: var(--color-yellow);
   --callout-icon: url("https://api.iconify.design/mdi/warning.svg");
 }
 
-.callout[type="error"], .callout[type="danger"], .callout[type="fail"] {
+.callout[type="error"],
+.callout[type="danger"],
+.callout[type="fail"] {
   --callout-color: var(--color-red);
   --callout-icon: url("https://api.iconify.design/mdi/cross-circle.svg");
 }
@@ -62,7 +70,8 @@
   --callout-icon: url("https://api.iconify.design/mdi/format-list-bulleted.svg");
 }
 
-.callout[type="quote"], .callout[type="cite"] {
+.callout[type="quote"],
+.callout[type="cite"] {
   --callout-color: var(--color-overlay1);
   --callout-icon: url("https://api.iconify.design/mdi/format-quote-close.svg");
 }

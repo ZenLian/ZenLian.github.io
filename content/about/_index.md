@@ -1,7 +1,7 @@
 +++
-title = "关于我"
+# title = "About"
 +++
 
-{% callout(author="Moris") %}
-星露谷不能没有莫里斯
+{% callout(type="bug", name="About") %}
+**星露谷** 不能 没有 **莫里斯**
 {% end %}

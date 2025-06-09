@@ -1,133 +1,166 @@
 .post-title {
-  margin: 0.5em 0;
+  margin: 0.5rem 0;
 }
 
 .post-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0.5em 0;
-  font-size: 0.8em;
+  margin: 0.5rem 0;
+  font-size: 0.8rem;
   color: rgb(var(--color-overlay2));
 }
 
-/* markdown */
+/* markdown content */
 .post-content {
-  margin: 5em 0;
+  margin: 5rem 0;
+
+  h1 {
+    color: rgb(var(--color-h));
+    margin: 1.5rem 0;
+  }
+
+  h2 {
+    color: rgb(var(--color-h));
+    margin: 1rem 0;
+    position: relative;
+  }
+
+  h2::before {
+    content: "#";
+    color: rgb(var(--color-surface0));
+    position: absolute;
+    left: -1rem;
+    font-weight: bold;
+  }
+
+  h3 {
+    color: rgb(var(--color-h));
+    margin: 0.7rem 0;
+    position: relative;
+  }
+
+  h4 {
+    color: rgb(var(--color-h));
+    margin: 0.5rem 0;
+  }
+
+  p {
+    margin: 1rem 0;
+    line-height: 1.5;
+    text-align: justify;
+  }
+
+  ol,
+  ul {
+    padding-left: 2rem;
+    line-height: 2;
+  }
+
+  li::marker {
+    color: rgb(var(--color-li));
+  }
+
+  a {
+    color: rgb(var(--color-link));
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--color-link));
+  }
+
+  a:hover {
+    color: rgb(var(--color-link));
+    text-decoration-color: rgb(var(--color-link));
+  }
+
+  del {
+    color: rgb(var(--color-overlay0));
+  }
+
+  code {
+    color: rgb(var(--color-code));
+    font-family: "Fira Code", "I.Ming", monospace;
+    background-color: rgb(var(--color-pre));
+    padding: 0.05rem 0.1rem;
+  }
+
+  pre {
+    background-color: rgb(var(--color-pre)) !important;
+    padding: 1rem;
+    overflow: auto;
+    word-wrap: normal;
+    font-size: 0.9rem;
+  }
+
+  pre[data-linenos] {
+    padding: 1rem 0;
+  }
+
+  pre table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  pre table td {
+    padding: 0;
+  }
+
+  pre table td:nth-of-type(1) {
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+
+  pre mark {
+    display: block;
+  }
+
+  pre code {
+    font-family: "Fira Code", monospace;
+    display: block;
+    color: rgb(var(--color-text));
+    background-color: inherit;
+    padding: 0;
+  }
+
+  blockquote {
+    border-left: 0.2rem solid rgb(var(--color-quote));
+    color: rgb(var(--color-overlay2));
+    padding-left: 0.5rem;
+  }
+
+  hr {
+    border: none;
+    text-align: center;
+    margin: 1rem 0;
+  }
+
+  hr::after {
+    content: "···";
+    color: rgb(var(--color-hr));
+    letter-spacing: 2rem;
+    padding-left: 2rem;
+  }
+
+  img {
+    object-fit: cover;
+    width: 100%;
+  }
 }
 
-.post-content h1 {
-  color: rgb(var(--color-h));
-  margin: 1.5em 0;
-}
-.post-content h2 {
-  color: rgb(var(--color-h));
-  margin: 1em 0;
-  position: relative;
-}
-.post-content h2::before {
-  content: "#";
-  color: rgb(var(--color-surface0));
-  position: absolute;
-  left: -1em;
-  font-weight: bold;
-}
+.footnote-definition {
+  display: flex;
+  flex-direction: row;
 
-.post-content h3 {
-  color: rgb(var(--color-h));
-  margin: 0.7em 0;
-  position: relative;
-}
+  .footnote-definition-label {
+    vertical-align: text-bottom;
+    margin: 1rem 0.2rem 1rem 0;
+    font-size: inherit;
+    position: relative;
+    top: 0.25rem;
+  }
 
-.post-content h4 {
-  color: rgb(var(--color-h));
-  margin: 0.5em 0;
-}
-.post-content p {
-  margin: 1em 0;
-  line-height: 1.5;
-  text-align: justify;
-}
-.post-content ol,
-.post-content ul {
-  padding-left: 2em;
-  line-height: 2;
-}
-.post-content li::marker {
-  color: rgb(var(--color-li));
-}
-.post-content a {
-  color: rgb(var(--color-link));
-  text-decoration: underline;
-  text-decoration-color: rgb(var(--color-link));
-}
-.post-content a:hover {
-  color: rgb(var(--color-link));
-  text-decoration-color: rgb(var(--color-link));
-}
-.post-content del {
-  color: rgb(var(--color-overlay0));
-}
-
-.post-content code {
-  color: rgb(var(--color-code));
-  font-family: "Fira Code", "I.Ming", monospace;
-  background-color: rgb(var(--color-pre));
-  padding: 0.05em 0.1em;
-}
-
-.post-content pre {
-  background-color: rgb(var(--color-pre)) !important;
-  padding: 1rem;
-  overflow: auto;
-  word-wrap: normal;
-  font-size: 0.9em;
-}
-.post-content pre[data-linenos] {
-  padding: 1rem 0;
-}
-.post-content pre table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.post-content pre table td {
-  padding: 0;
-}
-.post-content pre table td:nth-of-type(1) {
-  text-align: center;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-.post-content pre mark {
-  display: block;
-}
-.post-content pre code {
-  font-family: "Fira Code", monospace;
-  display: block;
-  color: rgb(var(--color-text));
-  background-color: inherit;
-  padding: 0;
-}
-
-.post-content blockquote {
-  border-left: 0.2em solid rgb(var(--color-quote));
-  color: rgb(var(--color-overlay2));
-  padding-left: 0.5em;
-}
-.post-content hr {
-  border: none;
-  text-align: center;
-  margin: 1em 0;
-}
-.post-content hr::after {
-  content: "···";
-  color: rgb(var(--color-hr));
-  letter-spacing: 2em;
-  padding-left: 2em;
-}
-
-.post-content img {
-  object-fit: cover;
-  width: 100%;
+  .footnote-definition-label::after {
+    content: ".";
+  }
 }

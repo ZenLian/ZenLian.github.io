@@ -7,6 +7,7 @@
 
 @use "components/posts";
 @use "components/callouts";
+@use "components/toc";
 
 * {
   box-sizing: border-box;
@@ -101,6 +102,7 @@ header {
   font-size: 0.8em;
   color: rgb(var(--color-subtext0));
 }
+
 .menu-item {
   display: inline-block;
   margin-left: 0.5em;
@@ -117,6 +119,7 @@ header {
   display: inline-block;
   margin: 0.2em;
 }
+
 .socials-icon {
   font-size: 2em;
 }
@@ -183,6 +186,7 @@ main {
   color: rgb(var(--color-tagfg));
   background-color: rgb(var(--color-tagbg));
 }
+
 .tag-item a {
   color: inherit;
   transition: 50ms;
@@ -192,9 +196,11 @@ main {
 .term-list {
   line-height: 1.5;
 }
+
 .term-list li::marker {
   color: rgb(var(--color-overlay2));
 }
+
 .term-list .term-count {
   color: rgb(var(--color-surface2));
 }
@@ -202,6 +208,7 @@ main {
 .tag-cloud {
   text-align: center;
 }
+
 .tag-cloud-item {
   margin: 0.5rem;
   display: inline-block;
@@ -212,69 +219,8 @@ main {
   text-align: center;
   padding: 8em 0;
 }
+
 .poetry-line {
   font-size: 1.5em;
   line-height: 2;
-}
-
-/* toc */
-.post-sidebar {
-  position: fixed;
-  top: 6rem;
-  right: 1rem;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-}
-
-#toc-button {
-  font-size: 1.2rem;
-  text-align: right;
-}
-
-.toc-content {
-  max-width: 12rem;
-  padding: 0.5rem 0;
-  text-align: right;
-}
-
-.toc-content a:active {
-  color: rgb(var(--color-peach));
-}
-
-.toc-content a:hover {
-  color: rgb(var(--color-peach));
-}
-
-.toc-content li {
-  list-style: outside none none;
-}
-
-.toc-content .toc-h2 {
-  color: rgb(var(--color-subtext0));
-}
-
-.toc-content .toc-h2::before {
-  content: "#";
-}
-
-.toc-content .toc-h3 {
-  font-size: 0.9rem;
-  color: rgb(var(--color-overlay1));
-}
-
-.toc-content .toc-h3::before {
-  content: "·";
-}
-
-.footnote-definition {
-  display: flex;
-}
-.footnote-definition-label {
-  vertical-align: text-bottom;
-  margin: 1em 0;
-  font-size: inherit;
-}
-.footnote-definition-label::after {
-  content: ".";
 }
