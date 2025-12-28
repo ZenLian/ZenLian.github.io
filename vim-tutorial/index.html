@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/index.css"/>
+<link rel="stylesheet" href="https://zenlian.github.io/main.css"/>
+
+  <title>你真的会用 vim 吗 | The Ship of Zenlian</title>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">Moris Lian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      <div class="main-inner">
+        
+  <article>
+    <h1 class="post-title page-title">
+      你真的会用 vim 吗
+    </h1>
+    <div class="post-meta">
+      <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/tools/">#tools</a>
+  </li>
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/vim/">#vim</a>
+  </li>
+</ul>
+</span>
+      <span>
+        <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+        <span>
+<time datetime="2025-05-05">2025-05-05</time>
+</span>
+      </span>
+    </div>
+    <div class="post-content">
+      <p>在 VSCode 和各种 IDE 大行其道的时代，许多程序员已经没什么机会接触 vim 这个上古时代的终端编辑器了，也难怪“如何退出 vim”能成为 Stack Overflow 上搜索最多的问题之一。</p>
+<p>我也不会推荐新手程序员使用 vim，用惯了现代编辑器再去使用 vim 的话，你花在配置上的时间会远大于实际编程的时间，完全本末倒置了。但不可否认的是，vim 的编辑模式确实有它独到之处，即使在现代 IDE 中仍然有不少人习惯使用 vim 键位。</p>
+<p>同时我也观察过一些使用 vim 的程序员，发现不少人几乎只会用 <code>hjkl</code> 这几个键，说实话这一点儿都不 vim，编辑效率比记事本高不了多少。所以我萌生了写这篇文章的想法，以我自己的使用经验讲讲什么是符合 vim 理念的操作方式。</p>
+<blockquote>
+<p>本文只涉及原生 vim 操作，不会涉及 vim 插件和配置。</p>
+</blockquote>
+<hr />
+<h2 id="stay-in-normal-mode">Stay in NORMAL mode</h2>
+<p>初学 vim 需要形成的一个最重要的习惯就是 <strong>Stay in NORMAL mode</strong>。<strong>NORMAL</strong> 模式为什么叫 NORMAL，就是因为正常情况下你都应该处于这个模式下。</p>
+<p>对初学者的建议是<strong>永远</strong>不要使用方向键。没错，就是<strong>永远</strong>。坚持这个准则可以帮助你形成良好的 vim 使用习惯，当你在 INSERT 模式下输入了一段代码，想要移动到其他地方输入时，不应该继续在 INSERT 模式下使用方向键移动，而是应该退出到 NORMAL 模式下进行移动。</p>
+<blockquote>
+<p>PS: 用久了之后，你可能会发现自己频繁在 NORMAL 和 INSERT 模式之间切换，而 <code>ESC</code> 键离键盘主区域很远，切换起来不太方便。为了提高效率，有些人喜欢将 <code>CAPSLOCK</code> 键映射为 <code>ESC</code> 键，还有些人会用插件将 <code>jj</code> 映射为 <code>ESC</code>。有兴趣可以自己尝试一下，但我还是习惯了不做改动。</p>
+</blockquote>
+<h2 id="mo-shi-qie-huan">模式切换</h2>
+<p>从 NORMAL 模式进入 INSERT 模式实际上有很多种方式，你是不是只会用 <code>i</code> 键？</p>
+<ul>
+<li><code>i</code>/<code>a</code>：光标前/后插入</li>
+<li><code>I</code>/<code>A</code>: 行首/行尾插入</li>
+<li><code>o</code>/<code>O</code>：下一行/上一行插入</li>
+</ul>
+<p>选择合适的按键能够减少你的击键次数。</p>
+<h2 id="guang-biao-ding-wei">光标定位</h2>
+<p>我在文章开头说过，很多人只会用 <code>hjkl</code> 移动，这并不是高效的定位方式。为了养成良好的习惯，给初学者的一个建议是：不要多次重复 <code>hjkl</code>。甚至有插件能够禁止你多次重复 <code>hjkl</code> 按键。</p>
+<h3 id="sou-suo-shi-zui-hao-de-ding-wei">搜索是最好的定位</h3>
+<p>直接用 <code>/</code> 和 <code>?</code> 搜索，然后用 <code>n</code> 和 <code>N</code> 在搜索结果中跳转，是我最推崇的定位方式。</p>
+<p>为了配合搜索，常用的 vim 配置如下：</p>
+<pre data-lang="vim" class="language-vim z-code"><code class="language-vim" data-lang="vim"><span class="z-source z-viml"><span class="z-support z-function z-viml">set</span> ignorecase ; 忽略大小写
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">set</span> smartcase  ; 智能大小写: 存在大写时不忽略大小写
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">set</span> <span class="z-support z-variable z-viml">incsearch</span>  ; 实时显示搜索结果
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">set</span> <span class="z-support z-variable z-viml">hlsearch</span>   ; 高亮搜索结果
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">set</span> wrapscan   ; n/N 会在搜索结果中循环
+</span></code></pre>
+<p>使用 <code>n</code>/<code>N</code> 浏览搜索结果时的方向是由当前使用的是 <code>/</code> 还是 <code>?</code> 决定的，非常的反直觉。如果想让 <code>n</code> 键总是向前搜索，<code>N</code> 键总是向后搜索，可以参考 <a href="https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n">vim-galore</a> 这样配置键位：</p>
+<pre data-lang="vim" class="language-vim z-code"><code class="language-vim" data-lang="vim"><span class="z-source z-viml"><span class="z-support z-function z-viml">nnoremap</span> <span class="z-support z-type z-viml">&lt;expr&gt;</span> n  <span class="z-string z-quoted z-single z-viml">&#39;Nn&#39;</span>[<span class="z-variable z-other z-viml">v:searchforward</span>]
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">xnoremap</span> <span class="z-support z-type z-viml">&lt;expr&gt;</span> n  <span class="z-string z-quoted z-single z-viml">&#39;Nn&#39;</span>[<span class="z-variable z-other z-viml">v:searchforward</span>]
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">onoremap</span> <span class="z-support z-type z-viml">&lt;expr&gt;</span> n  <span class="z-string z-quoted z-single z-viml">&#39;Nn&#39;</span>[<span class="z-variable z-other z-viml">v:searchforward</span>]
+</span><span class="z-source z-viml">
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">nnoremap</span> <span class="z-support z-type z-viml">&lt;expr&gt;</span> N  <span class="z-string z-quoted z-single z-viml">&#39;nN&#39;</span>[<span class="z-variable z-other z-viml">v:searchforward</span>]
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">xnoremap</span> <span class="z-support z-type z-viml">&lt;expr&gt;</span> N  <span class="z-string z-quoted z-single z-viml">&#39;nN&#39;</span>[<span class="z-variable z-other z-viml">v:searchforward</span>]
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">onoremap</span> <span class="z-support z-type z-viml">&lt;expr&gt;</span> N  <span class="z-string z-quoted z-single z-viml">&#39;nN&#39;</span>[<span class="z-variable z-other z-viml">v:searchforward</span>]
+</span></code></pre>
+<h3 id="kua-xing-ding-wei">跨行定位</h3>
+<p>跨行定位最方便的方式是使用<strong>相对行号</strong>。</p>
+<p>如果你想把光标向下移动 10 行，不应该连按 10 下 <code>j</code>，而是应该按 <code>10j</code>。为了准确得知需要移动多少行，我喜欢将 vim 的行号配置为<strong>相对行号</strong>：</p>
+<pre data-lang="vim" class="language-vim z-code"><code class="language-vim" data-lang="vim"><span class="z-source z-viml"><span class="z-support z-function z-viml">set</span> nubmer
+</span><span class="z-source z-viml"><span class="z-support z-function z-viml">set</span> relativenumber
+</span></code></pre>
+<p>如下图所示，当前行是第 22 行，我要移动到目标行（<code>laststatus = 3</code> 那行），相对行号是 <code>13</code>，我就按下 <code>13j</code>。</p>
+<p><img src="/assets/vim_relativenumber.png" alt="relativenumber" /></p>
+<h3 id="xing-nei-ding-wei">行内定位</h3>
+<p>要在行内定位到某个字符，不应该连续按 <code>h</code>/<code>l</code>，而应该使用 <code>f</code>/<code>t</code> 查找，并用 <code>,</code>/<code>;</code> 在结果中跳转。或者使用 <code>w</code>/<code>e</code>/<code>b</code> 也比 <code>h</code>/<code>l</code> 会快一些。</p>
+<p>此外 <code>^</code>/<code>$</code> 跳转到行首/行尾，<code>%</code> 跳转到匹配的括号，也是比较常用的，但这几个键不太好按，我习惯映射成 <code>gh</code>/<code>gl</code>/<code>gm</code>。</p>
+<h2 id="text-objects">text objects</h2>
+<p>text objects 一般都由 <code>i</code> 或 <code>a</code> 开头（可以理解为 <code>inner</code> 和 <code>around</code>），后面跟着一个字符表示范围，比如 <code>ap</code> 表示一个段落包括两端的空行，<code>ip</code> 也表示一个段落但不包括两端的空行。</p>
+<p>比如当你想删除一个段落，可以直接按 <code>dap</code>。其中 <code>d</code> 是删除，<code>ap</code> 是一个 text object，表示整个段落（包括两端空行）。</p>
+<p>同样的，当你的光标在 <code>{</code>/<code>}</code> 之间，并且想选中括号内的内容时，可以直接按 <code>vi}</code>。其中 <code>v</code> 是选择，<code>i}</code> 是一个 text object，表示括号中的内容。</p>
+<p>内置的 text objects 有：</p>
+<ul>
+<li><code>aw</code>: 一个单词，包括两端空白</li>
+<li><code>iw</code>：一个单词，不包括两端空白</li>
+<li><code>ap</code>：一个段落，包括两端空行</li>
+<li><code>ip</code>：一个段落，不包括两端空行</li>
+<li><code>a[</code>/<code>a]</code>/<code>a(</code>/<code>a)</code>/<code>a{</code>/<code>a}</code>/<code>a&lt;</code>/<code>a&gt;</code>：对应的括号内容，包括括号本身</li>
+<li><code>i[</code>/<code>i]</code>/<code>i(</code>/<code>i)</code>/<code>i{</code>/<code>i}</code>/<code>i&lt;</code>/<code>i&gt;</code>：对应的括号内容，不包括括号本身</li>
+<li><code>a'</code>/<code>a"</code>/<code>a`</code>：对应的引号内容，包括引号本身</li>
+<li><code>i'</code>/<code>i"</code>/<code>i`</code>：对应的引号内容，不包括引号本身</li>
+</ul>
+<p>有些 vim 插件添加了很多额外的 text objects，比如 Function、Class 等等，这些都不在本文讨论范围之内。</p>
+<h2 id="vim-bu-xu-yao-duo-guang-biao-bian-ji">vim 不需要多光标编辑</h2>
+<p><a href="https://medium.com/@schtoeffel/you-don-t-need-more-than-one-cursor-in-vim-2c44117d51db">这篇文章</a>写得很好，vim 内置的功能实际上比多光标编辑要强大得多，完全不需要类似 sublime text 的多光标编辑功能。</p>
+<p>总结一下就是：</p>
+<ol>
+<li>用 <code>/</code> 搜索你想更改的词，按 <code>cgn</code> 更改。按 <code>n</code> 跳转到下一个，再按 <code>.</code> 重复更改。</li>
+<li>用 <code>Ctrl-V</code> 更改同一列位置的文字。</li>
+<li>用<a href="https://alextheobold.com/posts/no_you_dont_need_multi_cursors/#substitute-command">替换</a>/<a href="https://alextheobold.com/posts/no_you_dont_need_multi_cursors/#macros">宏录制</a>处理复杂的多处编辑。</li>
+</ol>
+<blockquote>
+<p>以后会补充介绍 vim 强大的替换和宏录制功能。</p>
+</blockquote>
+
+    </div>
+  </article>
+  
+  <div class="post-sidebar">
+    <a id="toc-button" class="toc-button">
+      <iconify-icon icon="mdi:menu"></iconify-icon>
+    </a>
+    <nav class="toc-content" id="toc-content">
+      <ul><li class="toc-h2">
+            <a href="https://zenlian.github.io/vim-tutorial/#stay-in-normal-mode">Stay in NORMAL mode</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/vim-tutorial/#mo-shi-qie-huan">模式切换</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/vim-tutorial/#guang-biao-ding-wei">光标定位</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/vim-tutorial/#sou-suo-shi-zui-hao-de-ding-wei">搜索是最好的定位</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/vim-tutorial/#kua-xing-ding-wei">跨行定位</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/vim-tutorial/#xing-nei-ding-wei">行内定位</a>
+                  </li></ul>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/vim-tutorial/#text-objects">text objects</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/vim-tutorial/#vim-bu-xu-yao-duo-guang-biao-bian-ji">vim 不需要多光标编辑</a>
+          </li></ul>
+    </nav>
+  </div>
+  
+
+      </div>
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/ZenLian/ZenLian.github.io/tree/zola/themes/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  <script src="https://zenlian.github.io/js/cattery.js"></script>
+  
+<script src="https://zenlian.github.io/js/page.js"></script>
+
+</html>

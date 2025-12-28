@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/index.css"/>
+<link rel="stylesheet" href="https://zenlian.github.io/main.css"/>
+
+  <title>BlueZ 的 RPC 通信基础：D-Bus | The Ship of Zenlian</title>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">Moris Lian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      <div class="main-inner">
+        
+  <article>
+    <h1 class="post-title page-title">
+      BlueZ 的 RPC 通信基础：D-Bus
+    </h1>
+    <div class="post-meta">
+      <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/lan-ya/">#蓝牙</a>
+  </li>
+</ul>
+</span>
+      <span>
+        <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+        <span>
+<time datetime="2024-07-02">2024-07-02</time>
+</span>
+      </span>
+    </div>
+    <div class="post-content">
+      <blockquote>
+<p>最近在学习 Linux 中的蓝牙开发，最想说的一句话就是：<strong>BlueZ 真的很难用</strong>。</p>
+</blockquote>
+<h2 id="bluez">BlueZ</h2>
+<p>BlueZ 是 Linux 官方的蓝牙开发框架，架构如下图：</p>
+<ul>
+<li>BlueZ 实现了蓝牙协议栈中的 Host 部分。</li>
+<li>应用与 BlueZ 之间通过 <strong>D-Bus</strong> 进行通信。</li>
+<li>BlueZ 与控制器（Controller，即蓝牙芯片）之间通过 HCI 接口通信。Controller 在 BlueZ 中也被称为 Adapter。</li>
+</ul>
+<p><img src="/assets/BlueZ_Architecture.png" alt="BlueZ_Architecture.png" /></p>
+<h2 id="d-bus">D-Bus</h2>
+<p>D-Bus 是一个通用的进程间通信中心，只要连接到同一个 D-Bus 总线上的进程都能相互发送消息。BlueZ 从 5.52 开始只使用 D-Bus 作为应用接口，抛弃了传统的 API 接口。</p>
+<p>D-Bus 有两种类型的总线：</p>
+<ul>
+<li><strong>系统总线</strong>。全局唯一的总线，一般的系统服务（如 BlueZ）都连接到系统总线上。</li>
+<li><strong>会话总线</strong>。每个登录会话都会生成一个会话总线。</li>
+</ul>
+<p><img src="/assets/DBus_Connection.png" alt="DBus_Connection.pn" /></p>
+<h3 id="d-bus-lian-jie">D-Bus 连接</h3>
+<p>BlueZ 的 bluetoothd 守护进程连接到系统总线上，作为<strong>服务端</strong>。我们编写的应用进程也连接到系统总线上，作为<strong>客户端</strong>调用 BlueZ 提供的接口。</p>
+<p>每当一个进程连接到总线上时，D-Bus 会给进程分配一个唯一的名字，以 <code>:</code> 开头（如 <code>:1.16</code>）。但是知名的服务都会另外注册一个别名，方便应用访问。比如 bluetoothd 的名字为 <code>org.bluez</code>。</p>
+<h3 id="d-bus-mian-xiang-dui-xiang-gai-nian">D-Bus 面向对象概念</h3>
+<p>D-Bus 使用了类似面向对象的设计。</p>
+<p>每个连接到总线上的服务，都包含了一些<strong>对象</strong>。对象用路径形式表示，有层级关系，比如 <code>/org/bluez/hci0</code> 表示一个蓝牙适配器对象，<code>/org/bluez/hci0/dev_4C_D7_64_CD_22_0A</code> 表示 hci0 下的一个蓝牙设备。</p>
+<p>对象会实现一些<strong>接口</strong>，接口中定义了<strong>方法</strong>、<strong>信号</strong>和<strong>属性</strong>。接口用域名形式表示，如 <code>org.freedesktop.DBus.Introspectable</code>、<code>org.bluez.GattManager1</code>。</p>
+<ul>
+<li><strong>方法</strong>可以被其他应用通过 D-Bus 调用。</li>
+<li>对象在发生某些事件时会触发<strong>信号</strong>，任何注册过这个信号的应用都会收到通知。</li>
+<li>对象还包含<strong>属性</strong>。应用可以访问和修改属性。</li>
+</ul>
+<p>我们可以用 <code>gdbus introspect</code> 命令查看指定对象上包含的接口，比如：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> introspect<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>y</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>d</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>org.bluez<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>o</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>/org/bluez/hci0<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<p>该命令告诉 D-Bus 我们要查看系统总线（<code>-y</code>）上的服务 bluez（<code>-d "org.bluez"</code>）中的对象 <code>"/org/bluez/hci0"</code>。这个对象表示的是蓝牙控制器。该命令将列出这个对象上的所有接口，包括接口中的方法、信号和属性，输出如下：</p>
+<p><img src="/assets/dbus_introspect.png" alt="dbus_introspect.png" /></p>
+<h3 id="d-bus-biao-zhun-jie-kou">D-Bus 标准接口</h3>
+<p>DBus 定义了一些标准接口，基本上所有服务（包括 BlueZ）都会实现这些接口。</p>
+<h4 id="org-freedesktop-dbus-properties">org.freedesktop.DBus.Properties</h4>
+<p>Properties 是最常用的接口，其他接口中的属性实际上都是通过该接口中的 <code>Get</code>/<code>Set</code>/<code>GetAll</code> 方法进行读写的。该接口还包括一个 <code>PropertiesChanged</code> 信号，当同一个对象上其他接口中的属性发生变化时，会触发这个信号通知使用者。</p>
+<p>几乎所有对象上都会实现这个接口，比如 bluez 的 <code>/org/bluez</code> 对象：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> introspect<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>y</span> system<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>d</span> org.bluez<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>o</span> /org/bluez</span>
+</span></code></pre>
+<p><img src="/assets/DBus_Properties.png" alt="DBus_Properties" /></p>
+<h4 id="org-freedesktop-dbus-objectmanager">org.freedesktop.DBus.ObjectManager</h4>
+<p>ObjectManager 接口用于管理对象。比如在 BlueZ 中，可以用 ObjectManager 来管理所有扫描到的蓝牙设备。调用 <code>GetManagedObjects()</code> 方法并从中筛选出所有蓝牙设备，并且每当扫描到一个新的设备，<code>InterfacesAdded</code> 信号就会触发。</p>
+<p><img src="/assets/DBus_ObjectManager.png" alt="DBus_ObjectManager" /></p>
+<h3 id="d-bus-shu-ju-lei-xing">D-Bus 数据类型</h3>
+<p>正如上面使用 <code>gdbus introspect</code> 观察到的接口信息中，我们可以看到 DBus 方法和信号的参数、属性都使用一些特殊的标识（比如 <code>o</code>、<code>as</code>、<code>a{sa{sv}}</code> 等）来表示该变量的数据类型。类型系统的详细描述参考 <a href="https://dbus.freedesktop.org/doc/dbus-specification.html#type-system">D-Bus Specification</a>，这里进行简单介绍。</p>
+<h4 id="ji-chu-lei-xing">基础类型</h4>
+<p>基础类型包括<strong>数值类型</strong>和<strong>字符串类型</strong>。</p>
+<p>数值类型：</p>
+<ul>
+<li><code>y</code> uint8</li>
+<li><code>b</code> <strong>Boolean</strong></li>
+<li><code>n</code> int16</li>
+<li><code>q</code> uint16</li>
+<li><code>i</code> <strong>int32</strong></li>
+<li><code>u</code> uint32</li>
+<li><code>x</code> int64</li>
+<li><code>t</code> uint64</li>
+<li><code>d</code> double</li>
+<li><code>h</code> handle，Unix 系统上的文件描述符类型</li>
+</ul>
+<p>字符串类型：</p>
+<ul>
+<li><code>s</code> <strong>String</strong> 字符串</li>
+<li><code>o</code> 表示一个 DBus <strong>对象路径</strong>（如 <code>/org/bluez/hci0</code>）</li>
+<li><code>g</code> Signature，类型标识形式</li>
+</ul>
+<h4 id="rong-qi-lei-xing">容器类型</h4>
+<p>容器类型有 4 种：STRUCT、ARRAY、AVRIANT 和 DICT_ENTRY。</p>
+<p>STRUCT 类型用 <code>()</code> 表示，可以嵌套：</p>
+<ul>
+<li><code>(ii)</code> 表示包含 2 个 int32 的结构体</li>
+<li><code>(s(ii))</code></li>
+</ul>
+<p>ARRAY 以 <code>a</code> 开头，后面跟着列表中元素类型：</p>
+<ul>
+<li><code>as</code> 表示一个列表，列表元素为 String</li>
+<li><code>a(ii)</code> 表示列表元素为结构体 <code>(ii)</code></li>
+</ul>
+<p>VARIANT 表示<strong>可变类型</strong>。</p>
+<p>DICT_ENTRY 是一个 key-value 类型，类比于 C++ 中的 <code>std::pair</code>，用 <code>{}</code> 表示。编程语言中常见的字典，可以用 ARRAY 和 DICT_ENTRY 组合在一起表示：</p>
+<ul>
+<li><code>a{sv}</code> 表示了一个字典。字典的 key 是 String，value 是可变类型。</li>
+</ul>
+<h2 id="d-bus-gong-ju">D-Bus 工具</h2>
+<p>调试 D-Bus 时可以借助一些命令行工具，包括 dbus-monitor、dbus-send、gdbus 等。</p>
+<h3 id="dbus-monitor">dbus-monitor</h3>
+<p>dbus-monitor 可以监听 DBus 总线上的所有的信号和方法调用。</p>
+<p>监听系统总线：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">sudo</span></span><span class="z-meta z-function-call z-arguments z-shell"> dbus-monitor<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>system</span></span>
+</span></code></pre>
+<p>只监听信号：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">sudo</span></span><span class="z-meta z-function-call z-arguments z-shell"> dbus-monitor<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>system</span> <span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span>type=signal<span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span></span>
+</span></code></pre>
+<p>只监听指定路径：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">sudo</span></span><span class="z-meta z-function-call z-arguments z-shell"> dbus-monitor<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>system</span> <span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span>path=/com/example<span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span></span>
+</span></code></pre>
+<h3 id="dbus-send">dbus-send</h3>
+<p>dbus-send 可以手动向 DBus 总线发送消息，包括触发信号、调用其他服务的方法等。</p>
+<p>在另一个窗口试着向 DBus <strong>发送信号</strong>：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">dbus-send</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>system</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>type</span><span class="z-keyword z-operator z-assignment z-option z-shell">=</span>signal /com/example com.example.Greeting string:<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>hello!<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<p>该命令在系统总线上触发了一个信号，发送信号的对象是 <code>/com/example</code>，接口是 <code>com.example</code>，信号名为 <code>Greeting</code>，参数为字符串 <code>"hello!"</code>。在 dbus-monitor 的监听窗口下就能看到信号被触发的打印。</p>
+<p>dbus-send 也可以用来进行<strong>方法调用</strong>。以 BlueZ 为例，我们如果想得到蓝牙适配器的地址，可以读取 <code>/org/bluez/hci0</code> 对象中 <code>org.bluez.Adapter1</code> 接口中的 <code>Address</code> 属性，前文介绍过，属性的读取都是通过 <code>org.freedesktop.DBus.Properties</code> 接口进行的，实际命令如下：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">dbus-send</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>system</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>type</span><span class="z-keyword z-operator z-assignment z-option z-shell">=</span>method_call<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>print-reply</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>dest</span><span class="z-keyword z-operator z-assignment z-option z-shell">=</span>org.bluez /org/bluez/hci0 org.freedesktoop.DBus.Properties.Get string:<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>org.bluez.Adapter1<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> string:<span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Address<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<p>输出会返回 <code>Address</code> 属性值，类似于：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash">  <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">variant</span></span><span class="z-meta z-function-call z-arguments z-shell">     string <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>44:87:63:2B:89:02<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<h3 id="gdbus">gdbus</h3>
+<p>gdbus 是 GLib 封装的一套 dbus 命令行工具，比原生的 dbus-* 命令更简单易用。</p>
+<p>比如用 <code>gdbus introspect</code> 命令可以查看某个对象中包含的接口：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> introspect<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>y</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>d</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>org.bluez<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>o</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>/org/bluez/hci0<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<p>该命令告诉 D-Bus 我们要查看系统总线（<code>-y</code>）上的服务 bluez（<code>-d "org.bluez"</code>）中的对象 <code>"/org/bluez/hci0"</code>。这个对象表示的是蓝牙控制器。</p>
+<p><code>gdbus</code> 同样可以实现 <code>dbus-*</code> 系列命令的功能。比如用 <code>gdbus monitor</code> 监听 bluez 服务：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> monitor<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>y</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>d</span> org.bluez</span>
+</span></code></pre>
+<p>用 <code>gdbus emit</code> 发送信号：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> emit<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>y</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>o</span> /com/example<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>s</span> com.example.Greeting <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>hello!<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<p>用 <code>gdbus call</code> 调用方法：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> call<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>y</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>d</span> org.bluez<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>o</span> /org/bluez/hci0<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>m</span> org.freedesktoop.DBus.Properties.Get <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>org.bluez.Adapter1<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Address<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<h2 id="d-bus-bian-cheng">D-Bus 编程</h2>
+<p>用户是通过 DBus 与 BlueZ 进行交互的，在深入 BlueZ 之前必须掌握 DBus 的编程开发方法。DBus 本身是一个消息总线，不同的编程语言中有相应的库实现了与 DBus 的 RPC 通信，比如 C 语言的 gdbus、python 的 python-dbus 等。为了方便，这里使用 python 进行编程示例，掌握了 DBus 的基本概念之后，使用其他语言的库也能很快上手。本节只涉及 DBus，而不涉及 BlueZ。</p>
+<h3 id="qian-zhi-tiao-jian">前置条件</h3>
+<p>以 ubuntu 为例，确保安装了以下包：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">$</span></span><span class="z-meta z-function-call z-arguments z-shell"> sudo apt install dbus-python</span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">$</span></span><span class="z-meta z-function-call z-arguments z-shell"> sudo apt install python3-gi</span>
+</span></code></pre>
+<h3 id="fang-fa-diao-yong">方法调用</h3>
+<p>DBus 系统总线上都有一个 hostname 服务，我们用 <code>gdbus introspect</code> 查看一下这个服务：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> introspect<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>system</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>dest</span> org.freedesktop.hostname1<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>object-path</span> /org/freedesktop/hostname1</span>
+</span></code></pre>
+<p><img src="/assets/org.freedesktop.hostname1.png" alt="org.freedesktop.hostname1" /></p>
+<p>可以看到其中有 Hostname 属性。</p>
+<p>用 python 读取其中的 Hostname 属性：</p>
+<ul>
+<li>首先拿到 <code>org.freedesktop.hostname1</code> 服务中的 <code>/org/freedesktop/hostname1</code> 对象；</li>
+<li>获取该对象上的 <code>org.freedesktop.DBus.Properties</code> 接口；</li>
+<li>调用 <code>Properties</code> 接口中的 <code>Get</code> 方法读取属性。<code>Get</code> 方法参数中传入接口名和属性名，表示我们要读取 <code>hostname1</code> 接口中的 <code>Hostname</code> 属性。</li>
+</ul>
+<pre data-lang="python" class="language-python z-code"><code class="language-python" data-lang="python"><span class="z-source z-python"><span class="z-comment z-line z-number-sign z-python"><span class="z-punctuation z-definition z-comment z-python">#</span>!/usr/bin/python3
+</span></span><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span> <span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span></span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">bus</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">SystemBus</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">proxy</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">bus</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">get_object</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">org.freedesktop.hostname1<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-separator z-arguments z-python">,</span> <span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">/org/freedesktop/hostname1<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">interface</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">Interface</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">proxy</span></span><span class="z-punctuation z-separator z-arguments z-python">,</span> <span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">org.freedesktop.DBus.Properties<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">hostname</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">interface</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">Get</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">org.freedesktop.hostname1<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-separator z-arguments z-python">,</span> <span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">Hostname<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-support z-function z-builtin z-python">print</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">Hostname is <span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-separator z-arguments z-python">,</span> <span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">hostname</span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span></code></pre>
+<h3 id="jie-shou-xin-hao">接收信号</h3>
+<p>以下代码监听信号：</p>
+<ul>
+<li>创建 mainloop 事件循环；</li>
+<li>调用 <code>add_signal_receiver</code> 监听信号，监听接口 <code>com.example</code> 中的信号 <code>Greeting</code>；</li>
+<li>收到信号时调用 <code>greeting()</code> 打印接收的信息。</li>
+</ul>
+<pre data-lang="python" class="language-python z-code"><code class="language-python" data-lang="python"><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span> <span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span></span></span>
+</span><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-from z-python">from</span></span><span class="z-meta z-statement z-import z-python"><span class="z-meta z-import-source z-python"> <span class="z-meta z-import-path z-python"><span class="z-meta z-import-name z-python">dbus</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-import-name z-python">mainloop</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-import-name z-python">glib</span></span> <span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span></span></span></span><span class="z-meta z-statement z-import z-python"></span><span class="z-meta z-statement z-import z-python"> <span class="z-meta z-generic-name z-python">DBusGMainLoop</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-from z-python">from</span></span><span class="z-meta z-statement z-import z-python"><span class="z-meta z-import-source z-python"> <span class="z-meta z-import-path z-python"><span class="z-meta z-import-name z-python">gi</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-import-name z-python">repository</span></span> <span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span></span></span></span><span class="z-meta z-statement z-import z-python"></span><span class="z-meta z-statement z-import z-python"> <span class="z-meta z-generic-name z-python">GLib</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-function z-python"><span class="z-storage z-type z-function z-python"><span class="z-keyword z-declaration z-function z-python">def</span></span> <span class="z-entity z-name z-function z-python"><span class="z-meta z-generic-name z-python">greeting</span></span></span><span class="z-meta z-function z-parameters z-python"><span class="z-punctuation z-section z-parameters z-begin z-python">(</span></span><span class="z-meta z-function z-parameters z-python"><span class="z-variable z-parameter z-python">msg</span><span class="z-punctuation z-section z-parameters z-end z-python">)</span></span><span class="z-meta z-function z-python"><span class="z-punctuation z-section z-function z-begin z-python">:</span></span>
+</span><span class="z-source z-python">    <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-support z-function z-builtin z-python">print</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">msg</span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">DBusGMainLoop</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-variable z-parameter z-python">set_as_default</span><span class="z-keyword z-operator z-assignment z-python">=</span><span class="z-constant z-language z-python">True</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">bus</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">SystemBus</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">bus</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">add_signal_receiver</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">greeting</span></span><span class="z-punctuation z-separator z-arguments z-python">,</span>
+</span></span><span class="z-source z-python"><span class="z-meta z-function-call z-arguments z-python">        <span class="z-variable z-parameter z-python">dbus_interface</span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">com.example<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-separator z-arguments z-python">,</span>
+</span></span><span class="z-source z-python"><span class="z-meta z-function-call z-arguments z-python">        <span class="z-variable z-parameter z-python">signal_name</span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">Greeting<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">loop</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">GLib</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">MainLoop</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">loop</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">run</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span></code></pre>
+<p>运行上面的 python 代码，然后在另外一个终端向 dbus 发送信号：</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gdbus</span></span><span class="z-meta z-function-call z-arguments z-shell"> emit<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>y</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>o</span> /<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>s</span> com.example.Greeting <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>hello<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span></code></pre>
+<p>可以看到运行 python 代码的窗口中 “hello” 被打印出来了，表示我们收到了信号。</p>
+<h3 id="zhu-ce-dui-xiang">注册对象</h3>
+<p>像 BlueZ 等服务都在 DBus 总线上注册了很多对象，提供接口和接口里的方法来给其他应用调用。我们自己也可以向 DBus 注册对象，以此来接收方法调用。</p>
+<p>dbus-python 中凡是继承自 <code>dbus.service.Object</code> 的对象，都会自动成为 DBus 对象，在 DBus 总线上可以被其他应用和服务访问到。</p>
+<pre data-lang="python" class="language-python z-code"><code class="language-python" data-lang="python"><span class="z-source z-python"><span class="z-comment z-line z-number-sign z-python"><span class="z-punctuation z-definition z-comment z-python">#</span>!/usr/bin/env python3
+</span></span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span> <span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span></span></span>
+</span><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span> <span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">service</span></span></span>
+</span><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-from z-python">from</span></span><span class="z-meta z-statement z-import z-python"><span class="z-meta z-import-source z-python"> <span class="z-meta z-import-path z-python"><span class="z-meta z-import-name z-python">dbus</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-import-name z-python">mainloop</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-import-name z-python">glib</span></span> <span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span></span></span></span><span class="z-meta z-statement z-import z-python"></span><span class="z-meta z-statement z-import z-python"> <span class="z-meta z-generic-name z-python">DBusGMainLoop</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-from z-python">from</span></span><span class="z-meta z-statement z-import z-python"><span class="z-meta z-import-source z-python"> <span class="z-meta z-import-path z-python"><span class="z-meta z-import-name z-python">gi</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-import-name z-python">repository</span></span> <span class="z-meta z-statement z-import z-python"><span class="z-keyword z-control z-import z-python">import</span></span></span></span><span class="z-meta z-statement z-import z-python"></span><span class="z-meta z-statement z-import z-python"> <span class="z-meta z-generic-name z-python">GLib</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-class z-python"><span class="z-storage z-type z-class z-python"><span class="z-keyword z-declaration z-class z-python">class</span></span> <span class="z-entity z-name z-class z-python"><span class="z-meta z-generic-name z-python">Calculator</span></span><span class="z-meta z-class z-inheritance z-python"><span class="z-punctuation z-section z-inheritance z-begin z-python">(</span></span></span><span class="z-meta z-class z-inheritance z-python"><span class="z-entity z-other z-inherited-class z-python">dbus<span class="z-punctuation z-accessor z-dot z-python">.</span>service<span class="z-punctuation z-accessor z-dot z-python">.</span>Object</span><span class="z-punctuation z-section z-inheritance z-end z-python">)</span></span><span class="z-meta z-class z-python"><span class="z-punctuation z-section z-class z-begin z-python">:</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-function z-python">    <span class="z-storage z-type z-function z-python"><span class="z-keyword z-declaration z-function z-python">def</span></span> <span class="z-entity z-name z-function z-python"><span class="z-support z-function z-magic z-python">__init__</span></span></span><span class="z-meta z-function z-parameters z-python"><span class="z-punctuation z-section z-parameters z-begin z-python">(</span></span><span class="z-meta z-function z-parameters z-python"><span class="z-variable z-parameter z-python">self</span><span class="z-punctuation z-separator z-parameters z-python">,</span> <span class="z-variable z-parameter z-python">bus</span><span class="z-punctuation z-section z-parameters z-end z-python">)</span></span><span class="z-meta z-function z-python"><span class="z-punctuation z-section z-function z-begin z-python">:</span></span>
+</span><span class="z-source z-python">        <span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">path</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">/com/example/counter<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span>
+</span><span class="z-source z-python">        <span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">value</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-constant z-numeric z-integer z-decimal z-python">0</span>
+</span><span class="z-source z-python">        <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-support z-function z-builtin z-python">super</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span><span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-support z-function z-magic z-python">__init__</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">bus</span></span><span class="z-punctuation z-separator z-arguments z-python">,</span> <span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">path</span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python">    <span class="z-meta z-annotation z-python"><span class="z-punctuation z-definition z-annotation z-python">@</span><span class="z-meta z-annotation z-function z-python"></span></span><span class="z-meta z-annotation z-function z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">service</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-annotation z-function z-python"><span class="z-meta z-generic-name z-python">method</span></span></span></span><span class="z-meta z-annotation z-function z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span></span><span class="z-meta z-annotation z-arguments z-python"><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">com.example.Counter<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-separator z-arguments z-python">,</span>
+</span></span><span class="z-source z-python"><span class="z-meta z-annotation z-arguments z-python">            <span class="z-variable z-parameter z-python">in_signature</span><span class="z-keyword z-operator z-assignment z-python">=</span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">i<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-separator z-arguments z-python">,</span>
+</span></span><span class="z-source z-python"><span class="z-meta z-annotation z-arguments z-python">            <span class="z-variable z-parameter z-python">out_signature</span><span class="z-keyword z-operator z-assignment z-python">=</span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">i<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span></span><span class="z-meta z-annotation z-function z-python"><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-function z-python">    <span class="z-storage z-type z-function z-python"><span class="z-keyword z-declaration z-function z-python">def</span></span> <span class="z-entity z-name z-function z-python"><span class="z-meta z-generic-name z-python">Increase</span></span></span><span class="z-meta z-function z-parameters z-python"><span class="z-punctuation z-section z-parameters z-begin z-python">(</span></span><span class="z-meta z-function z-parameters z-python"><span class="z-variable z-parameter z-python">self</span><span class="z-punctuation z-separator z-parameters z-python">,</span> <span class="z-variable z-parameter z-python">a</span><span class="z-punctuation z-section z-parameters z-end z-python">)</span></span><span class="z-meta z-function z-python"><span class="z-punctuation z-section z-function z-begin z-python">:</span></span>
+</span><span class="z-source z-python">        <span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">value</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">value</span></span> <span class="z-keyword z-operator z-arithmetic z-python">+</span> <span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">a</span></span>
+</span><span class="z-source z-python">        <span class="z-meta z-statement z-conditional z-if z-python"><span class="z-keyword z-control z-conditional z-if z-python">if</span> <span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">value</span></span> <span class="z-keyword z-operator z-comparison z-python">&gt;</span> <span class="z-constant z-numeric z-integer z-decimal z-python">10</span><span class="z-punctuation z-section z-block z-conditional z-if z-python">:</span></span>
+</span><span class="z-source z-python">	        <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">CounterOverflowed</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">value</span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">        <span class="z-keyword z-control z-flow z-return z-python">return</span> <span class="z-meta z-qualified-name z-python"><span class="z-variable z-language z-python">self</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">value</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python">	<span class="z-meta z-annotation z-python"><span class="z-punctuation z-definition z-annotation z-python">@</span><span class="z-meta z-annotation z-function z-python"></span></span><span class="z-meta z-annotation z-function z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span><span class="z-punctuation z-accessor z-dot z-python">.</span><span class="z-meta z-generic-name z-python">service</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-annotation z-function z-python"><span class="z-meta z-generic-name z-python">signal</span></span></span></span><span class="z-meta z-annotation z-function z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span></span><span class="z-meta z-annotation z-arguments z-python"><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">com.example.Counter<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span>，
+</span></span><span class="z-source z-python"><span class="z-meta z-annotation z-arguments z-python">		<span class="z-variable z-parameter z-python">signature</span><span class="z-keyword z-operator z-assignment z-python">=</span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">i<span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span></span><span class="z-meta z-annotation z-function z-python"><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-function z-python">	<span class="z-storage z-type z-function z-python"><span class="z-keyword z-declaration z-function z-python">def</span></span> <span class="z-entity z-name z-function z-python"><span class="z-meta z-generic-name z-python">CounterOverflowed</span></span></span><span class="z-meta z-function z-parameters z-python"><span class="z-punctuation z-section z-parameters z-begin z-python">(</span></span><span class="z-meta z-function z-parameters z-python"><span class="z-variable z-parameter z-python">self</span><span class="z-punctuation z-separator z-parameters z-python">,</span> <span class="z-variable z-parameter z-python">value</span><span class="z-punctuation z-section z-parameters z-end z-python">)</span></span><span class="z-meta z-function z-python"><span class="z-punctuation z-section z-function z-begin z-python">:</span></span>
+</span><span class="z-source z-python">		<span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-support z-function z-builtin z-python">print</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python"><span class="z-punctuation z-definition z-string z-begin z-python">&quot;</span></span></span><span class="z-meta z-string z-python"><span class="z-string z-quoted z-double z-python">Counter Overflow: <span class="z-punctuation z-definition z-string z-end z-python">&quot;</span></span></span><span class="z-punctuation z-separator z-arguments z-python">,</span> <span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">value</span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">DBusGMainLoop</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-variable z-parameter z-python">set_as_default</span><span class="z-keyword z-operator z-assignment z-python">=</span><span class="z-constant z-language z-python">True</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">bus</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">dbus</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">SystemBus</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">calc</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">Calculator</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">bus</span></span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python">
+</span><span class="z-source z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">loop</span></span> <span class="z-keyword z-operator z-assignment z-python">=</span> <span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">GLib</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">MainLoop</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span><span class="z-source z-python"><span class="z-meta z-function-call z-python"><span class="z-meta z-qualified-name z-python"><span class="z-meta z-generic-name z-python">loop</span></span><span class="z-meta z-qualified-name z-python"><span class="z-punctuation z-accessor z-dot z-python">.</span></span><span class="z-meta z-qualified-name z-python"><span class="z-variable z-function z-python"><span class="z-meta z-generic-name z-python">run</span></span></span></span><span class="z-meta z-function-call z-arguments z-python"><span class="z-punctuation z-section z-arguments z-begin z-python">(</span><span class="z-punctuation z-section z-arguments z-end z-python">)</span></span>
+</span></code></pre>
+<p>以上代码注册了一个 Calculator 对象：</p>
+<ul>
+<li>继承自 <code>dbus.service.Object</code>。路径为 <code>/com/example/counter</code>。</li>
+<li><strong>方法</strong>用 <code>@dbus.service.method</code> 装饰器注册。这里注册了一个 <code>Increase</code> 方法，属于 <code>com.example.Counter</code> 接口，输入参数类型为 “i”（int32），输出为 “i”（int32）。</li>
+<li><strong>信号</strong>用 <code>@dbus.service.signal</code> 装饰器注册。当 <code>Counter</code> 中计数超过 10 时，触发 <code>CounterOverflowed</code> 信号。</li>
+</ul>
+<hr />
+<h2 id="references">References</h2>
+<ol>
+<li><a href="https://dbus.freedesktop.org/doc/dbus-specification.html">D-Bus Specification (dbus.freedesktop.org)</a></li>
+</ol>
+
+    </div>
+  </article>
+  
+  <div class="post-sidebar">
+    <a id="toc-button" class="toc-button">
+      <iconify-icon icon="mdi:menu"></iconify-icon>
+    </a>
+    <nav class="toc-content" id="toc-content">
+      <ul><li class="toc-h2">
+            <a href="https://zenlian.github.io/bluez-dbus/#bluez">BlueZ</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/bluez-dbus/#d-bus">D-Bus</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#d-bus-lian-jie">D-Bus 连接</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#d-bus-mian-xiang-dui-xiang-gai-nian">D-Bus 面向对象概念</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#d-bus-biao-zhun-jie-kou">D-Bus 标准接口</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#d-bus-shu-ju-lei-xing">D-Bus 数据类型</a>
+                  </li></ul>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/bluez-dbus/#d-bus-gong-ju">D-Bus 工具</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#dbus-monitor">dbus-monitor</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#dbus-send">dbus-send</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#gdbus">gdbus</a>
+                  </li></ul>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/bluez-dbus/#d-bus-bian-cheng">D-Bus 编程</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#qian-zhi-tiao-jian">前置条件</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#fang-fa-diao-yong">方法调用</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#jie-shou-xin-hao">接收信号</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/bluez-dbus/#zhu-ce-dui-xiang">注册对象</a>
+                  </li></ul>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/bluez-dbus/#references">References</a>
+          </li></ul>
+    </nav>
+  </div>
+  
+
+      </div>
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/ZenLian/ZenLian.github.io/tree/zola/themes/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  <script src="https://zenlian.github.io/js/cattery.js"></script>
+  
+<script src="https://zenlian.github.io/js/page.js"></script>
+
+</html>

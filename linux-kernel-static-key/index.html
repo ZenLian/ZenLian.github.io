@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/index.css"/>
+<link rel="stylesheet" href="https://zenlian.github.io/main.css"/>
+
+  <title>linux 内核中的 static key 机制 | The Ship of Zenlian</title>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">Moris Lian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      <div class="main-inner">
+        
+  <article>
+    <h1 class="post-title page-title">
+      linux 内核中的 static key 机制
+    </h1>
+    <div class="post-meta">
+      <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/linux-nei-he/">#linux 内核</a>
+  </li>
+</ul>
+</span>
+      <span>
+        <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+        <span>
+<time datetime="2020-09-15">2020-09-15</time>
+</span>
+      </span>
+    </div>
+    <div class="post-content">
+      <p>最近在操作系统部门实习，学习了一些 linux 内核追踪和调试的机制。其中 static key 机制是我认为比较精妙的一个，用来优化系统中大量的 <code>if-else</code> 判断性能问题。</p>
+<hr />
+<p>linux 中有一套很强大的内核代码追踪机制，说白了就是在各种重要的内核事件发生的地方（<strong>trace point</strong>）加上一段调试函数，将相关的信息记录下来。比如在切换进程的时候多调用一个 <code>trace_sched_switch</code> 函数：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-modifier z-c">static</span> <span class="z-storage z-modifier z-c">inline</span> <span class="z-storage z-type z-c">void</span>
+</span><span class="z-source z-c"><span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">prepare_task_switch</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-storage z-type z-c">struct</span> rq <span class="z-keyword z-operator z-c">*</span><span class="z-variable z-parameter z-c">rq</span><span class="z-punctuation z-separator z-c">,</span> <span class="z-storage z-type z-c">struct</span> task_struct <span class="z-keyword z-operator z-c">*</span><span class="z-variable z-parameter z-c">prev</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">		    <span class="z-storage z-type z-c">struct</span> task_struct <span class="z-keyword z-operator z-c">*</span><span class="z-variable z-parameter z-c">next</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-meta z-function z-c">
+</span></span><span class="z-source z-c"><span class="z-meta z-function z-c"></span><span class="z-meta z-function z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span></span></span><span class="z-meta z-function z-c"><span class="z-meta z-block z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-c"><span class="z-meta z-block z-c">    <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">trace_sched_switch</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c">prev<span class="z-punctuation z-separator z-c">,</span> next</span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-c"><span class="z-meta z-block z-c">    <span class="z-keyword z-operator z-variadic z-c">...</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-c"><span class="z-meta z-block z-c"></span></span><span class="z-meta z-function z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span></span>
+</span></code></pre>
+<p>这个 trace 功能绝大部分 linux 用户都用不到，只有在进行内核调试时才会用到，所以默认都是关闭的，需要的时候再手动操作 <code>/sys/kernel/debug/tracing/events</code> 下的文件打开。</p>
+<p>但是即使我们在运行时关闭了 trace，内核运行到这里的时候也会多执行一个无用的 <code>if</code> 判断语句。当系统中的追踪点很多的时候，这些空判断对性能的影响是不可忽视的。于是 linux 中引入了 static key 解决这个问题。</p>
+<h2 id="yong-fa">用法</h2>
+<p>虽然 static key 最初是为了消除 trace point 的开销而设计的，但它本身是一个独立的机制，其他模块也可以随意使用。</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 定义一个 static key
+</span></span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> - 必须为全局变量
+</span></span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> - 必须初始化为 STATIC_KEY_INIT_FALSE 或 STATIC_KEY_INIT_TRUE
+</span></span><span class="z-source z-c"><span class="z-storage z-type z-c">struct</span> static_key key <span class="z-keyword z-operator z-assignment z-c">=</span> STATIC_KEY_INIT_FALSE<span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c">
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 初始化为 false 时，判断必须使用 static_key_false 包装
+</span></span><span class="z-source z-c"><span class="z-keyword z-control z-c">if</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">static_key_false</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>key</span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-section z-group z-end z-c">)</span></span> <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">    <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 这是 true 分支，由于 key 初始化为 false，默认不会走该分支
+</span></span></span><span class="z-source z-c"><span class="z-meta z-block z-c">    <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">do_unlikely_branch</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span> <span class="z-keyword z-control z-c">else</span> <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">    <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 这个分支是默认走的分支
+</span></span></span><span class="z-source z-c"><span class="z-meta z-block z-c">    <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">do_likely_branch</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span>
+</span><span class="z-source z-c">
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> key 的值一开始为 0，该函数把 key 的值加 1
+</span></span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> key 从 0 变 1 时，代码路径会更换为 do_unlikely_branch() 分支
+</span></span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">static_key_slow_inc</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>key</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 该函数把 key 的值减 1
+</span></span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> key 从 1 变 0 时，代码路径会更换为 do_likely_branch() 分支
+</span></span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">static_key_slow_dec</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>key</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c">
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 直接将 key 的值置 1
+</span></span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">static_key_enable</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>key</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 直接将 key 的值置 0
+</span></span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">static_key_disable</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>key</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<h2 id="yuan-li">原理</h2>
+<p>linux 使用了 static key 的机制来消除 trace point 的运行时开销。其工作原理是：</p>
+<ul>
+<li>系统初始化时，将所有的用 static key 判断的代码地址保存到一个单独的段 <code>jump_table</code> 中</li>
+<li>打开 static key 时，遍历 <code>jump_table</code> 中所有的地址，将此处代码替换为 <code>jmp</code> 指令</li>
+<li>关闭 static key 时，遍历 <code>jump_table</code> 中所有的地址，将此处代码替换为 <code>nop</code> 指令</li>
+</ul>
+<p>由此可见，当我们关闭 static key 后，所有本来需要判断 static key 的地方都是一条 <code>nop</code> 指令，尽可能减少了对系统性能的影响。需要注意的是，打开和关闭的操作是很<strong>耗时</strong>的，因为需要遍历所有出现过判断的地方，并进行代码段指令的替换。所以 static key <strong>不适用</strong>于需要频繁开关的场景。</p>
+<h2 id="shi-xian">实现</h2>
+<p>具体的实现依赖于不同架构的汇编指令，我模拟 linux 的 API 做了一个简易版本的 <a href="https://github.com/ZenLian/jumplabel">x86 实现</a> 放在 github 上以供参考。</p>
+<hr />
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><a href="https://www.kernel.org/doc/html/latest/staging/static-keys.html">https://www.kernel.org/doc/html/latest/staging/static-keys.html</a></p>
+</div>
+
+    </div>
+  </article>
+  
+  <div class="post-sidebar">
+    <a id="toc-button" class="toc-button">
+      <iconify-icon icon="mdi:menu"></iconify-icon>
+    </a>
+    <nav class="toc-content" id="toc-content">
+      <ul><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-kernel-static-key/#yong-fa">用法</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-kernel-static-key/#yuan-li">原理</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-kernel-static-key/#shi-xian">实现</a>
+          </li></ul>
+    </nav>
+  </div>
+  
+
+      </div>
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/ZenLian/ZenLian.github.io/tree/zola/themes/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  <script src="https://zenlian.github.io/js/cattery.js"></script>
+  
+<script src="https://zenlian.github.io/js/page.js"></script>
+
+</html>

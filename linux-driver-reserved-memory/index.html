@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/index.css"/>
+<link rel="stylesheet" href="https://zenlian.github.io/main.css"/>
+
+  <title>linux 驱动预留内存 | The Ship of Zenlian</title>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">Moris Lian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      <div class="main-inner">
+        
+  <article>
+    <h1 class="post-title page-title">
+      linux 驱动预留内存
+    </h1>
+    <div class="post-meta">
+      <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/linux-qu-dong/">#linux 驱动</a>
+  </li>
+</ul>
+</span>
+      <span>
+        <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+        <span>
+<time datetime="2023-04-01">2023-04-01</time>
+</span>
+      </span>
+    </div>
+    <div class="post-content">
+      <p>嵌入式项目中可能会碰到这样的需求，需要在内存中预留出一块比较大的空间在驱动里使用，并且这块空间的物理地址必须是固定的。而内核里常用的 <code>kmalloc()</code> 分配出的内存物理地址是不固定的，我们需要在内核启动之前预留一块空间出来。</p>
+<h2 id="fang-fa-yi-qi-dong-can-shu-zhi-ding">方法一：启动参数指定</h2>
+<p>默认情况下 linux 会使用整块内存，如果你的内存是 1G，那么内核会将这 1G 都收入囊中，你想使用只能向它申请。除非你在 uboot 里指定启动参数，规定内存大小：</p>
+<pre class="z-code"><code><span class="z-text z-plain">mem=512M
+</span></code></pre>
+<p>这里 <code>mem=512M</code> 会让 linux 认为系统的内存本身就只有 512M，那么剩下的 512M 物理内存你就可以随意使用了。</p>
+<p>也可以使用 <code>memmap</code> 参数：</p>
+<pre class="z-code"><code><span class="z-text z-plain">memmap=512M@0x40000000,512M$0x60000000
+</span></code></pre>
+<ul>
+<li><code>512M@0x40000000</code> 表示系统使用从 <code>0x40000000</code> 开始的 512M 内存</li>
+<li><code>512M@0x60000000</code> 表示系统预留从 <code>0x60000000</code> 开始的 512M 内存</li>
+</ul>
+<p><code>memmap</code> 参数更加灵活，可以同时指定多块内存，但这个参数在你的板子或低版本的 linux 内核上不一定会生效。</p>
+<h2 id="fang-fa-er-she-bei-shu-yu-liu-nei-cun">方法二：设备树预留内存</h2>
+<p>通过设备树预留内存比在启动参数中直接指定内存更加符合驱动开发的规则，但用起来稍微复杂一些。</p>
+<h3 id="she-bei-shu-pei-zhi">设备树配置</h3>
+<p>首先我们需要在设备树中通过 <code>reserved-memory</code> 节点预留出物理内存。下面的设备树文件是一个示例：</p>
+<ul>
+<li>预留了 <code>0x10000000</code> 开始的大小为 <code>0x01000000</code> 的物理内存</li>
+<li>标签为 <code>somedev_reserved</code>，供设备节点引用</li>
+<li><code>no-map</code> 表示内核不会对该段内存作地址映射，<code>/proc/iomem</code> 中的 System RAM 也不会包括该内存区域</li>
+</ul>
+<pre class="z-code"><code><span class="z-text z-plain">\{
+</span><span class="z-text z-plain">  reserved-memory {
+</span><span class="z-text z-plain">    #address-cells = &lt;1&gt;;
+</span><span class="z-text z-plain">    #size-cells = &lt;1&gt;;
+</span><span class="z-text z-plain">    ranges;
+</span><span class="z-text z-plain">    somedev_reserved: buffer@0x1f000000 {
+</span><span class="z-text z-plain">      no-map;
+</span><span class="z-text z-plain">      reg = &lt;0x10000000 0x01000000&gt;;
+</span><span class="z-text z-plain">    };
+</span><span class="z-text z-plain">  };
+</span><span class="z-text z-plain">};
+</span></code></pre>
+<p>然后在用到需要用到预留内存的驱动设备节点中，使用 <code>memory-region</code> 分配预留的内存区域：</p>
+<pre class="z-code"><code><span class="z-text z-plain">\{
+</span><span class="z-text z-plain">  somedev@0 {
+</span><span class="z-text z-plain">    compatible = &quot;xlnx,dev1&quot;;
+</span><span class="z-text z-plain">    memory-region = &lt;&amp;somedev_reserved&gt;;
+</span><span class="z-text z-plain">  }
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<h3 id="qu-dong-cheng-xu">驱动程序</h3>
+<p>驱动程序里要使用这块内存，需要先解析自己的设备树节点拿到物理地址，再选择合适的映射方式拿到虚拟地址。其中映射又分为带缓存和不带缓存两种方式。</p>
+<h4 id="dai-huan-cun-ying-she">带缓存映射</h4>
+<p>将预留内存用 <code>memremap</code> 映射，带有缓存，可以直接读写：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 获得预留内存的设备树节点（memory-region 指向 somedev_reserved）
+</span></span><span class="z-source z-c"><span class="z-storage z-type z-c">struct</span> device_node <span class="z-keyword z-operator z-c">*</span>np <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">of_parse_phandle</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c">dev<span class="z-punctuation z-accessor z-c">-&gt;</span>of_node<span class="z-punctuation z-separator z-c">,</span> <span class="z-string z-quoted z-double z-c"><span class="z-punctuation z-definition z-string z-begin z-c">&quot;</span>memory-region<span class="z-punctuation z-definition z-string z-end z-c">&quot;</span></span><span class="z-punctuation z-separator z-c">,</span> <span class="z-constant z-numeric z-integer z-decimal z-c">0</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-keyword z-control z-c">if</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-keyword z-operator z-arithmetic z-c">!</span>np<span class="z-punctuation z-section z-group z-end z-c">)</span></span> <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">    <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">dev_err</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c">dev<span class="z-punctuation z-separator z-c">,</span> <span class="z-string z-quoted z-double z-c"><span class="z-punctuation z-definition z-string z-begin z-c">&quot;</span>No memory-region specified<span class="z-constant z-character z-escape z-c">\n</span><span class="z-punctuation z-definition z-string z-end z-c">&quot;</span></span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">    <span class="z-keyword z-control z-flow z-return z-c">return</span> <span class="z-keyword z-operator z-arithmetic z-c">-</span><span class="z-constant z-numeric z-integer z-decimal z-c">1</span><span class="z-punctuation z-terminator z-c">;</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span>
+</span><span class="z-source z-c">
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 获得内存资源地址（存在 struct resource 中）
+</span></span><span class="z-source z-c"><span class="z-storage z-type z-c">struct</span> resource r<span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> rc <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">of_address_to_resource</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c">np<span class="z-punctuation z-separator z-c">,</span> <span class="z-constant z-numeric z-integer z-decimal z-c">0</span><span class="z-punctuation z-separator z-c">,</span> <span class="z-keyword z-operator z-c">&amp;</span>r</span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-keyword z-control z-c">if</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span>rc<span class="z-punctuation z-section z-group z-end z-c">)</span></span> <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">    <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">dev_err</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c">dev<span class="z-punctuation z-separator z-c">,</span> <span class="z-string z-quoted z-double z-c"><span class="z-punctuation z-definition z-string z-begin z-c">&quot;</span>No memory address assigned<span class="z-constant z-character z-escape z-c">\n</span><span class="z-punctuation z-definition z-string z-end z-c">&quot;</span></span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span>
+</span><span class="z-source z-c">
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 物理地址
+</span></span><span class="z-source z-c"><span class="z-storage z-type z-c">unsigned</span> <span class="z-storage z-type z-c">long</span> paddr <span class="z-keyword z-operator z-assignment z-c">=</span> r<span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">start</span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 映射为虚拟地址
+</span></span><span class="z-source z-c"><span class="z-storage z-type z-c">unsigned</span> <span class="z-storage z-type z-c">long</span> vaddr <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-storage z-type z-c">unsigned</span> <span class="z-storage z-type z-c">long</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">memremap</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c">r<span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">start</span><span class="z-punctuation z-separator z-c">,</span> <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">resource_size</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>r</span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-separator z-c">,</span> MEMREMAP_WB</span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c">
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 对虚拟地址直接读写
+</span></span><span class="z-source z-c"><span class="z-keyword z-operator z-c">*</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span>u32 <span class="z-keyword z-operator z-c">*</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span>vadd<span class="z-punctuation z-section z-group z-end z-c">)</span></span> <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-constant z-numeric z-integer z-hexadecimal z-c"><span class="z-punctuation z-definition z-numeric z-base z-c">0x</span>12345678</span><span class="z-punctuation z-terminator z-c">;</span>          <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 32位写
+</span></span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">pr_info</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-string z-quoted z-double z-c"><span class="z-punctuation z-definition z-string z-begin z-c">&quot;</span>0x<span class="z-constant z-other z-placeholder z-c">%08X</span><span class="z-constant z-character z-escape z-c">\n</span><span class="z-punctuation z-definition z-string z-end z-c">&quot;</span></span><span class="z-punctuation z-separator z-c">,</span> <span class="z-keyword z-operator z-c">*</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span>u32 <span class="z-keyword z-operator z-c">*</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span>vaddr<span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span> <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 32位读
+</span></span></code></pre>
+<h4 id="bu-dai-huan-cun-ying-she">不带缓存映射</h4>
+<p>如果不希望带缓存，使用 <code>ioremap</code>，需要调用 IO 函数读写：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 映射为虚拟地址
+</span></span><span class="z-source z-c"><span class="z-storage z-type z-c">unsigned</span> <span class="z-storage z-type z-c">long</span> vaddr <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-storage z-type z-c">unsigned</span> <span class="z-storage z-type z-c">long</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">ioremap</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c">r<span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">start</span><span class="z-punctuation z-separator z-c">,</span> <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">resource_size</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>r</span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> IO 函数读写大块内存
+</span></span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">memcpy_toio</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">memcpy_fromio</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c"><span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">memset_io</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+
+    </div>
+  </article>
+  
+  <div class="post-sidebar">
+    <a id="toc-button" class="toc-button">
+      <iconify-icon icon="mdi:menu"></iconify-icon>
+    </a>
+    <nav class="toc-content" id="toc-content">
+      <ul><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-driver-reserved-memory/#fang-fa-yi-qi-dong-can-shu-zhi-ding">方法一：启动参数指定</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-driver-reserved-memory/#fang-fa-er-she-bei-shu-yu-liu-nei-cun">方法二：设备树预留内存</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-driver-reserved-memory/#she-bei-shu-pei-zhi">设备树配置</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-driver-reserved-memory/#qu-dong-cheng-xu">驱动程序</a>
+                  </li></ul>
+          </li></ul>
+    </nav>
+  </div>
+  
+
+      </div>
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/ZenLian/ZenLian.github.io/tree/zola/themes/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  <script src="https://zenlian.github.io/js/cattery.js"></script>
+  
+<script src="https://zenlian.github.io/js/page.js"></script>
+
+</html>

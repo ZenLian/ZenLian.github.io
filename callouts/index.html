@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/index.css"/>
+<link rel="stylesheet" href="https://zenlian.github.io/main.css"/>
+
+  <title>给 zola 添加 callouts | The Ship of Zenlian</title>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">Moris Lian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      <div class="main-inner">
+        
+  <article>
+    <h1 class="post-title page-title">
+      给 zola 添加 callouts
+    </h1>
+    <div class="post-meta">
+      <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/zola/">#zola</a>
+  </li>
+</ul>
+</span>
+      <span>
+        <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+        <span>
+<time datetime="2025-06-05">2025-06-05</time>
+</span>
+      </span>
+    </div>
+    <div class="post-content">
+      <p>Obsidian 中有 <strong>callouts</strong> 语法用来创建醒目的提示框，能够在笔记中突出重要信息。Zola 中却没有这个语法，于是我借助 shortcode 也实现了类似的效果。</p>
+<h2 id="yong-fa">用法</h2>
+<pre data-lang="md" class="language-md z-code"><code class="language-md" data-lang="md"><span class="z-text z-html z-markdown"><span class="z-meta z-paragraph z-markdown">{% callout(type=&quot;note&quot;, name=&quot;Note&quot;) %}
+</span></span><span class="z-text z-html z-markdown"><span class="z-meta z-paragraph z-markdown"></span><span class="z-markup z-list z-unnumbered z-bullet z-markdown"><span class="z-punctuation z-definition z-list_item z-markdown">-</span></span><span class="z-markup z-list z-unnumbered z-markdown"> <span class="z-meta z-paragraph z-list z-markdown"><span class="z-markup z-bold z-markdown"><span class="z-punctuation z-definition z-bold z-begin z-markdown">**</span>type<span class="z-punctuation z-definition z-bold z-end z-markdown">**</span></span> 表示 callout 类型，默认为 &quot;note&quot;
+</span></span></span><span class="z-text z-html z-markdown"><span class="z-markup z-list z-unnumbered z-markdown"><span class="z-meta z-paragraph z-list z-markdown"></span></span><span class="z-markup z-list z-unnumbered z-bullet z-markdown"><span class="z-punctuation z-definition z-list_item z-markdown">-</span></span><span class="z-markup z-list z-unnumbered z-markdown"><span class="z-meta z-paragraph z-list z-markdown"> <span class="z-markup z-bold z-markdown"><span class="z-punctuation z-definition z-bold z-begin z-markdown">**</span>name<span class="z-punctuation z-definition z-bold z-end z-markdown">**</span></span> 为 callout 的标题，默认为 type 的首字母大写
+</span></span></span><span class="z-text z-html z-markdown"><span class="z-markup z-list z-unnumbered z-markdown"><span class="z-meta z-paragraph z-list z-markdown"></span></span><span class="z-markup z-list z-unnumbered z-markdown">
+</span></span><span class="z-text z-html z-markdown"><span class="z-markup z-list z-unnumbered z-markdown"></span><span class="z-meta z-paragraph z-markdown">hello
+</span></span><span class="z-text z-html z-markdown"><span class="z-meta z-paragraph z-markdown">{% end %}
+</span></span></code></pre>
+<p>渲染结果如下：</p>
+<div class="callout" type="note">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Note</span>
+  </span>
+  <div class="callout-inner">
+    <ul>
+<li><strong>type</strong> 表示 callout 类型，默认为 “note”</li>
+<li><strong>name</strong> 为 callout 的标题，默认为 type 的首字母大写</li>
+</ul>
+  </div>
+</div>
+<h2 id="xiao-guo">效果</h2>
+<p>所有类型的 callouts 如下（完全照搬了 obsidian）：</p>
+<div class="callout" type="note">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Note</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>note</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="info">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Info</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>info</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="todo">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Todo</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>todo</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="tip">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Tip</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>tip</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="success">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Success</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>success</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="faq">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Faq</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>faq</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="warning">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Warning</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>WARNING</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="error">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Error</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>ERROR</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="bug">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Bug</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>bug</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="example">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Example</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>example</strong> callout.</p>
+  </div>
+</div>
+<div class="callout" type="quote">
+  <span class="callout-title">
+    <span class="callout-icon"></span>
+    <span class="callout-name">Quote</span>
+  </span>
+  <div class="callout-inner">
+    <p>This is a <strong>QUOTE</strong> callout.</p>
+  </div>
+</div>
+
+    </div>
+  </article>
+  
+  <div class="post-sidebar">
+    <a id="toc-button" class="toc-button">
+      <iconify-icon icon="mdi:menu"></iconify-icon>
+    </a>
+    <nav class="toc-content" id="toc-content">
+      <ul><li class="toc-h2">
+            <a href="https://zenlian.github.io/callouts/#yong-fa">用法</a>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/callouts/#xiao-guo">效果</a>
+          </li></ul>
+    </nav>
+  </div>
+  
+
+      </div>
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/ZenLian/ZenLian.github.io/tree/zola/themes/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  <script src="https://zenlian.github.io/js/cattery.js"></script>
+  
+<script src="https://zenlian.github.io/js/page.js"></script>
+
+</html>

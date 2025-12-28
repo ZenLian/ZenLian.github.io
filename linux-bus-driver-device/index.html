@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-colormode="colorful">
+  <head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="index,follow"/>
+<meta name="googlebot" content="index,follow"/>
+<meta name="google" content="nositelinkssearchbox"/>
+<meta name="google" content="notranslate"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/index.css"/>
+<link rel="stylesheet" href="https://zenlian.github.io/main.css"/>
+
+  <title>linux 设备驱动模型 | The Ship of Zenlian</title>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script></head>
+  <body>
+    
+      
+<header id="header" class="header">
+  <div class="header-inner">
+  <div class="site-brand">
+    <a href="https://zenlian.github.io">Moris Lian</a>
+  </div>
+  <nav class="nav">
+    <ul class="menu-list">
+      
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;tags">
+            <iconify-icon icon="mdi:tags"></iconify-icon>
+            <span class="menu-label">标签</span>
+          </a>
+        </li>
+        
+        <li class="menu-item">
+          
+          
+            
+          
+          <a href="https:&#x2F;&#x2F;zenlian.github.io&#x2F;about">
+            <iconify-icon icon="mdi:user"></iconify-icon>
+            <span class="menu-label">关于</span>
+          </a>
+        </li>
+        
+      
+      <li class="menu-item">
+        <a id="theme-switcher" href="#">
+          <iconify-icon id="theme-switcher-light" icon="material-symbols:light-mode" class="menu-icon"></iconify-icon>
+          <iconify-icon id="theme-switcher-dark" icon="material-symbols:dark-mode" class="menu-icon"></iconify-icon>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  </div>
+</header>
+
+    
+    <main class="main">
+      <div class="main-inner">
+        
+  <article>
+    <h1 class="post-title page-title">
+      linux 设备驱动模型
+    </h1>
+    <div class="post-meta">
+      <span>
+<ul class="tag-list">
+  <li class="tag-item">
+    <a href="https://zenlian.github.io/tags/linux-qu-dong/">#linux 驱动</a>
+  </li>
+</ul>
+</span>
+      <span>
+        <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+        <span>
+<time datetime="2023-10-11">2023-10-11</time>
+</span>
+      </span>
+    </div>
+    <div class="post-content">
+      <p>linux 的设备总线模型核心层主要由 3 个结构组成，分别是<strong>总线</strong>、<strong>设备</strong>和<strong>驱动</strong>。</p>
+<ul>
+<li><strong>总线</strong>（<code>struct bus_type</code>）进行设备和驱动的匹配。设备和驱动都挂在总线上，每添加一个设备或驱动，总线就会尝试进行一次匹配。</li>
+<li><strong>设备</strong>（<code>struct device</code>）是每一个实际设备的底层结构，任何设备最终都对应着一个 <code>struct device</code> 结构体。设备间有父子层级关系，所有设备将组成一个树状结构。</li>
+<li><strong>驱动</strong>（<code>struct device_driver</code>）负责对设备的实际操作。</li>
+</ul>
+<p>相关源文件：</p>
+<pre class="z-code"><code><span class="z-text z-plain">/
+</span><span class="z-text z-plain">|- include/linux/device.h
+</span><span class="z-text z-plain">|- drivers/base/
+</span><span class="z-text z-plain">  |- base.h
+</span><span class="z-text z-plain">  |- core.c    # device 相关
+</span><span class="z-text z-plain">  |- driver.c  # driver 相关
+</span><span class="z-text z-plain">  |- dd.c      # driver 与 device 交互相关
+</span><span class="z-text z-plain">  |- bus.c     # bus 总线层
+</span></code></pre>
+<h2 id="bus">bus</h2>
+<h3 id="ding-yi-zong-xian">定义总线</h3>
+<p>内核中使用 <code>struct bus_type</code> 结构表示一种总线类型。每一种总线都会<strong>静态</strong>定义一个 <code>bus_type</code>：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-storage z-type z-c">struct</span> <span class="z-meta z-struct z-c"><span class="z-entity z-name z-struct z-c">bus_type</span></span></span><span class="z-meta z-struct z-c"> pci_bus_type <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span></span></span><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">	<span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">name</span> <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-string z-quoted z-double z-c"><span class="z-punctuation z-definition z-string z-begin z-c">&quot;</span>pci<span class="z-punctuation z-definition z-string z-end z-c">&quot;</span></span><span class="z-punctuation z-separator z-c">,</span> <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 必须
+</span></span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">	<span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">match</span> <span class="z-keyword z-operator z-assignment z-c">=</span> pci_bus_match<span class="z-punctuation z-separator z-c">,</span> <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 可选
+</span></span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c"></span></span><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<p>其中：</p>
+<ul>
+<li><code>name</code> 字段是必须的。</li>
+<li><code>match</code> 字段是可选的，用于驱动与设备匹配的函数，匹配则返回 1。</li>
+</ul>
+<p>这个静态定义的 <code>bus_type</code> 必须在头文件里导出，以供其他驱动模块使用：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-modifier z-c">extern</span> <span class="z-storage z-type z-c">struct</span> bus_type pci_bus_type<span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<h3 id="zhu-ce-zong-xian">注册总线</h3>
+<p>有了总线类型之后，相应的总线驱动层调用 <code>bus_register()</code> 向内核注册总线：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">bus_register</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-storage z-type z-c">struct</span> bus_type <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">bus</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<h3 id="she-bei-he-qu-dong-lie-biao">设备和驱动列表</h3>
+<p>总线上持有 2 个列表：<strong>设备列表</strong>和<strong>驱动列表</strong>，分别保存属于该总线的所有设备（<code>struct device</code>）和驱动（<code>struct driver</code>）。当调用 <code>device_register()</code> 添加设备时，设备被插入设备列表中；当调用 <code>driver_register()</code> 添加驱动时，驱动被插入驱动列表中。</p>
+<p>驱动核心层提供了以下方法遍历总线上的设备和驱动：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">bus_for_each_dev</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">struct</span> bus_type <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">bus</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">struct</span> device <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">start</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">void</span> <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">data</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">int</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-keyword z-operator z-c">*</span>fn<span class="z-punctuation z-section z-group z-end z-c">)</span></span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-storage z-type z-c">struct</span> device <span class="z-keyword z-operator z-c">*</span><span class="z-punctuation z-separator z-c">,</span> <span class="z-storage z-type z-c">void</span> <span class="z-keyword z-operator z-c">*</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span><span class="z-source z-c">
+</span><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">bus_for_each_drv</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">struct</span> bus_type <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">bus</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">struct</span> device_driver <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">start</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">void</span> <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">data</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">int</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-keyword z-operator z-c">*</span>fn<span class="z-punctuation z-section z-group z-end z-c">)</span></span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-storage z-type z-c">struct</span> device_driver <span class="z-keyword z-operator z-c">*</span><span class="z-punctuation z-separator z-c">,</span> <span class="z-storage z-type z-c">void</span> <span class="z-keyword z-operator z-c">*</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<h3 id="qu-dong-pi-pei">驱动匹配</h3>
+<p>添加设备和添加驱动都会触发<strong>驱动匹配</strong>，一个设备只能匹配一个驱动，但同一个驱动可以匹配多个设备。</p>
+<p><strong>添加设备</strong>时，总线遍历驱动列表里的驱动，并调用总线的 <code>match()</code> 方法尝试匹配驱动。<code>match()</code> 方法由总线定义，一般来说是对比设备的 ID 和驱动支持的 ID，返回 1 表示匹配成功。<code>match()</code> 原型如下：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">match</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-storage z-type z-c">struct</span> device <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">dev</span><span class="z-punctuation z-separator z-c">,</span> <span class="z-storage z-type z-c">struct</span> device_driver <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">drv</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<p>匹配成功之后，设备和驱动相互绑定：设备的 <code>driver</code> 字段指向驱动，驱动的设备列表中添加该设备。然后驱动的 <code>probe()</code> 方法会在此时调用。</p>
+<p><strong>添加驱动</strong>时的流程也类似，总线遍历设备列表里的设备，尝试和驱动相匹配。因为同一个驱动可以匹配多个设备，所以还没有驱动的所有设备都要被遍历一遍。</p>
+<h2 id="device">device</h2>
+<p><code>struct device</code> 结构是 linux 中最底层的设备结构，任何设备最终都对应着一个 <code>struct device</code> 结构体，包括所有的字符设备、块设备等。</p>
+<p>实际设备驱动一般不会调用这些底层的接口，而是由更上层的设备模型进一步封装调用。比如 pci 设备，将 <code>struct device</code> 嵌入自已的结构体中：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-storage z-type z-c">struct</span> <span class="z-meta z-struct z-c"><span class="z-entity z-name z-struct z-c">pci_dev</span></span></span><span class="z-meta z-struct z-c"> <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span></span></span><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">	<span class="z-keyword z-operator z-variadic z-c">...</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">	<span class="z-storage z-type z-c">struct</span> device dev<span class="z-punctuation z-terminator z-c">;</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">	<span class="z-keyword z-operator z-variadic z-c">...</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c"></span></span><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<h3 id="zhu-ce-she-bei">注册设备</h3>
+<p>驱动框架中向内核注册设备的接口是：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">device_register</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-storage z-type z-c">struct</span> device<span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">dev</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<p>以注册 PCI 设备为例：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">pci_register</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-storage z-type z-c">struct</span> pci_dev <span class="z-keyword z-operator z-c">*</span><span class="z-variable z-parameter z-c">pdev</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-meta z-function z-c">
+</span></span><span class="z-source z-c"><span class="z-meta z-function z-c"></span><span class="z-meta z-function z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span></span></span><span class="z-meta z-function z-c"><span class="z-meta z-block z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-c"><span class="z-meta z-block z-c">	err <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-meta z-function-call z-c"><span class="z-variable z-function z-c">device_register</span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-keyword z-operator z-c">&amp;</span>pdev<span class="z-punctuation z-accessor z-c">-&gt;</span>dev</span></span><span class="z-meta z-function-call z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-c"><span class="z-meta z-block z-c"></span></span><span class="z-meta z-function z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span></span>
+</span></code></pre>
+<h2 id="driver">driver</h2>
+<p><code>struct device_driver</code> 是内核中最底层的驱动结构。一个典型的驱动结构为：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-modifier z-c">static</span> <span class="z-storage z-type z-c">struct</span> device_driver eepro100_driver <span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">       <span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">name</span>		<span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-string z-quoted z-double z-c"><span class="z-punctuation z-definition z-string z-begin z-c">&quot;</span>eepro100<span class="z-punctuation z-definition z-string z-end z-c">&quot;</span></span><span class="z-punctuation z-separator z-c">,</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">       <span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">bus</span>		<span class="z-keyword z-operator z-assignment z-c">=</span> <span class="z-keyword z-operator z-c">&amp;</span>pci_bus_type<span class="z-punctuation z-separator z-c">,</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">       <span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">probe</span>		<span class="z-keyword z-operator z-assignment z-c">=</span> eepro100_probe<span class="z-punctuation z-separator z-c">,</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">       <span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">remove</span>		<span class="z-keyword z-operator z-assignment z-c">=</span> eepro100_remove<span class="z-punctuation z-separator z-c">,</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">       <span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">suspend</span>		<span class="z-keyword z-operator z-assignment z-c">=</span> eepro100_suspend<span class="z-punctuation z-separator z-c">,</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c">       <span class="z-punctuation z-accessor z-c">.</span><span class="z-variable z-other z-member z-c">resume</span>		<span class="z-keyword z-operator z-assignment z-c">=</span> eepro100_resume<span class="z-punctuation z-separator z-c">,</span>
+</span></span><span class="z-source z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<p>其中：</p>
+<ul>
+<li><code>name</code> 驱动名称，会在 sysfs 中显示</li>
+<li><code>bus</code> 表示该驱动所挂载的总线。</li>
+<li><code>probe</code>/<code>remove</code> 是驱动的回调函数，在驱动与设备绑定/解绑时调用。</li>
+<li><code>suspend</code>/<code>resume</code> 是电源管理回调函数，在设备进入/退出低功耗模式时调用。</li>
+</ul>
+<p>实际总线上的驱动有些字段是与<strong>总线相关</strong>的，不是通用的。最典型的就是 ID 表，通常驱动都会定义一个支持的设备 ID 列表，设备 ID 的格式以及匹配方法等都是和总线本身密切相关的。因此实际驱动都会将 <code>struct device_driver</code> 内嵌到自己的结构体里，并定义其他总线相关的字段，如 PCI 驱动：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-storage z-type z-c">struct</span> <span class="z-meta z-struct z-c"><span class="z-entity z-name z-struct z-c">pci_driver</span></span></span><span class="z-meta z-struct z-c"> <span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-begin z-c">{</span></span></span><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">       <span class="z-storage z-modifier z-c">const</span> <span class="z-meta z-struct z-c"><span class="z-storage z-type z-c">struct</span> <span class="z-meta z-struct z-c"><span class="z-entity z-name z-struct z-c">pci_device_id</span></span></span><span class="z-meta z-struct z-c"> *id_table</span><span class="z-punctuation z-terminator z-c">;</span> <span class="z-comment z-line z-double-slash z-c"><span class="z-punctuation z-definition z-comment z-c">//</span> 匹配的设备 ID
+</span></span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c">       <span class="z-storage z-type z-c">struct</span> device_driver	  driver<span class="z-punctuation z-terminator z-c">;</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c"></span></span><span class="z-meta z-struct z-c"><span class="z-meta z-block z-c"><span class="z-punctuation z-section z-block z-end z-c">}</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<h3 id="zhu-ce-qu-dong">注册驱动</h3>
+<p>向内核注册驱动的接口是：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">driver_register</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-storage z-type z-c">struct</span> device_driver <span class="z-keyword z-operator z-c">*</span><span class="z-variable z-parameter z-c">drv</span><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<p>实际的总线驱动会提供更高层的封装，如 <code>pci_driver_register()</code>，驱动开发者一般使用的都是这些高层的驱动接口。</p>
+<h3 id="bian-li-she-bei">遍历设备</h3>
+<p>一个驱动可以绑定多个设备，内核提供了接口以遍历同一个驱动的设备：</p>
+<pre data-lang="c" class="language-c z-code"><code class="language-c" data-lang="c"><span class="z-source z-c"><span class="z-storage z-type z-c">int</span> <span class="z-meta z-function z-c"><span class="z-entity z-name z-function z-c">driver_for_each_dev</span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span></span></span><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">struct</span> device_driver <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">drv</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">void</span> <span class="z-keyword z-operator z-c">*</span> <span class="z-variable z-parameter z-c">data</span><span class="z-punctuation z-separator z-c">,</span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c">	<span class="z-storage z-type z-c">int</span> <span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-keyword z-operator z-c">*</span>callback<span class="z-punctuation z-section z-group z-end z-c">)</span></span><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-begin z-c">(</span><span class="z-storage z-type z-c">struct</span> device <span class="z-keyword z-operator z-c">*</span> dev<span class="z-punctuation z-separator z-c">,</span> <span class="z-storage z-type z-c">void</span> <span class="z-keyword z-operator z-c">*</span> data<span class="z-punctuation z-section z-group z-end z-c">)</span></span>
+</span></span></span><span class="z-source z-c"><span class="z-meta z-function z-parameters z-c"><span class="z-meta z-group z-c"><span class="z-punctuation z-section z-group z-end z-c">)</span></span></span><span class="z-punctuation z-terminator z-c">;</span>
+</span></code></pre>
+<h2 id="sysfs-jie-kou">sysfs 接口</h2>
+<p><code>/sys</code> 目录反映了系统中设备的层级结构。</p>
+<p>每种总线类型在 <code>/sys/bus/</code> 下有一个对应的总线目录，如：</p>
+<pre class="z-code"><code><span class="z-text z-plain">/sys/bus/
+</span><span class="z-text z-plain">  |- i2c
+</span><span class="z-text z-plain">  |- mmc
+</span><span class="z-text z-plain">  |- pci
+</span><span class="z-text z-plain">  |- usb
+</span><span class="z-text z-plain">  |- ...
+</span></code></pre>
+<p>以 PCI 总线为例，每个总线目录下又有 2 个子目录对应总线下的设备和驱动：</p>
+<pre class="z-code"><code><span class="z-text z-plain">/sys/bus/pci/
+</span><span class="z-text z-plain">  |- devices/
+</span><span class="z-text z-plain">  |- drivers/
+</span></code></pre>
+<p><strong>drivers</strong> 目录下有该总线下注册的所有驱动：</p>
+<pre class="z-code"><code><span class="z-text z-plain">/sys/bus/pci/
+</span><span class="z-text z-plain">  |- devices/
+</span><span class="z-text z-plain">  |- drivers/
+</span><span class="z-text z-plain">    |- agpgart/
+</span><span class="z-text z-plain">    |- e1000/
+</span><span class="z-text z-plain">    |- ehci-pci/
+</span></code></pre>
+<p><strong>devices</strong> 目录下列出属于该总线类型的所有设备，通过软链接的方式指向实际的设备目录：</p>
+<pre class="z-code"><code><span class="z-text z-plain">/sys/bus/pci/
+</span><span class="z-text z-plain">  |- devices/
+</span><span class="z-text z-plain">    |- 00:00.0 -&gt; ../../../devices/pci0/00:00.0
+</span><span class="z-text z-plain">    |- 00:00.1 -&gt; ../../../devices/pci0/00:00.1
+</span><span class="z-text z-plain">    |- 00:00.2 -&gt; ../../../devices/pci0/00:00.2
+</span></code></pre>
+
+    </div>
+  </article>
+  
+  <div class="post-sidebar">
+    <a id="toc-button" class="toc-button">
+      <iconify-icon icon="mdi:menu"></iconify-icon>
+    </a>
+    <nav class="toc-content" id="toc-content">
+      <ul><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-bus-driver-device/#bus">bus</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-bus-driver-device/#ding-yi-zong-xian">定义总线</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-bus-driver-device/#zhu-ce-zong-xian">注册总线</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-bus-driver-device/#she-bei-he-qu-dong-lie-biao">设备和驱动列表</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-bus-driver-device/#qu-dong-pi-pei">驱动匹配</a>
+                  </li></ul>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-bus-driver-device/#device">device</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-bus-driver-device/#zhu-ce-she-bei">注册设备</a>
+                  </li></ul>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-bus-driver-device/#driver">driver</a><ul><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-bus-driver-device/#zhu-ce-qu-dong">注册驱动</a>
+                  </li><li class="toc-h3">
+                    <a href="https://zenlian.github.io/linux-bus-driver-device/#bian-li-she-bei">遍历设备</a>
+                  </li></ul>
+          </li><li class="toc-h2">
+            <a href="https://zenlian.github.io/linux-bus-driver-device/#sysfs-jie-kou">sysfs 接口</a>
+          </li></ul>
+    </nav>
+  </div>
+  
+
+      </div>
+    </main>
+    
+      
+<footer class="footer">
+  <div class="powered-by">
+    Powered by <a href="https://github.com/getzola/zola">Zola</a>
+    | Themed by <a href="https://github.com/ZenLian/ZenLian.github.io/tree/zola/themes/cattery">cattery</a>
+  </div>
+  
+  <div class="site-copyright">
+      <a href="https:&#x2F;&#x2F;creativecommons.org&#x2F;licenses&#x2F;by-nc-sa&#x2F;4.0&#x2F;deed.zh">CC BY-NC-SA 4.0</a>
+  </div>
+  
+  
+  <ul class="socials">
+    
+    <li class="socials-item">
+      <a href="https:&#x2F;&#x2F;github.com&#x2F;zenlian">
+        <iconify-icon icon="mdi:github" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+    <li class="socials-item">
+      <a href="mailto:&#x2F;&#x2F;zeninglian@gmail.com">
+        <iconify-icon icon="mdi:email" class="socials-icon"></iconify-icon>
+      </a>
+    </li>
+    
+  </ul>
+  
+</footer>
+
+    
+  </body>
+
+  <script src="https://zenlian.github.io/js/cattery.js"></script>
+  
+<script src="https://zenlian.github.io/js/page.js"></script>
+
+</html>
