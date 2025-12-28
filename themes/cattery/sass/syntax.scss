@@ -16,67 +16,85 @@
 }
 .z-string,
 .z-constant,
+.z-code {
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-pre));
+}
+
+.z-function {
+  color: rgb(var(--color-blue));
+}
+
+.z-punctuation {
+  color: rgb(var(--color-text));
+}
+
+.z-none {
+  color: rgb(var(--color-text));
+}
+.z-string,
+.z-constant,
 .z-symbol {
-  color: var(--color-green);
+  color: rgb(var(--color-green));
 }
 .z-numeric,
 .z-null {
-  color: var(--color-peach);
+  color: rgb(var(--color-peach));
 }
 
 .z-property {
-  color: var(--color-lavender);
+  color: rgb(var(--color-lavender));
 }
 
 .z-keyword {
-  color: var(--color-mauve);
+  color: rgb(var(--color-mauve));
 }
 .z-operator {
-  color: var(--color-teal);
+  color: rgb(var(--color-teal));
 }
 .z-special-method {
-  color: var(--color-red);
+  color: rgb(var(--color-red));
 }
 
 .z-variable {
-  color: var(--color-text);
+  color: rgb(var(--color-text));
 }
 .z-attribute-name {
-  color: var(--color-blue);
+  color: rgb(var(--color-blue));
 }
 .z-array {
-  color: var(--color-text);
+  color: rgb(var(--color-text));
 }
 
 .z-type,
 .z-storage,
 .z-class {
-  color: var(--color-mauve);
+  color: rgb(var(--color-mauve));
 }
 
 .z-comment {
-  color: var(--color-overlay0);
+  color: rgb(var(--color-overlay0));
 }
 
 .z-invalid,
 .z-illegal {
-  color: var(--color-base);
-  background-color: var(--color-red);
+  color: rgb(var(--color-base));
+  background-color: rgb(var(--color-red));
 }
 .z-deleted {
-  color: var(--color-red);
+  color: rgb(var(--color-red));
 }
 .z-inserted {
-  color: var(--color-green);
+  color: rgb(var(--color-green));
 }
 .z-changed {
-  color: var(--color-blue);
+  color: rgb(var(--color-blue));
 }
 .z-ignored {
-  color: var(--color-overlay0);
+  color: rgb(var(--color-overlay0));
 }
 .z-untracked {
-  color: var(--color-overlay0);
+  color: rgb(var(--color-overlay0));
 }
 
 .z-section,

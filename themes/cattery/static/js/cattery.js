@@ -2,18 +2,23 @@ class ThemeSwitcher {
   constructor() {}
 
   initTheme() {
-    const currentTheme = localStorage.getItem("theme") || "light";
-    if (currentTheme === "light") {
-      document.documentElement.setAttribute("data-theme", "light");
-    } else {
-      document.documentElement.setAttribute("data-theme", "dark");
+    const currentTheme = localStorage.getItem("theme");
+    if (currentTheme === null) {
+      // No stored preference: set to system preference if available.
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        currentTheme = "dark";
+      } else {
+        currentTheme = "light";
+      }
     }
+    // Apply the current theme to the document.
+    document.documentElement.setAttribute("data-theme", currentTheme);
+
     this.updateDom(currentTheme);
   }
 
   switchTheme() {
-    const currentTheme =
-      document.documentElement.getAttribute("data-theme") || "light";
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
     const theme = currentTheme === "light" ? "dark" : "light";
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
@@ -24,11 +29,11 @@ class ThemeSwitcher {
     const light_icon = document.getElementById("theme-switcher-light");
     const dark_icon = document.getElementById("theme-switcher-dark");
     if (mode === "light") {
-      light_icon.style.display = "inline-block";
-      dark_icon.style.display = "none";
+      if (light_icon) light_icon.style.display = "inline-block";
+      if (dark_icon) dark_icon.style.display = "none";
     } else {
-      light_icon.style.display = "none";
-      dark_icon.style.display = "inline-block";
+      if (light_icon) light_icon.style.display = "none";
+      if (dark_icon) dark_icon.style.display = "inline-block";
     }
   }
 }
